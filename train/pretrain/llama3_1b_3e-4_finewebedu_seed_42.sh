@@ -90,7 +90,7 @@ python -u multihost_runner_orig.py \
         use_wandb=True \
         wandb_project=maxtext_1b \
         wandb_run_name=${RUN_NAME} \
-        wandb_run_id=${RUN_NAME}
+        wandb_run_id=${RUN_NAME} \
         packing=true \
         enable_data_shuffling=true \
         data_shuffle_seed=43 \
