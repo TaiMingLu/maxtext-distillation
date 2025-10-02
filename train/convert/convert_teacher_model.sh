@@ -23,7 +23,7 @@ python3.10 -c "import MaxText.generate_param_only_checkpoint as m; print('USING:
 
 # Loop settings
 SEEDS=(42 43)
-CHECKPOINTS=(2499 12499 24999)
+CHECKPOINTS=(2500 12499 24999)
 
 for SEED in "${SEEDS[@]}"; do
   for CHECKPOINT in "${CHECKPOINTS[@]}"; do
