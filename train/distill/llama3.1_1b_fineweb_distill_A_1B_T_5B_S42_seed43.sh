@@ -28,11 +28,18 @@ export LR=3.e-4
 export MIN_LR_RATIO=0.1
 export WARMUP_RATIO=0.05
 export ASYNC_CHECKPOINTING=false
-export BASE_OUTPUT_DIRECTORY="gs://$BUCKET_NAME/ckpts/distill"
+export BASE_OUTPUT_DIRECTORY="gs://$BUCKET_NAME/ckpts/distill_pretrain"
 export DATA_FILES='/home/terry/gcs-bucket/datasets/fineweb-edu/*.array_record'
 
 export RUN_NAME="${MODEL_NAME}_finewebedu_distill_pretrain_A_1B_T_5B_S42_seed43"
 export RUN_ID="llama3-1b_finewebedu_distill_pretrain_A_1B_T_5B_S42_seed43"
+
+# Distillation parameters
+export USE_KD=true
+export KD_ALPHA=0.5
+export KD_TEMPERATURE=1.0
+# export KD_TEACHER_PARAMETERS_PATH="/home/terry/gcs-bucket/model_ckpts/maxtext/llama3.1-1b_seqlen_8192_bs_4_grad_accum_1_lr_2.e-4_min_lr_ratio_0.1_warmup_ratio_0.05_quadratic_warmup/checkpoints/500"
+export KD_TEACHER_PARAMETERS_PATH="/home/terry/gcs-bucket/ckpts/pretrain_param_only/llama3.1-1b_finewebedu_pretrain_shuffled_lr_3e-4_seed_42/checkpoint_2500/0/items"
 
 echo "========================"
 echo "running llama3_1b_fineweb_distill_pretrain_A_1B_T_5B_S42_seed43.sh"
@@ -50,16 +57,14 @@ echo "DATA_FILES: $DATA_FILES"
 echo "RUN_NAME: $RUN_NAME"
 echo "TPU_PREFIX: $TPU_PREFIX"
 echo "BUCKET_NAME: $BUCKET_NAME"
+echo "USE_KD: $USE_KD"
+echo "KD_ALPHA: $KD_ALPHA"
+echo "KD_TEMPERATURE: $KD_TEMPERATURE"
+echo "KD_TEACHER_PARAMETERS_PATH: $KD_TEACHER_PARAMETERS_PATH"
 echo "========================"
 
 wandb login --relogin 01126ae90da25bae0d86704140ac978cb9fd9c73
 
-# Distillation parameters
-export USE_KD=true
-export KD_ALPHA=0.5
-export KD_TEMPERATURE=1.0
-# export KD_TEACHER_PARAMETERS_PATH="/home/terry/gcs-bucket/model_ckpts/maxtext/llama3.1-1b_seqlen_8192_bs_4_grad_accum_1_lr_2.e-4_min_lr_ratio_0.1_warmup_ratio_0.05_quadratic_warmup/checkpoints/500"
-export KD_TEACHER_PARAMETERS_PATH="/home/terry/gcs-bucket/ckpts/pretrain_param_only/llama3.1-1b_finewebedu_pretrain_shuffled_lr_3e-4_seed_42/checkpoint_2500/0/items"
 
 python -u multihost_runner_orig.py \
     --TPU_PREFIX=$TPU_PREFIX \
