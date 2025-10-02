@@ -23,7 +23,7 @@ for var in "${required_vars[@]}"; do
   fi
 done
 
-export MODEL_NAME='llama3-1b'
+export MODEL_NAME='llama3.1-1b'
 export NUM_STEPS=25000
 export SEQ_LEN=8192
 export BATCH_SIZE=4
@@ -36,7 +36,7 @@ export BASE_OUTPUT_DIRECTORY="gs://$BUCKET_NAME/ckpts/pretrain/maxtext"
 export DATA_FILES='/home/terry/gcs-bucket/datasets/fineweb-edu/*.array_record'
 
 export RUN_NAME="${MODEL_NAME}_finewebedu_pretrain_shuffled_lr_3e-4_seed_43"
-
+export RUN_ID="llama3-1b_finewebedu_pretrain_shuffled_lr_3e-4_seed_43"
 
 echo "========================"
 echo "running llama3_8b_1b_3e-4.sh"
@@ -92,7 +92,7 @@ python -u multihost_runner_orig.py \
         use_wandb=True \
         wandb_project=maxtext_1b \
         wandb_run_name=${RUN_NAME} \
-        wandb_run_id=${RUN_NAME} \
+        wandb_run_id=${RUN_ID} \
         packing=true \
         enable_data_shuffling=true \
         data_shuffle_seed=43 \
