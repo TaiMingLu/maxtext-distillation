@@ -28,7 +28,7 @@ CHECKPOINTS=(2500 12500 24999)
 for SEED in "${SEEDS[@]}"; do
   for CHECKPOINT in "${CHECKPOINTS[@]}"; do
     LOAD_PATH="$BASE_BUCKET/pretrain/maxtext/llama3.1-1b_finewebedu_pretrain_shuffled_lr_3e-4_seed_${SEED}/checkpoints/${CHECKPOINT}/items"
-    OUT_DIR="$BASE_BUCKET/taiming_us_central2_b/ckpts/pretrain_param_only/llama3.1-1b_finewebedu_pretrain_shuffled_lr_3e-4_seed_${SEED}"
+    OUT_DIR="$BASE_BUCKET/ckpts/pretrain_param_only/llama3.1-1b_finewebedu_pretrain_shuffled_lr_3e-4_seed_${SEED}/checkpoint_${CHECKPOINT}"
 
     echo "========================"
     echo "Seed: ${SEED}"
