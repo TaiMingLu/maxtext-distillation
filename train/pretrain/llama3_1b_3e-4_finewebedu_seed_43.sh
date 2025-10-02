@@ -61,7 +61,6 @@ wandb login --relogin 01126ae90da25bae0d86704140ac978cb9fd9c73
 python -u multihost_runner_orig.py \
     --TPU_PREFIX=$TPU_PREFIX \
     --INTERNAL_IP=true \
-    --SCRIPT_DIR="${SCRIPT_ROOT_DIR}" \
     --COMMAND="
     export TPU_LOG_DIR=/home/terry/tpu_logs
     source ~/maxtext_env/bin/activate
@@ -73,7 +72,7 @@ python -u multihost_runner_orig.py \
         base_output_directory=${BASE_OUTPUT_DIRECTORY} \
         dataset_type=grain \
         grain_train_files=${DATA_FILES} \
-        grain_file_type=arrayrecord \
+        grain_file_type='arrayrecord' \
         grain_worker_count=1 \
         tokenize_train_data=False \
         tokenize_eval_data=False \
