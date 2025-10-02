@@ -21,6 +21,7 @@ limitations under the License.
 import json
 import os
 import queue
+from typing import List, Dict, Any
 
 import numpy as np
 
@@ -61,6 +62,11 @@ class MetricLogger:
     
     # Enable Weights & Biases on process 0 only if requested.
     self.use_wandb = getattr(config, "use_wandb", False) and jax.process_index() == 0
+    # Internal flags for optional W&B relog/backfill behavior
+    self._wandb_relog_requested = False
+    self._wandb_relog_done = False
+    self._wandb_relog_source = None  # 'gcs', 'tensorboard', or 'auto'
+
     if self.use_wandb:
       try:
         import wandb  # type: ignore
@@ -75,9 +81,37 @@ class MetricLogger:
         except Exception:
           cfg_dict = None
 
-        wandb.init(project=getattr(config, "wandb_project", ""),
-                   name=getattr(config, "wandb_run_name", ""),
-                   config=cfg_dict)
+        # Support env var overrides so we don't require config edits.
+        # Project/name can come from config or env (WANDB_PROJECT, WANDB_NAME).
+        project = getattr(config, "wandb_project", "") or os.environ.get("WANDB_PROJECT", "")
+        name = getattr(config, "wandb_run_name", "") or os.environ.get("WANDB_NAME", "")
+        # Support resuming into the same run to keep a single continuous curve.
+        # If provided, use a fixed run id and a resume policy (e.g. "allow" or "must").
+        run_id = getattr(config, "wandb_run_id", "") or os.environ.get("WANDB_RUN_ID")
+        resume_policy = getattr(config, "wandb_resume", None) or os.environ.get("WANDB_RESUME")
+
+        # Special relog mode: backfill from history before continuing.
+        # We convert the policy to 'allow' for wandb.init and set a flag to run backfill once.
+        if resume_policy == "relog":
+          self._wandb_relog_requested = True
+          # default relog source is gcs; can override via CLI or env
+          self._wandb_relog_source = (
+              getattr(config, "wandb_relog_source", None)
+              or os.environ.get("WANDB_RELOG_SOURCE", "gcs")
+          )
+          resume_policy = "allow"
+
+        init_kwargs = dict(
+            project=project,
+            name=name,
+            config=cfg_dict,
+        )
+        if run_id:
+            init_kwargs["id"] = run_id
+        if resume_policy:
+            init_kwargs["resume"] = resume_policy
+
+        wandb.init(**init_kwargs)
         # Stash module for later usage without re-importing
         self._wandb = wandb
       except Exception:  # pylint: disable=broad-except
@@ -87,6 +121,14 @@ class MetricLogger:
   def write_metrics(self, metrics, step, is_training=True):
     """Entry point for all metrics writing in Train's Main."""
     if metrics:
+      # Perform an optional one-time backfill to W&B if requested.
+      if self.use_wandb and self._wandb_relog_requested and not self._wandb_relog_done and jax.process_index() == 0:
+        try:
+          self._maybe_wandb_relog(int(step))
+        except Exception:
+          # Never break training due to relog failures; just continue.
+          pass
+
       self.log_metrics(metrics, step, is_training)
 
       if self.config.enable_tensorboard:
@@ -210,6 +252,142 @@ class MetricLogger:
         flat_metrics[f"{key}/{subkey}"] = float(subval)
     # Use cached module reference to avoid global import
     self._wandb.log(flat_metrics, step=step)
+
+  # -------------------
+  # W&B relog helpers
+  # -------------------
+  def _maybe_wandb_relog(self, current_step: int):
+    """Backfill historical metrics into W&B once, before continuing logging.
+
+    Only runs on process 0. Safe to call multiple times; executes once.
+    """
+    if self._wandb_relog_done:
+      return
+    source = (self._wandb_relog_source or "gcs").lower()
+    if source == "auto":
+      did = self._wandb_try_gcs(current_step)
+      if not did:
+        self._wandb_try_tensorboard(current_step)
+    elif source == "gcs":
+      self._wandb_try_gcs(current_step)
+    elif source == "tensorboard":
+      self._wandb_try_tensorboard(current_step)
+    self._wandb_relog_done = True
+
+  def _wandb_try_gcs(self, current_step: int) -> bool:
+    """Reads metric JSONL files from GCS metrics_dir and logs them to W&B.
+
+    Only logs entries with step < current_step to avoid duplication.
+    """
+    try:
+      from google.cloud import storage  # Lazy import
+    except Exception:
+      return False
+
+    metrics_dir = getattr(self.config, "metrics_dir", "")
+    if not metrics_dir or not metrics_dir.startswith("gs://"):
+      return False
+
+    try:
+      storage_client = storage.Client()
+      # Parse bucket and prefix
+      from MaxText.utils.gcs_utils import parse_gcs_bucket_and_prefix, add_trailing_slash
+      bucket_name, prefix = parse_gcs_bucket_and_prefix(metrics_dir)
+      prefix = add_trailing_slash(prefix)
+      bucket = storage_client.bucket(bucket_name)
+
+      # List all metric files under metrics_dir
+      blobs = storage_client.list_blobs(bucket_name, prefix=prefix)
+      entries: List[Dict[str, Any]] = []
+      for blob in blobs:
+        name = blob.name
+        if not name.endswith('.txt'):
+          continue
+        try:
+          content = blob.download_as_text()
+          for line in content.splitlines():
+            line = line.strip()
+            if not line:
+              continue
+            try:
+              rec = json.loads(line)
+              step_val = int(rec.get("step", -1))
+              if step_val >= 0 and step_val < int(current_step):
+                # Remove non-metric fields
+                rec = {k: v for k, v in rec.items() if k not in ("step", "run_name")}
+                entries.append({"step": step_val, "metrics": rec})
+            except Exception:
+              continue
+        except Exception:
+          continue
+
+      if not entries:
+        return False
+      # Sort by step and de-dup by step keeping last occurrence
+      entries.sort(key=lambda x: x["step"]) 
+      dedup: Dict[int, Dict[str, float]] = {}
+      for e in entries:
+        dedup[e["step"]] = e["metrics"]
+
+      for step_val in sorted(dedup.keys()):
+        self._wandb.log(dedup[step_val], step=int(step_val))
+      return True
+    except Exception:
+      # Silent failure, training should proceed
+      return False
+
+  def _wandb_try_tensorboard(self, current_step: int) -> bool:
+    """Parses TensorBoard event files and logs scalars to W&B.
+
+    Looks under {tensorboard_dir}/{run_name} unless overridden by WANDB_RELOG_TB_DIR.
+    Only logs entries with step < current_step.
+    """
+    try:
+      from tensorboard.backend.event_processing.event_accumulator import EventAccumulator  # type: ignore
+    except Exception:
+      return False
+
+    # Determine TB directory
+    tb_dir_override = os.environ.get("WANDB_RELOG_TB_DIR")
+    if tb_dir_override:
+      tb_dir = tb_dir_override
+    else:
+      base = getattr(self.config, "tensorboard_dir", "")
+      run_name = getattr(self.config, "run_name", "")
+      if not base or not run_name:
+        return False
+      tb_dir = os.path.join(base, run_name)
+
+    try:
+      ea = EventAccumulator(tb_dir)
+      ea.Reload()
+    except Exception:
+      return False
+
+    try:
+      scalar_tags = list(ea.Tags().get('scalars', []))
+      if not scalar_tags:
+        return False
+
+      # Aggregate by step
+      by_step: Dict[int, Dict[str, float]] = {}
+      for tag in scalar_tags:
+        for ev in ea.Scalars(tag):
+          step_val = int(ev.step)
+          if step_val >= int(current_step):
+            continue
+          d = by_step.setdefault(step_val, {})
+          # tensorboard tags are already hierarchical; keep as-is
+          d[tag] = float(ev.value)
+
+      if not by_step:
+        return False
+
+      for step_val in sorted(by_step.keys()):
+        self._wandb.log(by_step[step_val], step=int(step_val))
+      return True
+    except Exception:
+      return False
 
   def write_setup_info_to_tensorboard(self, params):
     """Writes setup information like train config params, num model params, and XLA flags to TensorBoard."""

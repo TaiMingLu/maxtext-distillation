@@ -876,7 +876,13 @@ def train_loop(config, recorder, state=None):
       step_time_delta = datetime.datetime.now() - last_step_completion
       last_step_completion = datetime.datetime.now()
 
-      state_to_save = state if not config.use_dpo else _split_dpo_state(state)[0]
+      # Exclude auxiliary params (DPO/KD) from checkpoints to keep TrainState
+      # structure consistent with the abstract state used by the checkpointer.
+      state_to_save = state
+      if getattr(config, "use_dpo", False):
+        state_to_save = _split_dpo_state(state_to_save)[0]
+      if getattr(config, "use_kd", False):
+        state_to_save = _split_kd_state(state_to_save)[0]
       checkpointing.maybe_save_checkpoint(checkpoint_manager, state_to_save, config, data_iterator, step)
 
       if config.dump_hlo and step == (config.dump_step if config.dump_step >= 0 else start_step):
@@ -913,7 +919,12 @@ def train_loop(config, recorder, state=None):
 
       metric_logger.buffer_and_write_train_metrics(metrics, step, step_time_delta)
 
-    state_to_save = state if not config.use_dpo else _split_dpo_state(state)[0]
+    # Final save: also strip auxiliary params (DPO/KD) before checkpointing.
+    state_to_save = state
+    if getattr(config, "use_dpo", False):
+      state_to_save = _split_dpo_state(state_to_save)[0]
+    if getattr(config, "use_kd", False):
+      state_to_save = _split_kd_state(state_to_save)[0]
     checkpointing.maybe_save_checkpoint(checkpoint_manager, state_to_save, config, data_iterator)
   except exceptions.StopTraining as e:
     max_logging.log(f"Training stopped: {str(e)}")
