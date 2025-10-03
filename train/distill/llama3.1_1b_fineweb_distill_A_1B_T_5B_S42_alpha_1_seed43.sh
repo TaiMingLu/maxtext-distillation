@@ -63,6 +63,7 @@ echo "USE_KD: $USE_KD"
 echo "KD_ALPHA: $KD_ALPHA"
 echo "KD_TEMPERATURE: $KD_TEMPERATURE"
 echo "KD_TEACHER_PARAMETERS_PATH: $KD_TEACHER_PARAMETERS_PATH"
+echo "start time: $(date)"
 echo "========================"
 
 wandb login --relogin 01126ae90da25bae0d86704140ac978cb9fd9c73
