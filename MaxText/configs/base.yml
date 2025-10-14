@@ -451,6 +451,10 @@ kd_alpha: 0.5
 kd_temperature: 1.0
 kd_teacher_parameters_path: ""
 kd_teacher_model_name: ""  # Optional: set to use a different teacher architecture preset (defaults to student model_name)
+kd_top_k: 0
+kd_top_p: 0.0
+kd_use_other_bucket: False
+kd_use_hard_labels: False
 
 # Supervised Fine-Tuning (SFT)
 use_sft: False

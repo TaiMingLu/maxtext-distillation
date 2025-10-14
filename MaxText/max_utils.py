@@ -24,7 +24,7 @@ import socket
 import subprocess
 import collections
 from collections.abc import Sequence
-from typing import Any, Tuple
+from typing import Any, Optional, Tuple
 from functools import partial
 
 import numpy as np
@@ -646,26 +646,101 @@ def _cross_entropy_with_logits_bwd(
 cross_entropy_with_logits.defvjp(_cross_entropy_with_logits_fwd, _cross_entropy_with_logits_bwd)
 
 
-def kl_divergence_between_logits(student_logits: jnp.ndarray, teacher_logits: jnp.ndarray, temperature: float) -> jnp.ndarray:
+def kl_divergence_between_logits(
+    student_logits: jnp.ndarray,
+    teacher_logits: jnp.ndarray,
+    temperature: float,
+    top_k: Optional[int] = None,
+    top_p: Optional[float] = None,
+    use_other_bucket: bool = False,
+) -> jnp.ndarray:
   """Computes per-position KL(teacher || student) between two logit tensors.
 
   Both inputs have shape [..., vocab]. The return value is the KL per position
-  with the last dimension reduced, i.e., shape [...].
+  with the last dimension reduced, i.e., shape [...]. When ``top_k`` or
+  ``top_p`` are provided, the teacher distribution is truncated before
+  computing the KL, either by renormalizing the kept mass or by aggregating the
+  discarded mass into a single "OTHER" bucket.
 
   Args:
     student_logits: Logits from the student model.
     teacher_logits: Logits from the teacher model.
     temperature: Temperature used to soften both distributions.
+    top_k: If set, keep only the ``top_k`` teacher tokens per position.
+    top_p: If set, keep the smallest teacher token set whose cumulative mass is
+      at least ``top_p``.
+    use_other_bucket: When truncating, aggregate the discarded probability mass
+      into a single "OTHER" bucket instead of renormalizing over the kept set.
 
   Returns:
     KL divergence per position with the last dimension reduced.
   """
+
   inv_t = 1.0 / temperature
   student_log_probs = jax.nn.log_softmax(student_logits * inv_t, axis=-1)
-  teacher_log_probs = jax.nn.log_softmax(teacher_logits * inv_t, axis=-1)
-  teacher_probs = jnp.exp(teacher_log_probs)
-  # KL(teacher || student) = sum p_t * (log p_t - log p_s)
-  return jnp.sum(teacher_probs * (teacher_log_probs - student_log_probs), axis=-1)
+  teacher_log_probs_full = jax.nn.log_softmax(teacher_logits * inv_t, axis=-1)
+  teacher_probs_full = jnp.exp(teacher_log_probs_full)
+
+  # Normalize configuration defaults.
+  vocab_size = teacher_probs_full.shape[-1]
+  if top_k is not None and top_k <= 0:
+    top_k = None
+  if top_k is not None and top_k >= vocab_size:
+    top_k = None
+  if top_p is not None and top_p <= 0.0:
+    top_p = None
+  if top_p is not None and top_p >= 1.0:
+    top_p = None
+
+  if top_k is None and top_p is None:
+    return jnp.sum(
+        teacher_probs_full * (teacher_log_probs_full - student_log_probs),
+        axis=-1,
+    )
+
+  probs_shape = teacher_probs_full.shape
+  flat_teacher_probs = teacher_probs_full.reshape((-1, vocab_size))
+
+  def _scatter_mask(indices: jnp.ndarray, values: jnp.ndarray) -> jnp.ndarray:
+    row_ids = jnp.arange(indices.shape[0])[:, None]
+    mask = jnp.zeros_like(flat_teacher_probs, dtype=bool)
+    return mask.at[row_ids, indices].set(values)
+
+  if top_k is not None:
+    k = int(top_k)
+    _, top_indices = jax.lax.top_k(flat_teacher_probs, k)
+    mask_flat = _scatter_mask(top_indices, jnp.ones_like(top_indices, dtype=bool))
+  else:
+    sorted_probs, sorted_indices = jax.lax.top_k(flat_teacher_probs, vocab_size)
+    cumulative = jnp.cumsum(sorted_probs, axis=-1)
+    prev_cumulative = cumulative - sorted_probs
+    keep_sorted = prev_cumulative < float(top_p)
+    mask_flat = _scatter_mask(sorted_indices, keep_sorted)
+
+  mask = mask_flat.reshape(probs_shape)
+  full_dtype = teacher_probs_full.dtype
+  mask_f = mask.astype(full_dtype)
+  eps = jnp.finfo(full_dtype).eps
+
+  if use_other_bucket:
+    kept_teacher_probs = teacher_probs_full * mask_f
+    teacher_other_prob = jnp.sum(teacher_probs_full * (1.0 - mask_f), axis=-1)
+    teacher_other_log_prob = jnp.log(jnp.maximum(teacher_other_prob, eps))
+
+    student_probs = jnp.exp(student_log_probs)
+    student_other_prob = jnp.sum(student_probs * (1.0 - mask_f), axis=-1)
+    student_other_log_prob = jnp.log(jnp.maximum(student_other_prob, eps))
+
+    kl_kept = jnp.sum(kept_teacher_probs * (teacher_log_probs_full - student_log_probs), axis=-1)
+    kl_other = teacher_other_prob * (teacher_other_log_prob - student_other_log_prob)
+    return kl_kept + kl_other
+
+  masked_probs = teacher_probs_full * mask_f
+  denom = jnp.sum(masked_probs, axis=-1, keepdims=True)
+  denom = jnp.maximum(denom, eps)
+  renorm_teacher_probs = masked_probs / denom
+  renorm_teacher_log_probs = jnp.log(jnp.maximum(renorm_teacher_probs, eps))
+  return jnp.sum(renorm_teacher_probs * (renorm_teacher_log_probs - student_log_probs), axis=-1)
 
 
 def print_pytree_shape(print_str, ptree):

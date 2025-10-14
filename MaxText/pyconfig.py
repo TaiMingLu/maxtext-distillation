@@ -178,6 +178,14 @@ def validate_keys(keys):
     assert keys.get("kd_teacher_parameters_path", ""), (
         "use_kd=True requires kd_teacher_parameters_path to be set to a valid checkpoint path"
     )
+    top_k = keys.get("kd_top_k", 0)
+    top_p = keys.get("kd_top_p", 0.0)
+    if top_k < 0:
+      raise ValueError("kd_top_k must be >= 0")
+    if top_p < 0.0 or top_p > 1.0:
+      raise ValueError("kd_top_p must be within [0, 1]")
+    if top_k > 0 and top_p > 0.0:
+      raise ValueError("kd_top_k and kd_top_p are mutually exclusive; set only one of them.")
 
   assert (keys["load_parameters_path"] == "" and keys["load_full_state_path"] == "") or keys[
       "enable_checkpointing"

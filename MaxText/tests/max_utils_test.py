@@ -101,5 +101,57 @@ class MaxUtilsCustomMesh(unittest.TestCase):
       max_utils.is_valid_custom_mesh([1, 1, 1, 1, 1, 16, 16, 1], "invalid_strategy")
 
 
+class KlDivergenceBetweenLogitsTest(unittest.TestCase):
+  """Tests for KL divergence with optional teacher truncation."""
+
+  def test_topk_truncation_renormalize(self):
+    student_probs = jnp.array([0.4, 0.4, 0.2], dtype=jnp.float32)
+    teacher_probs = jnp.array([0.6, 0.3, 0.1], dtype=jnp.float32)
+    student_logits = jnp.log(student_probs).reshape(1, 1, -1)
+    teacher_logits = jnp.log(teacher_probs).reshape(1, 1, -1)
+
+    actual = max_utils.kl_divergence_between_logits(student_logits, teacher_logits, temperature=1.0, top_k=2)
+    actual_val = float(actual[0, 0])
+
+    renorm_teacher = jnp.array([2.0 / 3.0, 1.0 / 3.0], dtype=jnp.float32)
+    expected_val = float(
+        jnp.sum(
+            renorm_teacher
+            * (
+                jnp.log(renorm_teacher)
+                - jnp.log(student_probs[:2])
+            )
+        )
+    )
+
+    self.assertAlmostEqual(actual_val, expected_val, places=6)
+
+  def test_topp_with_other_bucket(self):
+    student_probs = jnp.array([0.45, 0.25, 0.2, 0.1], dtype=jnp.float32)
+    teacher_probs = jnp.array([0.5, 0.25, 0.15, 0.1], dtype=jnp.float32)
+    student_logits = jnp.log(student_probs).reshape(1, 1, -1)
+    teacher_logits = jnp.log(teacher_probs).reshape(1, 1, -1)
+
+    actual = max_utils.kl_divergence_between_logits(
+        student_logits,
+        teacher_logits,
+        temperature=1.0,
+        top_p=0.7,
+        use_other_bucket=True,
+    )
+    actual_val = float(actual[0, 0])
+
+    expected_kept = float(
+        0.5 * (jnp.log(0.5) - jnp.log(0.45))
+        + 0.25 * (jnp.log(0.25) - jnp.log(0.25))
+    )
+    teacher_other = 0.15 + 0.1
+    student_other = 0.2 + 0.1
+    expected_other = float(teacher_other * (jnp.log(teacher_other) - jnp.log(student_other)))
+    expected_val = expected_kept + expected_other
+
+    self.assertAlmostEqual(actual_val, expected_val, places=6)
+
+
 if __name__ == "__main__":
   unittest.main()

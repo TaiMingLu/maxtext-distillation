@@ -320,21 +320,45 @@ def kd_loss_fn(model, config, data, dropout_rng, params, teacher_params, is_trai
   )
   teacher_logits = jax.lax.stop_gradient(teacher_logits)
 
+  target_mask = data["targets_segmentation"] != 0
   one_hot_targets = jax.nn.one_hot(data["targets"], config.vocab_size)
   xent, _ = max_utils.cross_entropy_with_logits(logits, one_hot_targets, 0.0)
   xent = nn.with_logical_constraint(xent, ("activation_embed_and_logits_batch", "activation_length"))
-  xent = xent * (data["targets_segmentation"] != 0)
+  xent = xent * target_mask
   total_ce = jnp.sum(xent)
-  total_weights = jnp.sum(data["targets_segmentation"] != 0)
+  total_weights = jnp.sum(target_mask)
   hard_loss = total_ce / (total_weights + EPS)
 
   # KD term (sum over vocab, mask over sequence) with T^2 scaling.
   kd_temperature = getattr(config, "kd_temperature", 1.0)
   kd_alpha = getattr(config, "kd_alpha", 0.5)
-  kd_kl = max_utils.kl_divergence_between_logits(logits, teacher_logits, kd_temperature)
-  kd_kl = kd_kl * (data["targets_segmentation"] != 0)
-  total_kd = jnp.sum(kd_kl)
-  kd_loss = (total_kd / (total_weights + EPS)) * (kd_temperature * kd_temperature)
+  kd_top_k = getattr(config, "kd_top_k", 0)
+  kd_top_p = getattr(config, "kd_top_p", 0.0)
+  kd_use_other_bucket = getattr(config, "kd_use_other_bucket", False)
+  kd_use_hard_labels = getattr(config, "kd_use_hard_labels", False)
+
+  if kd_use_hard_labels:
+    teacher_argmax = jnp.argmax(teacher_logits, axis=-1)
+    teacher_targets = jax.nn.one_hot(teacher_argmax, config.vocab_size)
+    kd_xent, _ = max_utils.cross_entropy_with_logits(logits, teacher_targets, 0.0)
+    kd_xent = nn.with_logical_constraint(kd_xent, ("activation_embed_and_logits_batch", "activation_length"))
+    kd_xent = kd_xent * target_mask
+    total_kd = jnp.sum(kd_xent)
+    kd_loss = total_kd / (total_weights + EPS)
+  else:
+    top_k_arg = int(kd_top_k) if kd_top_k and kd_top_k > 0 else None
+    top_p_arg = float(kd_top_p) if kd_top_p and kd_top_p > 0.0 else None
+    kd_kl = max_utils.kl_divergence_between_logits(
+        logits,
+        teacher_logits,
+        kd_temperature,
+        top_k=top_k_arg,
+        top_p=top_p_arg,
+        use_other_bucket=kd_use_other_bucket,
+    )
+    kd_kl = kd_kl * target_mask
+    total_kd = jnp.sum(kd_kl)
+    kd_loss = (total_kd / (total_weights + EPS)) * (kd_temperature * kd_temperature)
 
   loss = (1.0 - kd_alpha) * hard_loss + kd_alpha * kd_loss
 
