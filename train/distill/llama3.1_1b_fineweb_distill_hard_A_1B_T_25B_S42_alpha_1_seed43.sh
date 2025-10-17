@@ -40,8 +40,8 @@ export KD_TEACHER_PARAMETERS_PATH="/home/terry/gcs-bucket/ckpts/pretrain_param_o
 export BASE_OUTPUT_DIRECTORY="gs://$BUCKET_NAME/ckpts/distill_pretrain"
 export DATA_FILES='/home/terry/gcs-bucket/datasets/fineweb-edu/*.array_record'
 
-export RUN_NAME="${MODEL_NAME}_finewebedu_distill_hard_pretrain_A_1B_T_25B_S42_alpha_1_seed43"
-export RUN_ID="llama3-1b_finewebedu_distill_hard_pretrain_A_1B_T_25B_S42_alpha_1_seed43"
+export RUN_NAME="${MODEL_NAME}_finewebedu_distill_hard_pretrain_A_1B_T_50B_S42_alpha_1_seed43"
+export RUN_ID="llama3-1b_finewebedu_distill_hard_pretrain_A_1B_T_50B_S42_alpha_1_seed43"
 
 # Distillation parameters
 
