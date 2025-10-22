@@ -33,10 +33,10 @@ export MIN_LR_RATIO=0.1
 export WARMUP_RATIO=0.05
 export ASYNC_CHECKPOINTING=false
 export BASE_OUTPUT_DIRECTORY="gs://$BUCKET_NAME/ckpts/pretrain/maxtext"
-export DATA_FILES='/home/terry/gcs-bucket/datasets/fineweb-edu/*.array_record'
+export DATA_FILES='/home/terry/gcs-bucket/datasets/commoncrawl/cc_wet_tokenized/*.array_record'
 
-export RUN_NAME="${MODEL_NAME}_finewebedu_pretrain_shuffled_lr_3e-4_seed_42"
-export RUN_ID="llama3-1b_finewebedu_pretrain_shuffled_lr_3e-4_seed_42"
+export RUN_NAME="${MODEL_NAME}_commoncrawl_pretrain_shuffled_lr_3e-4_seed_43"
+export RUN_ID="llama3-1b_commoncrawl_pretrain_shuffled_lr_3e-4_seed_43"
 
 echo "========================"
 echo "running llama3_8b_1b_3e-4.sh"
@@ -93,8 +93,8 @@ python -u multihost_runner_orig.py \
         wandb_run_id=${RUN_ID} \
         packing=true \
         enable_data_shuffling=true \
-        data_shuffle_seed=42 \
-        init_weights_seed=42 \
+        data_shuffle_seed=43 \
+        init_weights_seed=43 \
         wandb_resume=relog \
         wandb_relog_source=auto \
     "
