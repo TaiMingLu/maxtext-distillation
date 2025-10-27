@@ -21,6 +21,8 @@ export JAX_DISABLE_MOST_OPTIMIZATIONS=False
 
 cd ~/maxtext
 
+export TPU_PREFIX="taiming-v4-128"
+
 export PYTHONPATH=$(pwd):$PYTHONPATH
 python -u multihost_runner_orig.py \
     --TPU_PREFIX=$TPU_PREFIX \
