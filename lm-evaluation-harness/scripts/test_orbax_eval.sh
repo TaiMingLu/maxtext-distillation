@@ -43,7 +43,7 @@ python -u multihost_runner_orig.py \
     model_name=$MODEL \
     force_unroll=true"
 
-cd lm-evaluation-harness
+cd ~/maxtext
 export PYTHONPATH=$(pwd):$PYTHONPATH
 python -u multihost_runner_orig.py \
     --TPU_PREFIX=$TPU_PREFIX \
