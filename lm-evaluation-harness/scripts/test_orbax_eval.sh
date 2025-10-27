@@ -22,18 +22,38 @@ export JAX_DISABLE_MOST_OPTIMIZATIONS=False
 cd ~/maxtext
 
 export PYTHONPATH=$(pwd):$PYTHONPATH
-python3 -m MaxText.generate_param_only_checkpoint \
+python -u multihost_runner_orig.py \
+    --TPU_PREFIX=$TPU_PREFIX \
+    --INTERNAL_IP=true \
+    --COMMAND="
+    cd ~/maxtext
+    export TPU_LOG_DIR=/home/terry/tpu_logs
+    source ~/maxtext_env/bin/activate
+    export WANDB_API_KEY='01126ae90da25bae0d86704140ac978cb9fd9c73'
+    export WANDB_PROJECT=maxtext_1b
+    export WANDB_NAME=${RUN_NAME}
+    python3.10 -u -m MaxText.generate_param_only_checkpoint \
     MaxText/configs/base.yml \
     checkpoint_dir=${BASE_OUTPUT_DIRECTORY} \
     base_output_directory=${BASE_OUTPUT_DIRECTORY} \
     load_parameters_path=${CHECKPOINT_TO_CONVERT} \
     run_name=${DIRECT_PARAMETER_CHECKPOINT_RUN} \
     model_name=$MODEL \
-    force_unroll=true
+    force_unroll=true"
 
 cd lm-evaluation-harness
 export PYTHONPATH=$(pwd):$PYTHONPATH
-python3 -u scripts/test_orbax_eval.py \
+python -u multihost_runner_orig.py \
+    --TPU_PREFIX=$TPU_PREFIX \
+    --INTERNAL_IP=true \
+    --COMMAND="
+    cd ~/maxtext/lm-evaluation-harness
+    export TPU_LOG_DIR=/home/terry/tpu_logs
+    source ~/maxtext_env/bin/activate
+    export WANDB_API_KEY='01126ae90da25bae0d86704140ac978cb9fd9c73'
+    export WANDB_PROJECT=maxtext_1b
+    export WANDB_NAME=${RUN_NAME}
+    python3.10 -u -m scripts/test_orbax_eval.py \
     ../MaxText/configs/base.yml \
     load_parameters_path=${UNSCANNED_CKPT_PATH} \
     run_name=forward_pass_test \
@@ -46,4 +66,4 @@ python3 -u scripts/test_orbax_eval.py \
     scan_layers=false \
     attention="dot_product" \
     --hf_model_path=${HF_MODEL_PATH} \
-    --add_special_tokens=False
+    --add_special_tokens=False"
