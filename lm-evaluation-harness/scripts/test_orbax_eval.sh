@@ -34,13 +34,12 @@ python -u multihost_runner_orig.py \
     export WANDB_API_KEY='01126ae90da25bae0d86704140ac978cb9fd9c73'
     export WANDB_PROJECT=maxtext_1b
     export WANDB_NAME=${RUN_NAME}
-    python3.10 -u -m MaxText.generate_param_only_checkpoint \
-    MaxText/configs/base.yml \
-    checkpoint_dir=${BASE_OUTPUT_DIRECTORY} \
-    base_output_directory=${BASE_OUTPUT_DIRECTORY} \
-    load_parameters_path=${CHECKPOINT_TO_CONVERT} \
-    run_name=${DIRECT_PARAMETER_CHECKPOINT_RUN} \
-    model_name=$MODEL \
+    python3.10 -u -m MaxText.generate_param_only_checkpoint MaxText/configs/base.yml \
+        checkpoint_dir=${BASE_OUTPUT_DIRECTORY} \
+        base_output_directory=${BASE_OUTPUT_DIRECTORY} \
+        load_parameters_path=${CHECKPOINT_TO_CONVERT} \
+        run_name=${DIRECT_PARAMETER_CHECKPOINT_RUN} \
+        model_name=$MODEL \
     force_unroll=true"
 
 cd ~/maxtext
@@ -55,17 +54,17 @@ python -u multihost_runner_orig.py \
     export WANDB_API_KEY='01126ae90da25bae0d86704140ac978cb9fd9c73'
     export WANDB_PROJECT=maxtext_1b
     export WANDB_NAME=${RUN_NAME}
-    python3.10 -u -m scripts/test_orbax_eval.py \
-    ../MaxText/configs/base.yml \
-    load_parameters_path=${UNSCANNED_CKPT_PATH} \
-    run_name=forward_pass_test \
-    per_device_batch_size=1 \
-    model_name=${MODEL} \
-    max_prefill_predict_length=4 \
-    max_target_length=8192 \
-    dataset_type=synthetic \
-    dtype=bfloat16 \
-    scan_layers=false \
-    attention="dot_product" \
-    --hf_model_path=${HF_MODEL_PATH} \
-    --add_special_tokens=False"
+    python3.10 -u -m scripts/test_orbax_eval.py ../MaxText/configs/base.yml \
+        load_parameters_path=${UNSCANNED_CKPT_PATH} \
+        run_name=forward_pass_test \
+        per_device_batch_size=1 \
+        model_name=${MODEL} \
+        max_prefill_predict_length=4 \
+        max_target_length=8192 \
+        dataset_type=synthetic \
+        dtype=bfloat16 \
+        scan_layers=false \
+        attention="dot_product" \
+        --hf_model_path=${HF_MODEL_PATH} \
+        --add_special_tokens=False
+    "
