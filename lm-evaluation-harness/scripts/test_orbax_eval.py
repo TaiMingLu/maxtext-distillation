@@ -31,6 +31,85 @@ from jax.experimental import mesh_utils
 
 import math
 
+def _human_readable_bytes(num_bytes):
+    units = ["B", "KiB", "MiB", "GiB", "TiB"]
+    size = float(num_bytes)
+    unit_idx = 0
+    while size >= 1024.0 and unit_idx < len(units) - 1:
+        size /= 1024.0
+        unit_idx += 1
+    return f"{size:.2f} {units[unit_idx]}"
+
+def print_device_memory(note=""):
+    try:
+        devices = jax.devices()
+    except Exception:
+        devices = []
+    try:
+        backend = jax.default_backend()
+    except Exception:
+        backend = "unknown"
+    header = f"[Device Memory]{' ' + note if note else ''} | backend={backend} | devices={len(devices)}"
+    print(header)
+    for dev in devices:
+        # Compose a friendly name
+        dev_kind = getattr(dev, "device_kind", getattr(dev, "kind", ""))
+        dev_name = f"{getattr(dev, 'platform', 'unknown')}:{getattr(dev, 'id', '?')} ({dev_kind})"
+
+        printed = False
+        # Preferred: memory_stats() if available (often on TPU)
+        try:
+            if hasattr(dev, "memory_stats"):
+                stats = dev.memory_stats()
+                if isinstance(stats, dict) and stats:
+                    in_use = stats.get("bytes_in_use") or stats.get("kb_in_use", 0) * 1024
+                    peak = stats.get("peak_bytes_in_use") or stats.get("peak_kb_in_use", 0) * 1024
+                    total = stats.get("total_memory") or stats.get("kb_total", 0) * 1024
+                    parts = []
+                    if in_use:
+                        parts.append(f"in_use={_human_readable_bytes(in_use)}")
+                    if peak:
+                        parts.append(f"peak={_human_readable_bytes(peak)}")
+                    if total:
+                        parts.append(f"total={_human_readable_bytes(total)}")
+                    if parts:
+                        print(f"  {dev_name}: " + ", ".join(parts))
+                        printed = True
+        except Exception:
+            pass
+
+        # Fallbacks commonly available on GPU/others
+        if not printed:
+            alloc = None
+            limit = None
+            try:
+                if hasattr(dev, "memory_allocated"):
+                    alloc = dev.memory_allocated()
+            except Exception:
+                pass
+            try:
+                if hasattr(dev, "memory_limit"):
+                    limit = dev.memory_limit()
+            except Exception:
+                pass
+            try:
+                if limit is None and hasattr(dev, "total_memory"):
+                    limit = dev.total_memory()
+            except Exception:
+                pass
+
+            if alloc is not None or limit is not None:
+                parts = []
+                if alloc is not None:
+                    parts.append(f"in_use={_human_readable_bytes(int(alloc))}")
+                if limit is not None:
+                    parts.append(f"total={_human_readable_bytes(int(limit))}")
+                print(f"  {dev_name}: " + ", ".join(parts))
+                printed = True
+
+        if not printed:
+            print(f"  {dev_name}: memory stats unavailable")
+
 def str2bool(v):
     if isinstance(v, bool):
         return v
@@ -216,8 +295,10 @@ def get_ppl(
     if task_range:
         tasks = [t for t in tasks if t in task_range]
     
+    print(f"Starting PPL evaluation for tasks: {tasks}")
     ppl_res = {}
     for task in tasks:
+        print(f"Currently evaluating PPL task: {task}")
         testenc = get_ppl_enc(task, tokenizer, add_special_tokens=add_special_tokens)
         tot_loss = 0
         tot_tokens = 0
@@ -268,10 +349,12 @@ def get_acc(model, tokenizer, tasks, task_range=[], limit=1000000):
     
     print("tasks to evaluate:")
     print(json.dumps(tasks, indent=2))
+    print("Starting accuracy evaluation for tasks...")
     acc_res = {}
     full_res_by_task = {}
     for cfg in tasks:
         task = cfg["name"]
+        print(f"Currently evaluating ACC task: {task} (fewshot={cfg['num_fewshot']})")
         res = evaluator.simple_evaluate(
             model=model,
             tasks=[task],
@@ -311,6 +394,7 @@ def main(config, test_args):
     orbax_state, _ = maxtext_utils.setup_decode_state(orbax_model, config, rng1, mesh, None)
     
     orbax_state = cast_orbax_state_to_bf16(orbax_state)
+    print_device_memory("after model init")
     
     _, _, state_mesh_shardings = maxtext_utils.get_abstract_state(
         orbax_model, None, config, rng1, mesh, is_training=False
@@ -318,6 +402,7 @@ def main(config, test_args):
 
     model = OrbaxLM(orbax_model, orbax_state, tokenizer, config, state_mesh_shardings, mesh)
     
+    print_device_memory("before PPL eval")
     ppl_res = get_ppl(
         model, 
         tokenizer, 
@@ -331,6 +416,7 @@ def main(config, test_args):
     )
     print(ppl_res)
 
+    print_device_memory("before ACC eval")
     acc_res, acc_full = get_acc(
         model,
         tokenizer,
