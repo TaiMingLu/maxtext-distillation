@@ -101,7 +101,7 @@ for parent_dir in distill_pretrain pretrain; do
     python3.10 -u scripts/test_orbax_eval.py ../MaxText/configs/base.yml \
         load_parameters_path=${UNSCANNED_CKPT_PATH} \
         run_name=${DIRECT_PARAMETER_CHECKPOINT_RUN} \
-        per_device_batch_size=1 \
+        per_device_batch_size=4 \
         model_name=${MODEL} \
         max_prefill_predict_length=4 \
         max_target_length=8192 \

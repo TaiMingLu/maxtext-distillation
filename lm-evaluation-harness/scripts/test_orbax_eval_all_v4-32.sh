@@ -114,8 +114,8 @@ for parent_dir in distill_pretrain pretrain; do
         --eval_save_dir=/home/terry/gcs-bucket/eval/results
     "
 
-      echo "Cleaning up converted checkpoint for ${parent_dir}/${MODEL_RUN_NAME} step ${STEP}"
-      rm -rf "${BASE_OUTPUT_DIRECTORY}/${DIRECT_PARAMETER_CHECKPOINT_RUN}"
+      # echo "Cleaning up converted checkpoint for ${parent_dir}/${MODEL_RUN_NAME} step ${STEP}"
+      # rm -rf "${BASE_OUTPUT_DIRECTORY}/${DIRECT_PARAMETER_CHECKPOINT_RUN}"
 
     done
   done

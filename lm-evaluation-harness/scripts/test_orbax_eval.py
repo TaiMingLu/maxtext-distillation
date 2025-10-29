@@ -336,6 +336,7 @@ def get_ppl(
             print(f"{task} PPL: {ppl_res[task]} (time: {duration_s:.2f}s)")
             if task == "dclm":
                 print("dclm val loss", math.log(ppl_res[task]))
+            print_device_memory(f"after PPL task {task}")
                 
     return ppl_res, ppl_times
 
@@ -382,6 +383,7 @@ def get_acc(model, tokenizer, tasks, task_range=[], limit=1000000):
         if acc_key is not None:
             acc_res[task] = res['results'][task][acc_key]
         full_res_by_task[task] = res
+        print_device_memory(f"after ACC task {times_key}")
     return acc_res, full_res_by_task, acc_times
 
 def cast_orbax_state_to_bf16(orbax_state):
