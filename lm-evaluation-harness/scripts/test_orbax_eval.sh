@@ -54,6 +54,8 @@ python -u multihost_runner_orig.py \
     export WANDB_API_KEY='01126ae90da25bae0d86704140ac978cb9fd9c73'
     export WANDB_PROJECT=maxtext_1b
     export WANDB_NAME=${RUN_NAME}
+    export PYTHONPATH=$(pwd):$PYTHONPATH
+    python3.10 -m pip install -e .
     python3.10 -u scripts/test_orbax_eval.py ../MaxText/configs/base.yml \
         load_parameters_path=${UNSCANNED_CKPT_PATH} \
         run_name=forward_pass_test \
