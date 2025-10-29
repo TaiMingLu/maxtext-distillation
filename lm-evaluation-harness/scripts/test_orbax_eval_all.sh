@@ -3,14 +3,11 @@
 set +x
 set -eo pipefail
 
-mkdir -p "${HOME}/ckpts"
-
 bucket_name='taiming_us_central2_b'
 export TPU_PREFIX="taiming-v4-128"
 export HF_MODEL_PATH='/home/terry/gcs-bucket/HF_HOME/Llama-3.1-8B'
 
-BASE_OUTPUT_DIRECTORY="${HOME}/ckpts/param_only"
-mkdir -p "${BASE_OUTPUT_DIRECTORY}"
+BASE_OUTPUT_DIRECTORY="gs://$bucket_name/eval_param_only"
 
 export XLA_PYTHON_CLIENT_MEM_FRACTION=0.9
 export XLA_PYTHON_CLIENT_ALLOCATOR=platform
