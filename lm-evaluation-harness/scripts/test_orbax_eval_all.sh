@@ -111,7 +111,9 @@ for parent_dir in distill_pretrain pretrain; do
         attention=dot_product \
         --hf_model_path=${HF_MODEL_PATH} \
         --add_special_tokens=False \
-        --eval_save_dir=/home/terry/gcs-bucket/eval/results
+        --eval_save_dir=/home/terry/gcs-bucket/eval/results \
+        --ppl_batch_size 4 \
+        --acc_batch_size 64 \
     "
 
       echo "Cleaning up converted checkpoint for ${parent_dir}/${MODEL_RUN_NAME} step ${STEP}"

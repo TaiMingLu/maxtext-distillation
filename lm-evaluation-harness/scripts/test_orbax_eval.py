@@ -340,9 +340,9 @@ def get_ppl(
                 
     return ppl_res, ppl_times
 
-def get_acc(model, tokenizer, tasks, task_range=[], limit=1000000):
+def get_acc(model, tokenizer, tasks, task_range=[], limit=1000000, batch_size=32):
     # lm_eval_model = models.orbax_lm.HFLM(
-    #     pretrained=model, 
+    #     pretrained=model,
     #     tokenizer=tokenizer,
     #     generation_kwargs={
     #         "do_sample": True,
@@ -352,10 +352,10 @@ def get_acc(model, tokenizer, tasks, task_range=[], limit=1000000):
     # )
     if task_range:
         tasks = [cfg for cfg in tasks if cfg["name"] in task_range]
-    
+
     print("tasks to evaluate:")
     print(json.dumps(tasks, indent=2))
-    print("Starting accuracy evaluation for tasks...")
+    print(f"Starting accuracy evaluation with batch_size={batch_size}...")
     acc_res = {}
     full_res_by_task = {}
     acc_times = {}
@@ -367,9 +367,9 @@ def get_acc(model, tokenizer, tasks, task_range=[], limit=1000000):
             model=model,
             tasks=[task],
             num_fewshot=cfg["num_fewshot"],
-            max_batch_size=32,
+            max_batch_size=batch_size,
             log_samples=True,
-            # task_kwargs={"limit": 256}, 
+            # task_kwargs={"limit": 256},
             confirm_run_unsafe_code=True,
             limit=limit
         )
@@ -416,12 +416,11 @@ def main(config, test_args):
     
     print_device_memory("before PPL eval")
     ppl_res, ppl_times = get_ppl(
-        model, 
-        tokenizer, 
-        # batch_size=config.global_batch_size_to_train_on, 
-        batch_size=1,
+        model,
+        tokenizer,
+        batch_size=test_args.ppl_batch_size,
         calib_size=min(256, test_args.limit),
-        max_length=config.max_target_length, 
+        max_length=config.max_target_length,
         tasks=PPL_TASKS,
         add_special_tokens=test_args.add_special_tokens,
         task_range=test_args.tasks,
@@ -435,7 +434,8 @@ def main(config, test_args):
         tokenizer,
         tasks=ACC_TASKS,
         task_range=test_args.tasks,
-        limit=test_args.limit
+        limit=test_args.limit,
+        batch_size=test_args.acc_batch_size
     )
     print(acc_res)
     print({"acc_times_s": acc_times})
@@ -496,6 +496,8 @@ if __name__ == "__main__":
     parser.add_argument("--limit", type=int, default=1000000)
     parser.add_argument("--tasks", type=lambda x: [] if not x else x.split(","), default=[])
     parser.add_argument("--eval_save_dir", type=str, required=False, default="")
+    parser.add_argument("--ppl_batch_size", type=int, default=1, help="Batch size for PPL evaluation (default: 1)")
+    parser.add_argument("--acc_batch_size", type=int, default=32, help="Batch size for accuracy evaluation (default: 32)")
     test_args, _ = parser.parse_known_args()
 
     # Remove args defined in this test file to avoid error from pyconfig
@@ -512,7 +514,9 @@ if __name__ == "__main__":
         "--limit",
         "--tasks",
         "--save_dir",
-        "--eval_save_dir"
+        "--eval_save_dir",
+        "--ppl_batch_size",
+        "--acc_batch_size"
     ]
     for arg in to_remove_args:
         model_args = [s for s in model_args if not s.startswith(arg)]
