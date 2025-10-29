@@ -65,14 +65,15 @@ for parent_dir in distill_pretrain pretrain; do
       python -u multihost_runner_orig.py \
         --TPU_PREFIX=${TPU_PREFIX} \
         --INTERNAL_IP=true \
+        --RUN_NAME=maxtext \
         --COMMAND="
-    cd ~/maxtext
+    ROOT=\$(pwd)
     export TPU_LOG_DIR=/home/terry/tpu_logs
     source ~/maxtext_env/bin/activate
     export WANDB_API_KEY='01126ae90da25bae0d86704140ac978cb9fd9c73'
     export WANDB_PROJECT=maxtext_1b
     export WANDB_NAME=\${RUN_NAME}
-    export PYTHONPATH=~/maxtext:\$PYTHONPATH
+    export PYTHONPATH=\${ROOT}:\$PYTHONPATH
     python3.10 -u -m MaxText.generate_param_only_checkpoint MaxText/configs/base.yml \
         checkpoint_dir=${BASE_OUTPUT_DIRECTORY} \
         base_output_directory=${BASE_OUTPUT_DIRECTORY} \
@@ -86,14 +87,16 @@ for parent_dir in distill_pretrain pretrain; do
       python -u multihost_runner_orig.py \
         --TPU_PREFIX=${TPU_PREFIX} \
         --INTERNAL_IP=true \
+        --RUN_NAME=maxtext \
         --COMMAND="
-    cd ~/maxtext/lm-evaluation-harness
+    ROOT=\$(pwd)
+    cd lm-evaluation-harness
     export TPU_LOG_DIR=/home/terry/tpu_logs
     source ~/maxtext_env/bin/activate
     export WANDB_API_KEY='01126ae90da25bae0d86704140ac978cb9fd9c73'
     export WANDB_PROJECT=maxtext_1b
     export WANDB_NAME=\${RUN_NAME}
-    export PYTHONPATH=~/maxtext:\$(pwd):\$PYTHONPATH
+    export PYTHONPATH=\${ROOT}:\$(pwd):\$PYTHONPATH
     python3.10 -m pip install -e .
     python3.10 -u scripts/test_orbax_eval.py ../MaxText/configs/base.yml \
         load_parameters_path=${UNSCANNED_CKPT_PATH} \
