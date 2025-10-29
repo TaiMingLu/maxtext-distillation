@@ -341,8 +341,8 @@ def main(config, test_args):
     print(acc_res)
 
     # Optionally save results to disk
-    if getattr(test_args, "save_dir", ""):
-        os.makedirs(test_args.save_dir, exist_ok=True)
+    if getattr(test_args, "eval_save_dir", ""):
+        os.makedirs(test_args.eval_save_dir, exist_ok=True)
 
         def to_serializable(obj):
             try:
@@ -371,7 +371,7 @@ def main(config, test_args):
             },
         }
 
-        save_path = os.path.join(test_args.save_dir, f"{getattr(config, 'run_name', 'results')}.json")
+        save_path = os.path.join(test_args.eval_save_dir, f"{getattr(config, 'run_name', 'results')}.json")
         with open(save_path, "w") as f:
             json.dump(results_payload, f, indent=2, default=to_serializable)
         print(f"Saved results to {save_path}")
@@ -391,7 +391,7 @@ if __name__ == "__main__":
     parser.add_argument('--add_special_tokens', type=str2bool, default=True)
     parser.add_argument("--limit", type=int, default=1000000)
     parser.add_argument("--tasks", type=lambda x: [] if not x else x.split(","), default=[])
-    parser.add_argument("--save_dir", type=str, required=False, default="")
+    parser.add_argument("--eval_save_dir", type=str, required=False, default="")
     test_args, _ = parser.parse_known_args()
 
     # Remove args defined in this test file to avoid error from pyconfig
