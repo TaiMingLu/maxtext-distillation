@@ -47,7 +47,10 @@ for parent_dir in distill_pretrain pretrain; do
       continue
     fi
 
+    model_ckpt_prefix="gs://${bucket_name}/ckpts/${parent_dir}/${model_run_name}/checkpoints/"
+
     for step_path in ${step_paths}; do
+      [[ "${step_path}" == "${model_ckpt_prefix}" ]] && continue
       STEP="${step_path%/}"
       STEP="${STEP##*/}"
       [[ -z "${STEP}" ]] && continue
