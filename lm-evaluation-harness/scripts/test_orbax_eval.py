@@ -7,6 +7,7 @@ import jax
 import jax.numpy as jnp
 import numpy as np
 import sys
+import time
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -297,8 +298,10 @@ def get_ppl(
     
     print(f"Starting PPL evaluation for tasks: {tasks}")
     ppl_res = {}
+    ppl_times = {}
     for task in tasks:
         print(f"Currently evaluating PPL task: {task}")
+        start_ts = time.perf_counter()
         testenc = get_ppl_enc(task, tokenizer, add_special_tokens=add_special_tokens)
         tot_loss = 0
         tot_tokens = 0
@@ -328,11 +331,13 @@ def get_ppl(
                 tot_tokens += seq_len * (j - i)
                 
             ppl_res[task] = torch.exp(torch.tensor(tot_loss / tot_tokens)).item()
-            print(task, ppl_res[task])
+            duration_s = time.perf_counter() - start_ts
+            ppl_times[task] = duration_s
+            print(f"{task} PPL: {ppl_res[task]} (time: {duration_s:.2f}s)")
             if task == "dclm":
                 print("dclm val loss", math.log(ppl_res[task]))
                 
-    return ppl_res
+    return ppl_res, ppl_times
 
 def get_acc(model, tokenizer, tasks, task_range=[], limit=1000000):
     # lm_eval_model = models.orbax_lm.HFLM(
@@ -352,9 +357,11 @@ def get_acc(model, tokenizer, tasks, task_range=[], limit=1000000):
     print("Starting accuracy evaluation for tasks...")
     acc_res = {}
     full_res_by_task = {}
+    acc_times = {}
     for cfg in tasks:
         task = cfg["name"]
         print(f"Currently evaluating ACC task: {task} (fewshot={cfg['num_fewshot']})")
+        start_ts = time.perf_counter()
         res = evaluator.simple_evaluate(
             model=model,
             tasks=[task],
@@ -367,12 +374,15 @@ def get_acc(model, tokenizer, tasks, task_range=[], limit=1000000):
         )
         
         print(res['results'][task])
+        duration_s = time.perf_counter() - start_ts
+        times_key = f"{task}/fewshot={cfg['num_fewshot']}"
+        acc_times[times_key] = duration_s
+        print(f"{times_key} ACC eval time: {duration_s:.2f}s")
         acc_key = cfg["acc_key"]
         if acc_key is not None:
             acc_res[task] = res['results'][task][acc_key]
         full_res_by_task[task] = res
-
-    return acc_res, full_res_by_task
+    return acc_res, full_res_by_task, acc_times
 
 def cast_orbax_state_to_bf16(orbax_state):
     casted_params = jax.tree_util.tree_map(
@@ -403,7 +413,7 @@ def main(config, test_args):
     model = OrbaxLM(orbax_model, orbax_state, tokenizer, config, state_mesh_shardings, mesh)
     
     print_device_memory("before PPL eval")
-    ppl_res = get_ppl(
+    ppl_res, ppl_times = get_ppl(
         model, 
         tokenizer, 
         # batch_size=config.global_batch_size_to_train_on, 
@@ -415,9 +425,10 @@ def main(config, test_args):
         task_range=test_args.tasks,
     )
     print(ppl_res)
+    print({"ppl_times_s": ppl_times})
 
     print_device_memory("before ACC eval")
-    acc_res, acc_full = get_acc(
+    acc_res, acc_full, acc_times = get_acc(
         model,
         tokenizer,
         tasks=ACC_TASKS,
@@ -425,6 +436,7 @@ def main(config, test_args):
         limit=test_args.limit
     )
     print(acc_res)
+    print({"acc_times_s": acc_times})
 
     # Optionally save results to disk
     if getattr(test_args, "eval_save_dir", ""):
@@ -454,6 +466,10 @@ def main(config, test_args):
             "lm_eval": {
                 "acc_summary": acc_res,
                 "per_task": acc_full,
+            },
+            "timing": {
+                "ppl": ppl_times,
+                "lm_eval": acc_times,
             },
         }
 
