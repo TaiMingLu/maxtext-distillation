@@ -37,10 +37,10 @@ python -u multihost_runner_orig.py \
     python3.10 -u -m MaxText.generate_param_only_checkpoint MaxText/configs/base.yml \
         checkpoint_dir=${BASE_OUTPUT_DIRECTORY} \
         base_output_directory=${BASE_OUTPUT_DIRECTORY} \
-        load_parameters_path=${CHECKPOINT_TO_CONVERT} \
+        load_full_state_path=${CHECKPOINT_TO_CONVERT} \
         run_name=${DIRECT_PARAMETER_CHECKPOINT_RUN} \
         model_name=$MODEL \
-    force_unroll=true"
+        force_unroll=true"
 
 cd ~/maxtext
 export PYTHONPATH=$(pwd):$PYTHONPATH
@@ -64,7 +64,7 @@ python -u multihost_runner_orig.py \
         dataset_type=synthetic \
         dtype=bfloat16 \
         scan_layers=false \
-        attention="dot_product" \
+        attention=dot_product \
         --hf_model_path=${HF_MODEL_PATH} \
         --add_special_tokens=False
     "
