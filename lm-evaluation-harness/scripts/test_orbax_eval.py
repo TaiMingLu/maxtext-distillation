@@ -136,11 +136,11 @@ ACC_TASKS = [
         "num_fewshot": 0,
         "acc_key": "acc,none",
     },
-    {
-        "name": "winogrande",
-        "num_fewshot": 5,
-        "acc_key": "acc,none",
-    },
+    # {
+    #     "name": "winogrande",
+    #     "num_fewshot": 5,
+    #     "acc_key": "acc,none",
+    # },
     {
         "name": "arc_easy",
         "num_fewshot": 0,
@@ -151,21 +151,31 @@ ACC_TASKS = [
         "num_fewshot": 0,
         "acc_key": "acc_norm,none",
     },
-    {
-        "name": "arc_challenge",
-        "num_fewshot": 25,
-        "acc_key": "acc_norm,none",
-    },
+    # {
+    #     "name": "arc_challenge",
+    #     "num_fewshot": 25,
+    #     "acc_key": "acc_norm,none",
+    # },
     {
         "name": "hellaswag",
         "num_fewshot": 0,
         "acc_key": "acc_norm,none",
     },
+    # {
+    #     "name": "hellaswag",        
+    #     "num_fewshot": 10,
+    #     "acc_key": "acc_norm,none",
+    # },
     {
-        "name": "hellaswag",        
-        "num_fewshot": 10,
-        "acc_key": "acc_norm,none",
+        "name": "mmlu",
+        "num_fewshot": 0,
+        "acc_key": None,
     },
+    # {
+    #     "name": "mmlu",
+    #     "num_fewshot": 5,
+    #     "acc_key": None,
+    # },
     {
         "name": "truthfulqa_mc1",
         "num_fewshot": 0,
@@ -214,16 +224,6 @@ ACC_TASKS = [
     {
         "name": "rte",
         "num_fewshot": 0,
-        "acc_key": None,
-    },
-    {
-        "name": "mmlu",
-        "num_fewshot": 0,
-        "acc_key": None,
-    },
-    {
-        "name": "mmlu",
-        "num_fewshot": 5,
         "acc_key": None,
     },
     {
