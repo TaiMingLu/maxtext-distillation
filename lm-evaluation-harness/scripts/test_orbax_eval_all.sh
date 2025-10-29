@@ -8,6 +8,7 @@ export TPU_PREFIX="taiming-v4-128"
 export HF_MODEL_PATH='/home/terry/gcs-bucket/HF_HOME/Llama-3.1-8B'
 
 BASE_OUTPUT_DIRECTORY="gs://$bucket_name/eval_param_only"
+BASE_OUTPUT_DIRECTORY_DISK="${HOME}/gsc-bucket/eval_param_only"
 
 export XLA_PYTHON_CLIENT_MEM_FRACTION=0.9
 export XLA_PYTHON_CLIENT_ALLOCATOR=platform
@@ -59,7 +60,7 @@ for parent_dir in distill_pretrain pretrain; do
 
       echo "------------------------------------------------------------------"
       echo "Converting ${parent_dir}/${MODEL_RUN_NAME} at step ${STEP}"
-      rm -rf "${BASE_OUTPUT_DIRECTORY}/${DIRECT_PARAMETER_CHECKPOINT_RUN}"
+      rm -rf "${BASE_OUTPUT_DIRECTORY_DISK}/${DIRECT_PARAMETER_CHECKPOINT_RUN}"
 
       python -u multihost_runner_orig.py \
         --TPU_PREFIX=${TPU_PREFIX} \
