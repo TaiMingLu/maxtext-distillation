@@ -47,7 +47,7 @@ PPL_TASKS = [
     "wikitext",
     "wikitext2",
     "cnn_dailymail",
-    "dclm"
+    # "dclm"
 ]
 
 ACC_TASKS = [
@@ -269,6 +269,7 @@ def get_acc(model, tokenizer, tasks, task_range=[], limit=1000000):
     print("tasks to evaluate:")
     print(json.dumps(tasks, indent=2))
     acc_res = {}
+    full_res_by_task = {}
     for cfg in tasks:
         task = cfg["name"]
         res = evaluator.simple_evaluate(
@@ -286,8 +287,9 @@ def get_acc(model, tokenizer, tasks, task_range=[], limit=1000000):
         acc_key = cfg["acc_key"]
         if acc_key is not None:
             acc_res[task] = res['results'][task][acc_key]
+        full_res_by_task[task] = res
 
-    return acc_res
+    return acc_res, full_res_by_task
 
 def cast_orbax_state_to_bf16(orbax_state):
     casted_params = jax.tree_util.tree_map(
@@ -329,7 +331,7 @@ def main(config, test_args):
     )
     print(ppl_res)
 
-    acc_res = get_acc(
+    acc_res, acc_full = get_acc(
         model,
         tokenizer,
         tasks=ACC_TASKS,
@@ -337,6 +339,42 @@ def main(config, test_args):
         limit=test_args.limit
     )
     print(acc_res)
+
+    # Optionally save results to disk
+    if getattr(test_args, "save_dir", ""):
+        os.makedirs(test_args.save_dir, exist_ok=True)
+
+        def to_serializable(obj):
+            try:
+                import numpy as _np
+                import jax.numpy as _jnp
+            except Exception:  # pragma: no cover
+                _np, _jnp = None, None
+            if _np is not None and isinstance(obj, _np.generic):
+                return obj.item()
+            if _jnp is not None and hasattr(obj, "dtype") and hasattr(obj, "tolist"):
+                return obj.tolist()
+            if hasattr(obj, "tolist"):
+                return obj.tolist()
+            raise TypeError(f"Object of type {type(obj).__name__} is not JSON serializable")
+
+        results_payload = {
+            "run_name": getattr(config, "run_name", ""),
+            "model_name": getattr(config, "model_name", ""),
+            "limit": test_args.limit,
+            "tasks_requested": test_args.tasks,
+            "add_special_tokens": test_args.add_special_tokens,
+            "ppl": ppl_res,
+            "lm_eval": {
+                "acc_summary": acc_res,
+                "per_task": acc_full,
+            },
+        }
+
+        save_path = os.path.join(test_args.save_dir, f"{getattr(config, 'run_name', 'results')}.json")
+        with open(save_path, "w") as f:
+            json.dump(results_payload, f, indent=2, default=to_serializable)
+        print(f"Saved results to {save_path}")
     
 if __name__ == "__main__":
     jax.config.update("jax_default_prng_impl", "unsafe_rbg")
@@ -353,6 +391,7 @@ if __name__ == "__main__":
     parser.add_argument('--add_special_tokens', type=str2bool, default=True)
     parser.add_argument("--limit", type=int, default=1000000)
     parser.add_argument("--tasks", type=lambda x: [] if not x else x.split(","), default=[])
+    parser.add_argument("--save_dir", type=str, required=False, default="")
     test_args, _ = parser.parse_known_args()
 
     # Remove args defined in this test file to avoid error from pyconfig

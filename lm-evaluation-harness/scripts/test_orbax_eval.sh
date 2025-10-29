@@ -58,7 +58,7 @@ python -u multihost_runner_orig.py \
     python3.10 -m pip install -e .
     python3.10 -u scripts/test_orbax_eval.py ../MaxText/configs/base.yml \
         load_parameters_path=${UNSCANNED_CKPT_PATH} \
-        run_name=forward_pass_test \
+        run_name=${MODEL_RUN_NAME} \
         per_device_batch_size=1 \
         model_name=${MODEL} \
         max_prefill_predict_length=4 \
@@ -69,4 +69,5 @@ python -u multihost_runner_orig.py \
         attention=dot_product \
         --hf_model_path=${HF_MODEL_PATH} \
         --add_special_tokens=False
+        --save_dir=/home/terry/gcs-bucket/eval/results
     "
