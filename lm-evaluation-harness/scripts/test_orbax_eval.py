@@ -406,7 +406,9 @@ if __name__ == "__main__":
         "--run_hf_model",
         "--add_special_tokens",
         "--limit",
-        "--tasks"
+        "--tasks",
+        "--save_dir",
+        "--eval_save_dir"
     ]
     for arg in to_remove_args:
         model_args = [s for s in model_args if not s.startswith(arg)]
