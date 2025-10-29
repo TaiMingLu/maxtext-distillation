@@ -113,7 +113,7 @@ for parent_dir in distill_pretrain pretrain; do
         --add_special_tokens=False \
         --eval_save_dir=/home/terry/gcs-bucket/eval/results \
         --ppl_batch_size=2 \
-        --acc_batch_size=64 \
+        --acc_batch_size=128 \
     "
 
       # echo "Cleaning up converted checkpoint for ${parent_dir}/${MODEL_RUN_NAME} step ${STEP}"
