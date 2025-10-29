@@ -23,24 +23,24 @@ cd ~/maxtext
 
 export TPU_PREFIX="taiming-v4-128"
 
-export PYTHONPATH=$(pwd):$PYTHONPATH
-python -u multihost_runner_orig.py \
-    --TPU_PREFIX=$TPU_PREFIX \
-    --INTERNAL_IP=true \
-    --COMMAND="
-    cd ~/maxtext
-    export TPU_LOG_DIR=/home/terry/tpu_logs
-    source ~/maxtext_env/bin/activate
-    export WANDB_API_KEY='01126ae90da25bae0d86704140ac978cb9fd9c73'
-    export WANDB_PROJECT=maxtext_1b
-    export WANDB_NAME=${RUN_NAME}
-    python3.10 -u -m MaxText.generate_param_only_checkpoint MaxText/configs/base.yml \
-        checkpoint_dir=${BASE_OUTPUT_DIRECTORY} \
-        base_output_directory=${BASE_OUTPUT_DIRECTORY} \
-        load_full_state_path=${CHECKPOINT_TO_CONVERT} \
-        run_name=${DIRECT_PARAMETER_CHECKPOINT_RUN} \
-        model_name=$MODEL \
-        force_unroll=true"
+# export PYTHONPATH=$(pwd):$PYTHONPATH
+# python -u multihost_runner_orig.py \
+#     --TPU_PREFIX=$TPU_PREFIX \
+#     --INTERNAL_IP=true \
+#     --COMMAND="
+#     cd ~/maxtext
+#     export TPU_LOG_DIR=/home/terry/tpu_logs
+#     source ~/maxtext_env/bin/activate
+#     export WANDB_API_KEY='01126ae90da25bae0d86704140ac978cb9fd9c73'
+#     export WANDB_PROJECT=maxtext_1b
+#     export WANDB_NAME=${RUN_NAME}
+#     python3.10 -u -m MaxText.generate_param_only_checkpoint MaxText/configs/base.yml \
+#         checkpoint_dir=${BASE_OUTPUT_DIRECTORY} \
+#         base_output_directory=${BASE_OUTPUT_DIRECTORY} \
+#         load_full_state_path=${CHECKPOINT_TO_CONVERT} \
+#         run_name=${DIRECT_PARAMETER_CHECKPOINT_RUN} \
+#         model_name=$MODEL \
+#         force_unroll=true"
 
 cd ~/maxtext
 export PYTHONPATH=$(pwd):$PYTHONPATH
