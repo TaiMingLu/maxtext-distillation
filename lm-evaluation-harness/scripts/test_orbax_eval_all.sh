@@ -72,6 +72,7 @@ for parent_dir in distill_pretrain pretrain; do
     export WANDB_API_KEY='01126ae90da25bae0d86704140ac978cb9fd9c73'
     export WANDB_PROJECT=maxtext_1b
     export WANDB_NAME=\${RUN_NAME}
+    export PYTHONPATH=~/maxtext:\$PYTHONPATH
     python3.10 -u -m MaxText.generate_param_only_checkpoint MaxText/configs/base.yml \
         checkpoint_dir=${BASE_OUTPUT_DIRECTORY} \
         base_output_directory=${BASE_OUTPUT_DIRECTORY} \
@@ -80,6 +81,7 @@ for parent_dir in distill_pretrain pretrain; do
         model_name=${MODEL} \
         force_unroll=true"
 
+      cd ~/maxtext/
       echo "Evaluating ${parent_dir}/${MODEL_RUN_NAME} at step ${STEP}"
       python -u multihost_runner_orig.py \
         --TPU_PREFIX=${TPU_PREFIX} \
@@ -91,7 +93,7 @@ for parent_dir in distill_pretrain pretrain; do
     export WANDB_API_KEY='01126ae90da25bae0d86704140ac978cb9fd9c73'
     export WANDB_PROJECT=maxtext_1b
     export WANDB_NAME=\${RUN_NAME}
-    export PYTHONPATH=\$(pwd):\$PYTHONPATH
+    export PYTHONPATH=~/maxtext:\$(pwd):\$PYTHONPATH
     python3.10 -m pip install -e .
     python3.10 -u scripts/test_orbax_eval.py ../MaxText/configs/base.yml \
         load_parameters_path=${UNSCANNED_CKPT_PATH} \
