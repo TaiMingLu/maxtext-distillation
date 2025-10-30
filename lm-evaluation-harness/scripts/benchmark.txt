@@ -3,3 +3,4 @@ bs=2 c4 PPL: 98.66183471679688 (time: 476.39s)
 bs=4 Unavaliable
 
 bs=64 winogrande/fewshot=0 ACC eval time: 289.35s
+bs=128 winogrande/fewshot=0 ACC eval time: 256.75s
