@@ -156,11 +156,11 @@ ACC_TASKS = [
     #     "num_fewshot": 25,
     #     "acc_key": "acc_norm,none",
     # },
-    {
-        "name": "hellaswag",
-        "num_fewshot": 0,
-        "acc_key": "acc_norm,none",
-    },
+    # {
+    #     "name": "hellaswag",
+    #     "num_fewshot": 0,
+    #     "acc_key": "acc_norm,none",
+    # },
     # {
     #     "name": "hellaswag",        
     #     "num_fewshot": 10,
@@ -176,61 +176,61 @@ ACC_TASKS = [
     #     "num_fewshot": 5,
     #     "acc_key": None,
     # },
-    {
-        "name": "truthfulqa_mc1",
-        "num_fewshot": 0,
-        "acc_key": "acc,none",
-    },
-    {
-        "name": "truthfulqa_mc2",
-        "num_fewshot": 0,
-        "acc_key": "acc,none",
-    },
-    {
-        "name": "piqa",
-        "num_fewshot": 0,
-        "acc_key": "acc_norm,none",
-    },
-    {
-        "name": "sciq",
-        "num_fewshot": 0,
-        "acc_key": "acc,none",
-    },
-    {
-        "name": "boolq",
-        "num_fewshot": 0,
-        "acc_key": "acc,none",
-    },
-    {
-        "name": "anli_r1",
-        "num_fewshot": 0,
-        "acc_key": None,
-    },
-    {
-        "name": "anli_r2",
-        "num_fewshot": 0,
-        "acc_key": None,
-    },
-    {
-        "name": "anli_r3",
-        "num_fewshot": 0,
-        "acc_key": None,
-    },
-    {
-        "name": "openbookqa",
-        "num_fewshot": 0,
-        "acc_key": None,
-    },
-    {
-        "name": "rte",
-        "num_fewshot": 0,
-        "acc_key": None,
-    },
-    {
-        "name": "record",
-        "num_fewshot": 0,
-        "acc_key": None,
-    },
+    # {
+    #     "name": "truthfulqa_mc1",
+    #     "num_fewshot": 0,
+    #     "acc_key": "acc,none",
+    # },
+    # {
+    #     "name": "truthfulqa_mc2",
+    #     "num_fewshot": 0,
+    #     "acc_key": "acc,none",
+    # },
+    # {
+    #     "name": "piqa",
+    #     "num_fewshot": 0,
+    #     "acc_key": "acc_norm,none",
+    # },
+    # {
+    #     "name": "sciq",
+    #     "num_fewshot": 0,
+    #     "acc_key": "acc,none",
+    # },
+    # {
+    #     "name": "boolq",
+    #     "num_fewshot": 0,
+    #     "acc_key": "acc,none",
+    # },
+    # {
+    #     "name": "anli_r1",
+    #     "num_fewshot": 0,
+    #     "acc_key": None,
+    # },
+    # {
+    #     "name": "anli_r2",
+    #     "num_fewshot": 0,
+    #     "acc_key": None,
+    # },
+    # {
+    #     "name": "anli_r3",
+    #     "num_fewshot": 0,
+    #     "acc_key": None,
+    # },
+    # {
+    #     "name": "openbookqa",
+    #     "num_fewshot": 0,
+    #     "acc_key": None,
+    # },
+    # {
+    #     "name": "rte",
+    #     "num_fewshot": 0,
+    #     "acc_key": None,
+    # },
+    # {
+    #     "name": "record",
+    #     "num_fewshot": 0,
+    #     "acc_key": None,
+    # },
 ]
 
 def set_seed(seed: int):
