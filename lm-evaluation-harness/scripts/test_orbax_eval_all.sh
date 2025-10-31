@@ -6,6 +6,7 @@ set -eo pipefail
 bucket_name='taiming_us_central2_b'
 export TPU_PREFIX="taiming-v4-128"
 export HF_MODEL_PATH='/home/terry/gcs-bucket/HF_HOME/Llama-3.1-8B'
+EVAL_RESULTS_DIR="/home/terry/gcs-bucket/eval/results"
 
 BASE_OUTPUT_DIRECTORY="gs://$bucket_name/eval_param_only"
 BASE_OUTPUT_DIRECTORY_DISK="${HOME}/gsc-bucket/eval_param_only"
@@ -57,6 +58,12 @@ for parent_dir in distill_pretrain pretrain; do
       DIRECT_PARAMETER_CHECKPOINT_RUN="${MODEL_RUN_NAME}_step_${STEP}"
       CHECKPOINT_TO_CONVERT="gs://${bucket_name}/ckpts/${parent_dir}/${MODEL_RUN_NAME}/checkpoints/${STEP}/items"
       UNSCANNED_CKPT_PATH="${BASE_OUTPUT_DIRECTORY}/${DIRECT_PARAMETER_CHECKPOINT_RUN}/checkpoints/0/items"
+      RESULT_JSON_PATH="${EVAL_RESULTS_DIR}/${DIRECT_PARAMETER_CHECKPOINT_RUN}.json"
+
+      if [[ -f "${RESULT_JSON_PATH}" ]]; then
+        echo "Results already exist at ${RESULT_JSON_PATH}; skipping ${parent_dir}/${MODEL_RUN_NAME} step ${STEP}"
+        continue
+      fi
 
       echo "------------------------------------------------------------------"
       echo "Converting ${parent_dir}/${MODEL_RUN_NAME} at step ${STEP}"
@@ -111,13 +118,13 @@ for parent_dir in distill_pretrain pretrain; do
         attention=dot_product \
         --hf_model_path=${HF_MODEL_PATH} \
         --add_special_tokens=False \
-        --eval_save_dir=/home/terry/gcs-bucket/eval/results \
-        --ppl_batch_size=2 \
-        --acc_batch_size=64 \
+        --eval_save_dir=${EVAL_RESULTS_DIR} \
+        --ppl_batch_size=8 \
+        --acc_batch_size=1024 \
     "
 
-      echo "Cleaning up converted checkpoint for ${parent_dir}/${MODEL_RUN_NAME} step ${STEP}"
-      rm -rf "${BASE_OUTPUT_DIRECTORY}/${DIRECT_PARAMETER_CHECKPOINT_RUN}"
+      # echo "Cleaning up converted checkpoint for ${parent_dir}/${MODEL_RUN_NAME} step ${STEP}"
+      # rm -rf "${BASE_OUTPUT_DIRECTORY}/${DIRECT_PARAMETER_CHECKPOINT_RUN}"
 
     done
   done
