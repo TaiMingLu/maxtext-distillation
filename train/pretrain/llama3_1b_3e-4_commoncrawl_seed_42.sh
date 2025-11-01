@@ -32,7 +32,7 @@ export LR=3.e-4
 export MIN_LR_RATIO=0.1
 export WARMUP_RATIO=0.05
 export ASYNC_CHECKPOINTING=false
-export BASE_OUTPUT_DIRECTORY="gs://$BUCKET_NAME/ckpts/pretrain/maxtext"
+export BASE_OUTPUT_DIRECTORY="gs://$BUCKET_NAME/ckpts/pretrain"
 export DATA_FILES='/home/terry/gcs-bucket/datasets/commoncrawl/cc_wet_tokenized/*.array_record'
 
 export RUN_NAME="${MODEL_NAME}_commoncrawl_pretrain_shuffled_lr_3e-4_seed_42"
