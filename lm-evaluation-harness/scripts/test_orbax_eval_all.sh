@@ -19,7 +19,7 @@ cd "${HOME}/maxtext"
 export PYTHONPATH="$(pwd):${PYTHONPATH}"
 
 for parent_dir in pretrain distill_pretrain; do
-  if ! model_paths=$(gsutil ls "gs://${bucket_name}/ckpts/${parent_dir}/" 2>/dev/null); then
+  if ! model_paths=$(gsutil ls "gs://${bucket_name}/ckpts/${parent_dir}/" 2>/dev/null | shuf); then
     echo "Failed to list models under ${parent_dir}, skipping."
     continue
   fi
