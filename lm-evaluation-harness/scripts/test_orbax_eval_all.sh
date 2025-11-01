@@ -18,7 +18,7 @@ export JAX_DISABLE_MOST_OPTIMIZATIONS=False
 cd "${HOME}/maxtext"
 export PYTHONPATH="$(pwd):${PYTHONPATH}"
 
-for parent_dir in distill_pretrain pretrain; do
+for parent_dir in pretrain distill_pretrain; do
   if ! model_paths=$(gsutil ls "gs://${bucket_name}/ckpts/${parent_dir}/" 2>/dev/null); then
     echo "Failed to list models under ${parent_dir}, skipping."
     continue
@@ -119,7 +119,7 @@ for parent_dir in distill_pretrain pretrain; do
         --hf_model_path=${HF_MODEL_PATH} \
         --add_special_tokens=False \
         --eval_save_dir=${EVAL_RESULTS_DIR} \
-        --ppl_batch_size=2 \
+        --ppl_batch_size=4 \
         --acc_batch_size=1024 \
     "
 
