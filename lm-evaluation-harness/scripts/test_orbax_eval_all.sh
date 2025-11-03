@@ -3,8 +3,16 @@
 set +x
 set -eo pipefail
 
-BUCKET_NAME='taiming_us_central2_b'
 TPU_PREFIX='taiming-v4-64'
+
+cd "${HOME}/maxtext"
+export PYTHONPATH="$(pwd):${PYTHONPATH}"
+
+read -r -d '' MULTIHOST_COMMAND <<'EOF'
+set +x
+set -eo pipefail
+
+BUCKET_NAME='taiming_us_central2_b'
 HF_MODEL_PATH='/home/terry/gcs-bucket/HF_HOME/Llama-3.1-8B'
 EVAL_RESULTS_DIR='/home/terry/gcs-bucket/eval/results'
 WANDB_API_KEY='01126ae90da25bae0d86704140ac978cb9fd9c73'
@@ -12,52 +20,15 @@ WANDB_PROJECT='maxtext_1b'
 RUN_NAME='maxtext'
 BASE_OUTPUT_DIRECTORY="gs://${BUCKET_NAME}/eval_param_only"
 BASE_OUTPUT_DIRECTORY_DISK='/home/terry/gsc-bucket/eval_param_only'
-XLA_PYTHON_CLIENT_MEM_FRACTION='0.9'
-XLA_PYTHON_CLIENT_ALLOCATOR='platform'
-JAX_DISABLE_MOST_OPTIMIZATIONS='False'
-TPU_LOG_DIR='/home/terry/tpu_logs'
-
-cd "${HOME}/maxtext"
-export PYTHONPATH="$(pwd):${PYTHONPATH}"
-
-MULTIHOST_COMMAND=$(cat <<EOF
-set +x
-set -eo pipefail
-
-export BUCKET_NAME='${BUCKET_NAME}'
-export EVAL_RESULTS_DIR='${EVAL_RESULTS_DIR}'
-export BASE_OUTPUT_DIRECTORY='${BASE_OUTPUT_DIRECTORY}'
-export BASE_OUTPUT_DIRECTORY_DISK='${BASE_OUTPUT_DIRECTORY_DISK}'
-export HF_MODEL_PATH='${HF_MODEL_PATH}'
-export WANDB_API_KEY='${WANDB_API_KEY}'
-export WANDB_PROJECT='${WANDB_PROJECT}'
-export RUN_NAME='${RUN_NAME}'
-export XLA_PYTHON_CLIENT_MEM_FRACTION='${XLA_PYTHON_CLIENT_MEM_FRACTION}'
-export XLA_PYTHON_CLIENT_ALLOCATOR='${XLA_PYTHON_CLIENT_ALLOCATOR}'
-export JAX_DISABLE_MOST_OPTIMIZATIONS='${JAX_DISABLE_MOST_OPTIMIZATIONS}'
-export TPU_LOG_DIR='${TPU_LOG_DIR}'
-
-cat <<'SCRIPT' > /tmp/test_orbax_eval_all_inner.sh
-#!/bin/bash
-
-set +x
-set -eo pipefail
-
-: "${BUCKET_NAME:?Set BUCKET_NAME before running}"
-: "${EVAL_RESULTS_DIR:?Set EVAL_RESULTS_DIR before running}"
-: "${BASE_OUTPUT_DIRECTORY:?Set BASE_OUTPUT_DIRECTORY before running}"
-: "${BASE_OUTPUT_DIRECTORY_DISK:?Set BASE_OUTPUT_DIRECTORY_DISK before running}"
-: "${HF_MODEL_PATH:?Set HF_MODEL_PATH before running}"
-: "${WANDB_API_KEY:?Set WANDB_API_KEY before running}"
-: "${WANDB_PROJECT:?Set WANDB_PROJECT before running}"
-RUN_NAME=${RUN_NAME:-maxtext}
-
 DESIRED_STEPS=(0 2500 5000 7500 10000 12500 15000 17500 20000 22500 24999)
 
-export XLA_PYTHON_CLIENT_MEM_FRACTION=${XLA_PYTHON_CLIENT_MEM_FRACTION:-0.9}
-export XLA_PYTHON_CLIENT_ALLOCATOR=${XLA_PYTHON_CLIENT_ALLOCATOR:-platform}
-export JAX_DISABLE_MOST_OPTIMIZATIONS=${JAX_DISABLE_MOST_OPTIMIZATIONS:-False}
-export TPU_LOG_DIR=${TPU_LOG_DIR:-/home/terry/tpu_logs}
+export XLA_PYTHON_CLIENT_MEM_FRACTION=0.9
+export XLA_PYTHON_CLIENT_ALLOCATOR=platform
+export JAX_DISABLE_MOST_OPTIMIZATIONS=False
+export TPU_LOG_DIR=/home/terry/tpu_logs
+export WANDB_API_KEY
+export WANDB_PROJECT
+export RUN_NAME
 
 cd "${HOME}/maxtext"
 ROOT=$(pwd)
@@ -170,7 +141,7 @@ for parent_dir in distill_pretrain pretrain; do
         --acc_batch_size=1024
 
       echo "Completed evaluation for ${parent_dir}/${MODEL_RUN_NAME} step ${STEP}"
-      cd "${HOME}/maxtext"
+      cd "${ROOT}"
       if [[ -n "${ORIG_PYTHONPATH}" ]]; then
         export PYTHONPATH="${ROOT}:${ORIG_PYTHONPATH}"
       else
@@ -183,13 +154,7 @@ for parent_dir in distill_pretrain pretrain; do
     done
   done
 done
-SCRIPT
-
-chmod +x /tmp/test_orbax_eval_all_inner.sh
-bash /tmp/test_orbax_eval_all_inner.sh
-
 EOF
-)
 
 python -u multihost_runner_orig.py \
   --TPU_PREFIX="${TPU_PREFIX}" \
