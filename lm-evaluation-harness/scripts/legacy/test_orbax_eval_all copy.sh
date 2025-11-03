@@ -4,8 +4,6 @@ set +x
 set -eo pipefail
 
 bucket_name='taiming_us_central2_b'
-export TPU_PREFIX="taiming-v4-64"
-export HF_MODEL_PATH='/home/terry/gcs-bucket/HF_HOME/Llama-3.1-8B'
 EVAL_RESULTS_DIR="/home/terry/gcs-bucket/eval/results"
 
 BASE_OUTPUT_DIRECTORY="gs://$bucket_name/eval_param_only"
@@ -123,8 +121,8 @@ for parent_dir in distill_pretrain pretrain; do
         --acc_batch_size=1024 \
     "
 
-      # echo "Cleaning up converted checkpoint for ${parent_dir}/${MODEL_RUN_NAME} step ${STEP}"
-      # rm -rf "${BASE_OUTPUT_DIRECTORY}/${DIRECT_PARAMETER_CHECKPOINT_RUN}"
+      echo "Cleaning up converted checkpoint for ${parent_dir}/${MODEL_RUN_NAME} step ${STEP}"
+      rm -rf "${BASE_OUTPUT_DIRECTORY}/${DIRECT_PARAMETER_CHECKPOINT_RUN}"
 
     done
   done
