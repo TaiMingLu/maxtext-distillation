@@ -229,9 +229,9 @@ class OrbaxLM(LM):
                 segment_ids,
             )
 
-        logits_torch = convert_jax_weight_to_torch(jax_logits)
         if pad_size:
-            logits_torch = logits_torch[:original_batch]
+            jax_logits = jax_logits[:original_batch]
+        logits_torch = convert_jax_weight_to_torch(jax_logits)
 
         class Output:
             def __init__(self, logits):
