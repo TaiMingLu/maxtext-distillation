@@ -20,6 +20,13 @@ BASE_OUTPUT_DIRECTORY=\"gs://\${BUCKET_NAME}/eval_param_only\"
 BASE_OUTPUT_DIRECTORY_DISK='/home/terry/gsc-bucket/eval_param_only'
 DESIRED_STEPS=(0 2500 5000 7500 10000 12500 15000 17500 20000 22500 24999)
 
+DESIRED_MODELS=(
+  'llama3.1-1b_finewebedu_pretrain_shuffled_lr_3e-4_seed_43'
+  'llama3.1-1b_finewebedu_distill_hard_pretrain_A_1B_T_50B_S42_alpha_06_seed43'
+  'llama3.1-1b_finewebedu_distill_pretrain_A_1B_T_50B_S42_alpha_05_seed43'
+  'llama3.1-1b_finewebedu_distill_pretrain_A_1B_T_50B_S42_alpha_1_seed43'
+)
+
 export XLA_PYTHON_CLIENT_MEM_FRACTION=0.9
 export XLA_PYTHON_CLIENT_ALLOCATOR=platform
 export JAX_DISABLE_MOST_OPTIMIZATIONS=False
@@ -59,6 +66,20 @@ for parent_dir in distill_pretrain pretrain; do
     [[ -z \"\${model_run_name}\" ]] && continue
 
     MODEL=\"\${model_run_name%%_*}\"
+
+    if [[ ${#DESIRED_MODELS[@]} -gt 0 ]]; then
+      allowed=false
+      for desired_model in \"${DESIRED_MODELS[@]}\"; do
+        if [[ \"${model_run_name}\" == \"${desired_model}\" ]]; then
+          allowed=true
+          break
+        fi
+      done
+      if [[ \"${allowed}\" != true ]]; then
+        echo \"Model ${model_run_name} not in allow list; skipping.\"
+        continue
+      fi
+    fi
 
     if ! step_paths=\$(gsutil ls \"gs://\${BUCKET_NAME}/ckpts/\${parent_dir}/\${model_run_name}/checkpoints/\" 2>/dev/null); then
       echo \"Failed to list checkpoints for \${model_run_name}, skipping.\"
