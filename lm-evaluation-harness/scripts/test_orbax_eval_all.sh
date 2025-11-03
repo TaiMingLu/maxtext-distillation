@@ -8,8 +8,11 @@ TPU_PREFIX='taiming-v4-64'
 cd "${HOME}/maxtext"
 export PYTHONPATH="$(pwd):${PYTHONPATH}"
 
-read -r -d '' MULTIHOST_COMMAND <<'EOF'
-set +x
+python -u multihost_runner_orig.py \
+  --TPU_PREFIX="${TPU_PREFIX}" \
+  --INTERNAL_IP=true \
+  --RUN_NAME=maxtext \
+  --COMMAND="set +x
 set -eo pipefail
 
 BUCKET_NAME='taiming_us_central2_b'
@@ -153,11 +156,4 @@ for parent_dir in distill_pretrain pretrain; do
 
     done
   done
-done
-EOF
-
-python -u multihost_runner_orig.py \
-  --TPU_PREFIX="${TPU_PREFIX}" \
-  --INTERNAL_IP=true \
-  --RUN_NAME=maxtext \
-  --COMMAND="${MULTIHOST_COMMAND}"
+done"
