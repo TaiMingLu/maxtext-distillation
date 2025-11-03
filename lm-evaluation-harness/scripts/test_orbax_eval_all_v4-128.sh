@@ -4,6 +4,8 @@ set +x
 set -eo pipefail
 
 bucket_name='taiming_us_central2_b'
+export TPU_PREFIX="taiming-v4-128"
+export HF_MODEL_PATH='/home/terry/gcs-bucket/HF_HOME/Llama-3.1-8B'
 EVAL_RESULTS_DIR="/home/terry/gcs-bucket/eval/results"
 
 BASE_OUTPUT_DIRECTORY="gs://$bucket_name/eval_param_only"
