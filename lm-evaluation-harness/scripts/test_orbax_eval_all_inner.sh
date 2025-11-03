@@ -10,7 +10,7 @@ set -eo pipefail
 : "${HF_MODEL_PATH:?Set HF_MODEL_PATH before running}"
 : "${WANDB_API_KEY:?Set WANDB_API_KEY before running}"
 : "${WANDB_PROJECT:?Set WANDB_PROJECT before running}"
-: "${RUN_NAME:?Set RUN_NAME before running}"
+RUN_NAME=${RUN_NAME:-maxtext}
 
 export XLA_PYTHON_CLIENT_MEM_FRACTION=${XLA_PYTHON_CLIENT_MEM_FRACTION:-0.9}
 export XLA_PYTHON_CLIENT_ALLOCATOR=${XLA_PYTHON_CLIENT_ALLOCATOR:-platform}
