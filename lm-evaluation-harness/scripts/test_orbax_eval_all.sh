@@ -111,7 +111,6 @@ for parent_dir in distill_pretrain pretrain; do
         force_unroll=true"
 
       cd ~/maxtext/
-      export PYTHONPATH=\${ROOT}:\$(pwd):\$PYTHONPATH
       echo "Evaluating ${parent_dir}/${MODEL_RUN_NAME} at step ${STEP}"
       python -u multihost_runner_orig.py \
         --TPU_PREFIX=${TPU_PREFIX} \
