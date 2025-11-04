@@ -140,7 +140,7 @@ for parent_dir in distill_pretrain pretrain; do
         --hf_model_path=${HF_MODEL_PATH} \
         --add_special_tokens=False \
         --eval_save_dir=${EVAL_RESULTS_DIR} \
-        --ppl_batch_size=2 \
+        --ppl_batch_size=1 \
         --acc_batch_size=1024 \
     "
 
