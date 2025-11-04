@@ -116,8 +116,8 @@ def get_slices():
         f"Error occurred trying to find TPU slices named {args.TPU_PREFIX} or matching regex "
         f"{args.TPU_PREFIX}-[0-9]+ in project {args.PROJECT} zone {args.ZONE}"
     )
-    print(f"Error is:
-{err_msg}")
+    print("Error is:")
+    print(err_msg)
     return []
 
   instances = completed_command.stdout.decode()
