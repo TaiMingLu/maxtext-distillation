@@ -114,15 +114,14 @@ def get_slices():
     err_msg = e.stderr.decode().strip() if e.stderr else str(e)
     print(
         f"Error occurred trying to find TPU slices named {args.TPU_PREFIX} or matching regex "
-        f"
- {args.TPU_PREFIX}-[0-9]+ in project {args.PROJECT} zone {args.ZONE}")
+        f"{args.TPU_PREFIX}-[0-9]+ in project {args.PROJECT} zone {args.ZONE}"
+    )
     print(f"Error is:
- {err_msg}")
+{err_msg}")
     return []
 
   instances = completed_command.stdout.decode()
-  instance_rows = instances.strip().split('
-')
+  instance_rows = instances.strip().splitlines()
   raw_instances = instance_rows[1:] if len(instance_rows) > 1 else []
   instance_list = filter_instances(raw_instances, args.TPU_PREFIX)
   if not instance_list:
