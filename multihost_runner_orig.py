@@ -103,48 +103,83 @@ Slice = namedtuple('Slice', ['name', 'slice_num', 'num_workers', 'version'])
 
 def get_slices():
   """ Returns a list of slices matching TPU_PREFIX """
-  command = [
+  list_command = [
       "gcloud", "compute", "tpus", "tpu-vm", "list",
       f"--filter=name~{args.TPU_PREFIX}", "--format=csv(name,accelerator_type)",
       f"--project={args.PROJECT}", f"--zone={args.ZONE}"
   ]
   try:
-    completed_command = subprocess.run(command, capture_output=True, check=True)
+    completed_command = subprocess.run(list_command, capture_output=True, check=True)
   except subprocess.CalledProcessError as e:
-    print(f"Error occurred trying to find TPU slices named {args.TPU_PREFIX} or matching regex \n {args.TPU_PREFIX}-[0-9]+ "
-     f"in project {args.PROJECT} zone {args.ZONE}")
-    print(f"Error is:\n {e.stderr}")
+    err_msg = e.stderr.decode().strip() if e.stderr else str(e)
+    print(
+        f"Error occurred trying to find TPU slices named {args.TPU_PREFIX} or matching regex "
+        f"
+ {args.TPU_PREFIX}-[0-9]+ in project {args.PROJECT} zone {args.ZONE}")
+    print(f"Error is:
+ {err_msg}")
     return []
-  instances = completed_command.stdout.decode()
-  instance_list = instances.strip().split('\n')
-  instance_list = filter_instances(instance_list[1:], args.TPU_PREFIX) # First row is headers
-  num_slices = len(instance_list)
-  slices = [None for _ in range(num_slices)]
-  if not instance_list:
-      print(f"No TPUs found with name {args.TPU_PREFIX} in project {args.PROJECT} zone {args.ZONE}")
-      return []
-      
-  num_slices = len(instance_list)
-  slices = [None for _ in range(num_slices)]
 
+  instances = completed_command.stdout.decode()
+  instance_rows = instances.strip().split('
+')
+  raw_instances = instance_rows[1:] if len(instance_rows) > 1 else []
+  instance_list = filter_instances(raw_instances, args.TPU_PREFIX)
+  if not instance_list:
+    print(f"No TPUs found with name {args.TPU_PREFIX} in project {args.PROJECT} zone {args.ZONE}")
+    return []
+
+  num_slices = len(instance_list)
   if num_slices > 0:
     print(f"{num_slices} slices found.", flush=True)
   else:
-    print(f"No TPUs found with name {args.TPU_PREFIX} or matching regex {args.TPU_PREFIX}-[0-9]+ "
-    "in project {args.PROJECT} and zone {args.ZONE}.")
+    print(
+        f"No TPUs found with name {args.TPU_PREFIX} or matching regex {args.TPU_PREFIX}-[0-9]+ "
+        f"in project {args.PROJECT} and zone {args.ZONE}.")
     return []
 
   slice_names = [instance.split(',')[0] for instance in instance_list]
   slice_versions = [instance.split(',')[1] for instance in instance_list]
-  # Get number of workers in any slice (assume same worker count for all slices.)
-  command = [
-      "gcloud", "compute", "tpus", "describe", slice_names[0],
-      "--flatten=networkEndpoints[]", "--format=csv[no-heading](networkEndpoints.ipAddress)",
-      f"--project={args.PROJECT}", f"--zone={args.ZONE}"
-  ]
-  completed_command = subprocess.run(command, capture_output=True, check=True)
-  num_workers = len(completed_command.stdout.decode().strip().split('\n'))
 
+  describe_variants = [
+      [
+          "gcloud", "compute", "tpus", "tpu-vm", "describe", slice_names[0],
+          "--flatten=networkEndpoints[]",
+          "--format=csv[no-heading](networkEndpoints.ipAddress)",
+          f"--project={args.PROJECT}", f"--zone={args.ZONE}"
+      ],
+      [
+          "gcloud", "compute", "tpus", "describe", slice_names[0],
+          "--flatten=networkEndpoints[]",
+          "--format=csv[no-heading](networkEndpoints.ipAddress)",
+          f"--project={args.PROJECT}", f"--zone={args.ZONE}"
+      ],
+  ]
+  describe_result = None
+  errors = []
+  for describe_command in describe_variants:
+    try:
+      describe_result = subprocess.run(describe_command, capture_output=True, check=True)
+      break
+    except subprocess.CalledProcessError as err:
+      err_msg = err.stderr.decode().strip() if err.stderr else str(err)
+      errors.append((" ".join(describe_command), err_msg))
+
+  if describe_result is None:
+    print(f"Failed to describe TPU slice {slice_names[0]} using gcloud commands.", flush=True)
+    for command_str, err_msg in errors:
+      print(f"Command `{command_str}` failed with: {err_msg}")
+    return []
+
+  worker_ips = [ip for ip in describe_result.stdout.decode().splitlines() if ip.strip()]
+  if not worker_ips:
+    print(
+        f"No network endpoints returned when describing TPU slice {slice_names[0]} in project {args.PROJECT} "
+        f"zone {args.ZONE}.")
+    return []
+  num_workers = len(worker_ips)
+
+  slices = [None for _ in range(num_slices)]
   for slice_name, version in zip(slice_names, slice_versions):
     if num_slices > 1:
       slice_num = int(slice_name.split('-')[-1])
@@ -152,6 +187,7 @@ def get_slices():
       slice_num = 0
     slices[slice_num] = Slice(slice_name, slice_num, num_workers, version)
   return slices
+
 
 def filter_instances(instance_list, tpu_prefix):
   # First look for exact match with tpu_prefix
