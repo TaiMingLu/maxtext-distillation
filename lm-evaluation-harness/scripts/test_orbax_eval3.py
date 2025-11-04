@@ -131,11 +131,11 @@ PPL_TASKS = [
 ]
 
 ACC_TASKS = [
-    {
-        "name": "winogrande",
-        "num_fewshot": 0,
-        "acc_key": "acc,none",
-    },
+    # {
+    #     "name": "winogrande",
+    #     "num_fewshot": 0,
+    #     "acc_key": "acc,none",
+    # },
     # {
     #     "name": "winogrande",
     #     "num_fewshot": 5,
@@ -166,11 +166,11 @@ ACC_TASKS = [
     #     "num_fewshot": 10,
     #     "acc_key": "acc_norm,none",
     # },
-    # {
-    #     "name": "mmlu",
-    #     "num_fewshot": 0,
-    #     "acc_key": None,
-    # },
+    {
+        "name": "mmlu",
+        "num_fewshot": 0,
+        "acc_key": None,
+    },
     # {
     #     "name": "mmlu",
     #     "num_fewshot": 5,
