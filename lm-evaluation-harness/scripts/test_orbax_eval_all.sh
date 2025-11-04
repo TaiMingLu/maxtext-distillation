@@ -21,6 +21,7 @@ DESIRED_MODELS=(
   'llama3.1-1b_finewebedu_distill_pretrain_A_1B_T_50B_S42_alpha_05_seed43'
   'llama3.1-1b_finewebedu_distill_pretrain_A_1B_T_50B_S42_alpha_1_seed43'
 )
+DESIRED_STEPS=(0 2500 5000 7500 10000 12500 15000 17500 20000 22500 24999)
 
 cd "${HOME}/maxtext"
 export PYTHONPATH="$(pwd):${PYTHONPATH}"
@@ -74,6 +75,20 @@ for parent_dir in distill_pretrain pretrain; do
       STEP="${step_path%/}"
       STEP="${STEP##*/}"
       [[ -z "${STEP}" ]] && continue
+
+      if [[ ${#DESIRED_STEPS[@]} -gt 0 ]]; then
+        allowed_step=false
+        for desired_step in "${DESIRED_STEPS[@]}"; do
+          if [[ "${STEP}" == "${desired_step}" ]]; then
+            allowed_step=true
+            break
+          fi
+        done
+        if [[ "${allowed_step}" != true ]]; then
+          echo "Step ${STEP} not in allow list; skipping."
+          continue
+        fi
+      fi
 
       MODEL_RUN_NAME="${model_run_name}"
       DIRECT_PARAMETER_CHECKPOINT_RUN="${MODEL_RUN_NAME}_step_${STEP}"
