@@ -103,16 +103,10 @@ Slice = namedtuple('Slice', ['name', 'slice_num', 'num_workers', 'version'])
 
 def get_slices():
   """ Returns a list of slices matching TPU_PREFIX """
-  # command = [
-  #     "gcloud", "alpha", "compute", "tpus", "tpu-vm", "list",
-  #     f"--filter=name~{args.TPU_PREFIX}", "--format=csv(name,accelerator_type)",
-  #     f"--project={args.PROJECT}", f"--zone={args.ZONE}"
-  # ]
   command = [
-    "gcloud", "compute", "tpus", "tpu-vm", "describe", slice_names[0],
-    "--flatten=networkEndpoints[]",
-    "--format=csv[no-heading](networkEndpoints.ipAddress)",
-    f"--project={args.PROJECT}", f"--zone={args.ZONE}"
+      "gcloud", "compute", "tpus", "tpu-vm", "list",
+      f"--filter=name~{args.TPU_PREFIX}", "--format=csv(name,accelerator_type)",
+      f"--project={args.PROJECT}", f"--zone={args.ZONE}"
   ]
   try:
     completed_command = subprocess.run(command, capture_output=True, check=True)
