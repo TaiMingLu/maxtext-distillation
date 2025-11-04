@@ -77,15 +77,15 @@ for parent_dir in distill_pretrain pretrain; do
       [[ -z "${STEP}" ]] && continue
 
       if [[ ${#DESIRED_STEPS[@]} -gt 0 ]]; then
-        allowed_step=false
+        should_process=false
         for desired_step in "${DESIRED_STEPS[@]}"; do
           if [[ "${STEP}" == "${desired_step}" ]]; then
-            allowed_step=true
+            should_process=true
             break
           fi
         done
-        if [[ "${allowed_step}" != true ]]; then
-          echo "Step ${STEP} not in allow list; skipping."
+        if [[ "${should_process}" != true ]]; then
+          echo "Step ${STEP} not in DESIRED_STEPS; skipping."
           continue
         fi
       fi
