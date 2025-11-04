@@ -20,7 +20,7 @@ from MaxText.utils.ckpt_conversion.utils.hf_utils import (
 from MaxText import maxengine
 
 from jax.experimental import mesh_utils
-from jax.sharding import Mesh
+from jax.sharding import Mesh, NamedSharding
 from jax.experimental.pjit import pjit
 from flax.linen import partitioning as nn_partitioning
 
@@ -131,12 +131,24 @@ class OrbaxLM(LM):
         self.state_mesh_shardings = state_mesh_shardings
         self.mesh = mesh
 
+        self.input_sharding = self._compute_input_sharding()
+        self.batch_axis_shard_multiple = self._infer_batch_axis_shard_multiple()
+        self.devices_in_data_fsdp = self.batch_axis_shard_multiple
         self._compiled_forward = self._create_fast_forward()
-        
+
     def _create_fast_forward(self):
-        @partial(pjit,
-                 in_shardings=(self.state_mesh_shardings.params, None, None, None),
-                 out_shardings=None)
+        input_sharding = self.input_sharding
+
+        @partial(
+            pjit,
+            in_shardings=(
+                self.state_mesh_shardings.params,
+                input_sharding,
+                input_sharding,
+                input_sharding,
+            ),
+            out_shardings=None,
+        )
         def fast_forward(params, input_ids, positions, segment_ids):
             return self.model.apply(
                 params,
@@ -147,14 +159,67 @@ class OrbaxLM(LM):
                 rngs={"aqt": jax.random.PRNGKey(0)},
             )
         return fast_forward
-       
+
+    def _compute_input_sharding(self):
+        try:
+            return maxtext_utils.get_input_data_sharding(self.config, self.mesh)
+        except Exception:
+            return None
+
+    def _infer_batch_axis_shard_multiple(self) -> int:
+        """Infer how many devices share the leading batch axis."""
+        sharding = self.input_sharding
+        if not isinstance(sharding, NamedSharding):
+            return 1
+
+        spec = getattr(sharding, "spec", None)
+        mesh = getattr(sharding, "mesh", None)
+        if spec is None or mesh is None or not spec:
+            return 1
+
+        batch_axes = spec[0]
+        if batch_axes is None:
+            return 1
+        if isinstance(batch_axes, str):
+            batch_axes = (batch_axes,)
+
+        multiple = 1
+        for axis in batch_axes:
+            if axis is None:
+                continue
+            axis_size = mesh.shape.get(axis)
+            if axis_size is None:
+                continue
+            multiple *= axis_size
+
+        return multiple if multiple > 0 else 1
+
     def forward(self, input_ids, **kwargs):
         input_ids_np = input_ids.cpu().numpy()
         input_ids_jax = jnp.asarray(input_ids_np, dtype=jnp.int32)
 
-        batch_size, seq_len = input_ids_jax.shape
+        original_batch, seq_len = input_ids_jax.shape
+        pad_multiple = self.batch_axis_shard_multiple
+        pad_size = 0
+        if pad_multiple > 1:
+            remainder = original_batch % pad_multiple
+            if remainder:
+                pad_size = pad_multiple - remainder
+                pad_value = getattr(self.tokenizer, "pad_token_id", 0) or 0
+                input_ids_jax = jnp.pad(
+                    input_ids_jax,
+                    ((0, pad_size), (0, 0)),
+                    constant_values=pad_value,
+                )
+
+        batch_size, _ = input_ids_jax.shape
         segment_ids = jnp.ones((batch_size, seq_len), dtype=jnp.int32)
         positions = jnp.tile(jnp.arange(seq_len, dtype=jnp.int32), (batch_size, 1))
+
+        if self.input_sharding is not None:
+            input_ids_jax = jax.device_put(input_ids_jax, self.input_sharding)
+            segment_ids = jax.device_put(segment_ids, self.input_sharding)
+            positions = jax.device_put(positions, self.input_sharding)
 
         with self.mesh, nn_partitioning.axis_rules(self.config.logical_axis_rules):
             jax_logits = self._compiled_forward(
@@ -164,11 +229,15 @@ class OrbaxLM(LM):
                 segment_ids,
             )
 
+        if pad_size:
+            jax_logits = jax_logits[:original_batch]
+        logits_torch = convert_jax_weight_to_torch(jax_logits)
+
         class Output:
             def __init__(self, logits):
-                self.logits = convert_jax_weight_to_torch(logits)
+                self.logits = logits
 
-        return Output(jax_logits)
+        return Output(logits_torch)
 
     @classmethod
     def create_from_arg_string(cls, arg_string, additional_config=None):
