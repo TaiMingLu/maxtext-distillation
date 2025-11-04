@@ -137,7 +137,7 @@ for parent_dir in distill_pretrain pretrain; do
       fi
 
       python3.10 -m pip install -e .
-      python3.10 -u scripts/test_orbax_eval.py ../MaxText/configs/base.yml         load_parameters_path=\"\${UNSCANNED_CKPT_PATH}\"         run_name=\"\${DIRECT_PARAMETER_CHECKPOINT_RUN}\"         per_device_batch_size=4         model_name=\"\${MODEL}\"         max_prefill_predict_length=4         max_target_length=8192         dataset_type=synthetic         dtype=bfloat16         scan_layers=false         attention=dot_product         --hf_model_path=\"\${HF_MODEL_PATH}\"         --add_special_tokens=False         --eval_save_dir=\"\${EVAL_RESULTS_DIR}\"         --ppl_batch_size=8         --acc_batch_size=1024
+      python3.10 -u scripts/test_orbax_eval.py ../MaxText/configs/base.yml         load_parameters_path=\"\${UNSCANNED_CKPT_PATH}\"         run_name=\"\${DIRECT_PARAMETER_CHECKPOINT_RUN}\"         per_device_batch_size=4         model_name=\"\${MODEL}\"         max_prefill_predict_length=4         max_target_length=8192         dataset_type=synthetic         dtype=bfloat16         scan_layers=false         attention=dot_product         --hf_model_path=\"\${HF_MODEL_PATH}\"         --add_special_tokens=False         --eval_save_dir=\"\${EVAL_RESULTS_DIR}\"         --ppl_batch_size=2         --acc_batch_size=1024
 
       echo \"Cleaning up converted checkpoint for \${parent_dir}/\${MODEL_RUN_NAME} step \${STEP}\"
       rm -rf \"\${BASE_OUTPUT_DIRECTORY}/\${DIRECT_PARAMETER_CHECKPOINT_RUN}\"
