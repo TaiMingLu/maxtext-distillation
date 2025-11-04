@@ -7,7 +7,6 @@ import jax
 import jax.numpy as jnp
 import numpy as np
 import sys
-import time
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -31,85 +30,6 @@ from jax.sharding import Mesh
 from jax.experimental import mesh_utils
 
 import math
-
-def _human_readable_bytes(num_bytes):
-    units = ["B", "KiB", "MiB", "GiB", "TiB"]
-    size = float(num_bytes)
-    unit_idx = 0
-    while size >= 1024.0 and unit_idx < len(units) - 1:
-        size /= 1024.0
-        unit_idx += 1
-    return f"{size:.2f} {units[unit_idx]}"
-
-def print_device_memory(note=""):
-    try:
-        devices = jax.devices()
-    except Exception:
-        devices = []
-    try:
-        backend = jax.default_backend()
-    except Exception:
-        backend = "unknown"
-    header = f"[Device Memory]{' ' + note if note else ''} | backend={backend} | devices={len(devices)}"
-    print(header)
-    for dev in devices:
-        # Compose a friendly name
-        dev_kind = getattr(dev, "device_kind", getattr(dev, "kind", ""))
-        dev_name = f"{getattr(dev, 'platform', 'unknown')}:{getattr(dev, 'id', '?')} ({dev_kind})"
-
-        printed = False
-        # Preferred: memory_stats() if available (often on TPU)
-        try:
-            if hasattr(dev, "memory_stats"):
-                stats = dev.memory_stats()
-                if isinstance(stats, dict) and stats:
-                    in_use = stats.get("bytes_in_use") or stats.get("kb_in_use", 0) * 1024
-                    peak = stats.get("peak_bytes_in_use") or stats.get("peak_kb_in_use", 0) * 1024
-                    total = stats.get("total_memory") or stats.get("kb_total", 0) * 1024
-                    parts = []
-                    if in_use:
-                        parts.append(f"in_use={_human_readable_bytes(in_use)}")
-                    if peak:
-                        parts.append(f"peak={_human_readable_bytes(peak)}")
-                    if total:
-                        parts.append(f"total={_human_readable_bytes(total)}")
-                    if parts:
-                        print(f"  {dev_name}: " + ", ".join(parts))
-                        printed = True
-        except Exception:
-            pass
-
-        # Fallbacks commonly available on GPU/others
-        if not printed:
-            alloc = None
-            limit = None
-            try:
-                if hasattr(dev, "memory_allocated"):
-                    alloc = dev.memory_allocated()
-            except Exception:
-                pass
-            try:
-                if hasattr(dev, "memory_limit"):
-                    limit = dev.memory_limit()
-            except Exception:
-                pass
-            try:
-                if limit is None and hasattr(dev, "total_memory"):
-                    limit = dev.total_memory()
-            except Exception:
-                pass
-
-            if alloc is not None or limit is not None:
-                parts = []
-                if alloc is not None:
-                    parts.append(f"in_use={_human_readable_bytes(int(alloc))}")
-                if limit is not None:
-                    parts.append(f"total={_human_readable_bytes(int(limit))}")
-                print(f"  {dev_name}: " + ", ".join(parts))
-                printed = True
-
-        if not printed:
-            print(f"  {dev_name}: memory stats unavailable")
 
 def str2bool(v):
     if isinstance(v, bool):
@@ -166,16 +86,6 @@ ACC_TASKS = [
     #     "num_fewshot": 10,
     #     "acc_key": "acc_norm,none",
     # },
-    {
-        "name": "mmlu",
-        "num_fewshot": 0,
-        "acc_key": None,
-    },
-    # {
-    #     "name": "mmlu",
-    #     "num_fewshot": 5,
-    #     "acc_key": None,
-    # },
     # {
     #     "name": "truthfulqa_mc1",
     #     "num_fewshot": 0,
@@ -224,6 +134,16 @@ ACC_TASKS = [
     # {
     #     "name": "rte",
     #     "num_fewshot": 0,
+    #     "acc_key": None,
+    # },
+    {
+        "name": "mmlu",
+        "num_fewshot": 0,
+        "acc_key": None,
+    },
+    # {
+    #     "name": "mmlu",
+    #     "num_fewshot": 5,
     #     "acc_key": None,
     # },
     # {
@@ -296,12 +216,8 @@ def get_ppl(
     if task_range:
         tasks = [t for t in tasks if t in task_range]
     
-    print(f"Starting PPL evaluation for tasks: {tasks}")
     ppl_res = {}
-    ppl_times = {}
     for task in tasks:
-        print(f"Currently evaluating PPL task: {task}")
-        start_ts = time.perf_counter()
         testenc = get_ppl_enc(task, tokenizer, add_special_tokens=add_special_tokens)
         tot_loss = 0
         tot_tokens = 0
@@ -331,18 +247,15 @@ def get_ppl(
                 tot_tokens += seq_len * (j - i)
                 
             ppl_res[task] = torch.exp(torch.tensor(tot_loss / tot_tokens)).item()
-            duration_s = time.perf_counter() - start_ts
-            ppl_times[task] = duration_s
-            print(f"{task} PPL: {ppl_res[task]} (time: {duration_s:.2f}s)")
+            print(task, ppl_res[task])
             if task == "dclm":
                 print("dclm val loss", math.log(ppl_res[task]))
-            print_device_memory(f"after PPL task {task}")
                 
-    return ppl_res, ppl_times
+    return ppl_res
 
-def get_acc(model, tokenizer, tasks, task_range=[], limit=1000000, batch_size=32):
+def get_acc(model, tokenizer, tasks, task_range=[], limit=1000000):
     # lm_eval_model = models.orbax_lm.HFLM(
-    #     pretrained=model,
+    #     pretrained=model, 
     #     tokenizer=tokenizer,
     #     generation_kwargs={
     #         "do_sample": True,
@@ -352,39 +265,29 @@ def get_acc(model, tokenizer, tasks, task_range=[], limit=1000000, batch_size=32
     # )
     if task_range:
         tasks = [cfg for cfg in tasks if cfg["name"] in task_range]
-
+    
     print("tasks to evaluate:")
     print(json.dumps(tasks, indent=2))
-    print(f"Starting accuracy evaluation with batch_size={batch_size}...")
     acc_res = {}
-    full_res_by_task = {}
-    acc_times = {}
     for cfg in tasks:
         task = cfg["name"]
-        print(f"Currently evaluating ACC task: {task} (fewshot={cfg['num_fewshot']})")
-        start_ts = time.perf_counter()
         res = evaluator.simple_evaluate(
             model=model,
             tasks=[task],
             num_fewshot=cfg["num_fewshot"],
-            max_batch_size=batch_size,
+            max_batch_size=32,
             log_samples=True,
-            # task_kwargs={"limit": 256},
+            # task_kwargs={"limit": 256}, 
             confirm_run_unsafe_code=True,
             limit=limit
         )
         
         print(res['results'][task])
-        duration_s = time.perf_counter() - start_ts
-        times_key = f"{task}/fewshot={cfg['num_fewshot']}"
-        acc_times[times_key] = duration_s
-        print(f"{times_key} ACC eval time: {duration_s:.2f}s")
         acc_key = cfg["acc_key"]
         if acc_key is not None:
             acc_res[task] = res['results'][task][acc_key]
-        full_res_by_task[task] = res
-        print_device_memory(f"after ACC task {times_key}")
-    return acc_res, full_res_by_task, acc_times
+
+    return acc_res
 
 def cast_orbax_state_to_bf16(orbax_state):
     casted_params = jax.tree_util.tree_map(
@@ -406,7 +309,6 @@ def main(config, test_args):
     orbax_state, _ = maxtext_utils.setup_decode_state(orbax_model, config, rng1, mesh, None)
     
     orbax_state = cast_orbax_state_to_bf16(orbax_state)
-    print_device_memory("after model init")
     
     _, _, state_mesh_shardings = maxtext_utils.get_abstract_state(
         orbax_model, None, config, rng1, mesh, is_training=False
@@ -414,71 +316,27 @@ def main(config, test_args):
 
     model = OrbaxLM(orbax_model, orbax_state, tokenizer, config, state_mesh_shardings, mesh)
     
-    print_device_memory("before PPL eval")
-    ppl_res, ppl_times = get_ppl(
-        model,
-        tokenizer,
-        batch_size=test_args.ppl_batch_size,
+    ppl_res = get_ppl(
+        model, 
+        tokenizer, 
+        # batch_size=config.global_batch_size_to_train_on, 
+        batch_size=1,
         calib_size=min(256, test_args.limit),
-        max_length=config.max_target_length,
+        max_length=config.max_target_length, 
         tasks=PPL_TASKS,
         add_special_tokens=test_args.add_special_tokens,
         task_range=test_args.tasks,
     )
     print(ppl_res)
-    print({"ppl_times_s": ppl_times})
 
-    print_device_memory("before ACC eval")
-    acc_res, acc_full, acc_times = get_acc(
+    acc_res = get_acc(
         model,
         tokenizer,
         tasks=ACC_TASKS,
         task_range=test_args.tasks,
-        limit=test_args.limit,
-        batch_size=test_args.acc_batch_size
+        limit=test_args.limit
     )
     print(acc_res)
-    print({"acc_times_s": acc_times})
-
-    # Optionally save results to disk
-    if getattr(test_args, "eval_save_dir", ""):
-        os.makedirs(test_args.eval_save_dir, exist_ok=True)
-
-        def to_serializable(obj):
-            try:
-                import numpy as _np
-                import jax.numpy as _jnp
-            except Exception:  # pragma: no cover
-                _np, _jnp = None, None
-            if _np is not None and isinstance(obj, _np.generic):
-                return obj.item()
-            if _jnp is not None and hasattr(obj, "dtype") and hasattr(obj, "tolist"):
-                return obj.tolist()
-            if hasattr(obj, "tolist"):
-                return obj.tolist()
-            raise TypeError(f"Object of type {type(obj).__name__} is not JSON serializable")
-
-        results_payload = {
-            "run_name": getattr(config, "run_name", ""),
-            "model_name": getattr(config, "model_name", ""),
-            "limit": test_args.limit,
-            "tasks_requested": test_args.tasks,
-            "add_special_tokens": test_args.add_special_tokens,
-            "ppl": ppl_res,
-            "lm_eval": {
-                "acc_summary": acc_res,
-                "per_task": acc_full,
-            },
-            "timing": {
-                "ppl": ppl_times,
-                "lm_eval": acc_times,
-            },
-        }
-
-        save_path = os.path.join(test_args.eval_save_dir, f"{getattr(config, 'run_name', 'results')}.json")
-        with open(save_path, "w") as f:
-            json.dump(results_payload, f, indent=2, default=to_serializable)
-        print(f"Saved results to {save_path}")
     
 if __name__ == "__main__":
     jax.config.update("jax_default_prng_impl", "unsafe_rbg")
@@ -495,9 +353,6 @@ if __name__ == "__main__":
     parser.add_argument('--add_special_tokens', type=str2bool, default=True)
     parser.add_argument("--limit", type=int, default=1000000)
     parser.add_argument("--tasks", type=lambda x: [] if not x else x.split(","), default=[])
-    parser.add_argument("--eval_save_dir", type=str, required=False, default="")
-    parser.add_argument("--ppl_batch_size", type=int, default=1, help="Batch size for PPL evaluation (default: 1)")
-    parser.add_argument("--acc_batch_size", type=int, default=32, help="Batch size for accuracy evaluation (default: 32)")
     test_args, _ = parser.parse_known_args()
 
     # Remove args defined in this test file to avoid error from pyconfig
@@ -512,11 +367,7 @@ if __name__ == "__main__":
         "--run_hf_model",
         "--add_special_tokens",
         "--limit",
-        "--tasks",
-        "--save_dir",
-        "--eval_save_dir",
-        "--ppl_batch_size",
-        "--acc_batch_size"
+        "--tasks"
     ]
     for arg in to_remove_args:
         model_args = [s for s in model_args if not s.startswith(arg)]
