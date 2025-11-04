@@ -126,6 +126,12 @@ def get_slices():
   instance_list = filter_instances(instance_list[1:], args.TPU_PREFIX) # First row is headers
   num_slices = len(instance_list)
   slices = [None for _ in range(num_slices)]
+  if not instance_list:
+      print(f"No TPUs found with name {args.TPU_PREFIX} in project {args.PROJECT} zone {args.ZONE}")
+      return []
+      
+  num_slices = len(instance_list)
+  slices = [None for _ in range(num_slices)]
 
   if num_slices > 0:
     print(f"{num_slices} slices found.", flush=True)
