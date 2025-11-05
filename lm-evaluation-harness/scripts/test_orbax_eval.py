@@ -3,6 +3,9 @@
 # pip install sacrebleu accelerate peft 
 import os
 import json
+import shutil
+import tempfile
+from pathlib import Path
 import jax
 import jax.numpy as jnp
 import numpy as np
@@ -374,14 +377,24 @@ def get_acc(model, tokenizer, tasks, task_range=[], limit=1000000, batch_size=32
             limit=limit
         )
         
-        print(res['results'][task])
+        task_metrics = res['results'][task]
+        print(task_metrics)
         duration_s = time.perf_counter() - start_ts
         times_key = f"{task}/fewshot={cfg['num_fewshot']}"
         acc_times[times_key] = duration_s
         print(f"{times_key} ACC eval time: {duration_s:.2f}s")
         acc_key = cfg["acc_key"]
-        if acc_key is not None:
-            acc_res[task] = res['results'][task][acc_key]
+        summary_value = None
+        if acc_key is not None and acc_key in task_metrics:
+            summary_value = task_metrics[acc_key]
+        else:
+            fallback_keys = ["acc,none", "acc_norm,none", "acc", "acc_norm"]
+            for key in fallback_keys:
+                if key in task_metrics:
+                    summary_value = task_metrics[key]
+                    break
+        if summary_value is not None:
+            acc_res[task] = summary_value
         full_res_by_task[task] = res
         print_device_memory(f"after ACC task {times_key}")
     return acc_res, full_res_by_task, acc_times
@@ -475,9 +488,30 @@ def main(config, test_args):
             },
         }
 
-        save_path = os.path.join(test_args.eval_save_dir, f"{getattr(config, 'run_name', 'results')}.json")
-        with open(save_path, "w") as f:
-            json.dump(results_payload, f, indent=2, default=to_serializable)
+        save_dir = Path(test_args.eval_save_dir)
+        save_path = save_dir / f"{getattr(config, 'run_name', 'results')}.json"
+
+        temp_root = Path.home() / ".maxtext_eval_tmp"
+        temp_root.mkdir(parents=True, exist_ok=True)
+
+        tmp_path = None
+        with tempfile.NamedTemporaryFile("w", dir=str(temp_root), suffix=".json", delete=False) as tmp_file:
+            json.dump(results_payload, tmp_file, indent=2, default=to_serializable)
+            tmp_file.flush()
+            os.fsync(tmp_file.fileno())
+            tmp_path = Path(tmp_file.name)
+
+        try:
+            shutil.move(str(tmp_path), save_path)
+        except Exception:
+            # Clean up the temporary file if the move failed before re-raising
+            try:
+                if tmp_path is not None and tmp_path.exists():
+                    tmp_path.unlink()
+            except Exception:
+                pass
+            raise
+
         print(f"Saved results to {save_path}")
     
 if __name__ == "__main__":

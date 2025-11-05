@@ -17,7 +17,7 @@ export JAX_DISABLE_MOST_OPTIMIZATIONS=False
 
 DESIRED_MODELS=(
   'llama3.1-1b_finewebedu_pretrain_shuffled_lr_3e-4_seed_43'
-  'llama3.1-1b_finewebedu_distill_hard_pretrain_A_1B_T_50B_S42_alpha_06_seed43'
+  # 'llama3.1-1b_finewebedu_distill_hard_pretrain_A_1B_T_50B_S42_alpha_06_seed43'
   'llama3.1-1b_finewebedu_distill_pretrain_A_1B_T_50B_S42_alpha_05_seed43'
   'llama3.1-1b_finewebedu_distill_pretrain_A_1B_T_50B_S42_alpha_1_seed43'
 )
