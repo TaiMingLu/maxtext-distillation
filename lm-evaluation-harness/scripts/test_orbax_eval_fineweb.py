@@ -282,7 +282,7 @@ def get_ppl_enc(task, tokenizer, add_special_tokens: bool = True):
     elif task == 'finewebedu-test-100M':
         dataset = load_dataset(
             "TaiMingLu/finewebedu-test-100M",
-            split="train",
+            split="test",
             trust_remote_code=True
         )
         text_column = "text"
