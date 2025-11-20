@@ -16,13 +16,13 @@ export XLA_PYTHON_CLIENT_ALLOCATOR=platform
 export JAX_DISABLE_MOST_OPTIMIZATIONS=False
 
 DESIRED_MODELS=(
-  # 'llama3.1-1b_finewebedu_pretrain_shuffled_lr_3e-4_seed_43'
+  'llama3.1-1b_finewebedu_pretrain_shuffled_lr_3e-4_seed_43'
   # 'llama3.1-1b_finewebedu_distill_hard_pretrain_A_1B_T_50B_S42_alpha_06_seed43'
-  # 'llama3.1-1b_finewebedu_distill_pretrain_A_1B_T_50B_S42_alpha_05_seed43'
-  # 'llama3.1-1b_finewebedu_distill_pretrain_A_1B_T_50B_S42_alpha_1_seed43'
-  'llama3.1-1b-finewebedu-distill-soft-T50BS42-a02-s43'
-  'llama3.1-1b-finewebedu-distill-soft-T50BS42-a04-s43'
-  'llama3.1-1b-finewebedu-distill-soft-T50BS42-a08-s43'
+  'llama3.1-1b_finewebedu_distill_pretrain_A_1B_T_50B_S42_alpha_05_seed43'
+  'llama3.1-1b_finewebedu_distill_pretrain_A_1B_T_50B_S42_alpha_1_seed43'
+  # 'llama3.1-1b-finewebedu-distill-soft-T50BS42-a02-s43'
+  # 'llama3.1-1b-finewebedu-distill-soft-T50BS42-a04-s43'
+  # 'llama3.1-1b-finewebedu-distill-soft-T50BS42-a08-s43'
 )
 DESIRED_STEPS=(0 2500 5000 7500 10000 12500 15000 17500 20000 22500 24999)
 
@@ -97,7 +97,7 @@ for parent_dir in distill_pretrain pretrain; do
       DIRECT_PARAMETER_CHECKPOINT_RUN="${MODEL_RUN_NAME}_step_${STEP}"
       CHECKPOINT_TO_CONVERT="gs://${bucket_name}/ckpts/${parent_dir}/${MODEL_RUN_NAME}/checkpoints/${STEP}/items"
       UNSCANNED_CKPT_PATH="${BASE_OUTPUT_DIRECTORY}/${DIRECT_PARAMETER_CHECKPOINT_RUN}/checkpoints/0/items"
-      RESULT_JSON_PATH="${EVAL_RESULTS_DIR}/${DIRECT_PARAMETER_CHECKPOINT_RUN}.json"
+      RESULT_JSON_PATH="$fineweb_{EVAL_RESULTS_DIR}/${DIRECT_PARAMETER_CHECKPOINT_RUN}.json"
 
       if [[ -f "${RESULT_JSON_PATH}" ]]; then
         echo "Results already exist at ${RESULT_JSON_PATH}; skipping ${parent_dir}/${MODEL_RUN_NAME} step ${STEP}"
@@ -144,7 +144,7 @@ for parent_dir in distill_pretrain pretrain; do
     export WANDB_NAME=\${RUN_NAME}
     export PYTHONPATH=\${ROOT}:\$(pwd):\$PYTHONPATH
     python3.10 -m pip install -e .
-    python3.10 -u scripts/test_orbax_eval.py ../MaxText/configs/base.yml \
+    python3.10 -u scripts/test_orbax_eval_fineweb.py ../MaxText/configs/base.yml \
         load_parameters_path=${UNSCANNED_CKPT_PATH} \
         run_name=${DIRECT_PARAMETER_CHECKPOINT_RUN} \
         per_device_batch_size=4 \
