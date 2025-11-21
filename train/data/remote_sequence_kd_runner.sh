@@ -14,7 +14,6 @@ PROGRESS_PATH=${PROGRESS_PATH:?PROGRESS_PATH is required}
 SERVER_LOG=${SERVER_LOG:?SERVER_LOG is required}
 GCS_DATA_PATH=${GCS_DATA_PATH:?GCS_DATA_PATH is required}
 
-RUN_NAME="sequence-kd"
 DATASET_PATH="HuggingFaceFW/fineweb-edu"
 DATA_SPLIT="sample-350BT"
 TEXT_COLUMN="text"
@@ -29,6 +28,16 @@ JETSTREAM_SERVER_PORT=${JETSTREAM_SERVER_PORT:-9000}
 SERVER_READY_TIMEOUT_SEC=${SERVER_READY_TIMEOUT_SEC:-900}
 ENGINE_PARALLEL_FLAGS=(ici_data_parallelism=4 ici_tensor_parallelism=4 ici_fsdp_parallelism=4 ici_autoregressive_parallelism=1)
 DECODE_SAMPLING_STRATEGY="greedy"
+
+printf '\n=== Sequence KD Config ===\n'
+printf 'Dataset: %s (%s)\n' "$DATASET_PATH" "$DATA_SPLIT"
+printf 'Teacher model: %s\n' "$TEACHER_MODEL_NAME"
+printf 'Teacher checkpoint: %s\n' "$TEACHER_PARAMETERS_PATH"
+printf 'Tokenizer: %s\n' "$TOKENIZER_PATH"
+printf 'Progress file: %s\n' "$PROGRESS_PATH"
+printf 'Server log: %s\n' "$SERVER_LOG"
+printf 'Output bucket path: gs://%s/%s\n' "$BUCKET_NAME" "$GCS_DATA_PATH"
+printf '==========================\n\n'
 
 source ~/maxtext_env/bin/activate
 export PYTHONPATH="${ROOT}:${PYTHONPATH:-}"
