@@ -31,7 +31,7 @@ SERVER_READY_TIMEOUT_SEC=180
 ENGINE_PARALLEL_FLAGS="ici_tensor_parallelism=8 ici_fsdp_parallelism=1 ici_autoregressive_parallelism=-1"
 DECODE_SAMPLING_STRATEGY="greedy"
 PROGRESS_FILE="/home/terry/gcs-bucket/sequence_kd_progress/${RUN_NAME}.json"
-SERVER_LOG="$HOME/sequence_kd_logs/${RUN_NAME}_server.log"
+SERVER_LOG="/tmp/sequence_kd_logs/${RUN_NAME}_server.log"
 GCS_DATA_PATH="sequence_kd/${TEACHER_MODEL_NAME}"
 
 printf '\n=== Sequence KD Config ===\n'
