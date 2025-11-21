@@ -59,17 +59,17 @@ if [[ \"\${WORKER_ID}\" != \"0\" ]]; then
   exit 0
 fi
 
-export HF_ACCESS_TOKEN=${HF_ACCESS_TOKEN}
-export BUCKET_NAME=${BUCKET_NAME}
-export PROGRESS_PATH=${PROGRESS_PATH}
-export SERVER_LOG=${SERVER_LOG}
-export GCS_DATA_PATH=${GCS_DATA_PATH}
+HF_ACCESS_TOKEN=\"${HF_ACCESS_TOKEN}\"
+BUCKET_NAME=\"${BUCKET_NAME}\"
+PROGRESS_PATH=\"${PROGRESS_PATH}\"
+SERVER_LOG=\"${SERVER_LOG}\"
+GCS_DATA_PATH=\"${GCS_DATA_PATH}\"
 
 rm -rf /tmp/sequence_kd
 mkdir -p /tmp/sequence_kd
-mkdir -p $(dirname ${PROGRESS_PATH})
+mkdir -p \"\$(dirname \"\${PROGRESS_PATH}\")\"
 
-SERVER_PID=""
+SERVER_PID=\"\"
 cleanup() {
   if [[ -n \"\${SERVER_PID}\" ]]; then
     kill \"\${SERVER_PID}\" >/dev/null 2>&1 || true
@@ -78,27 +78,27 @@ cleanup() {
 }
 trap cleanup EXIT
 
-python3 -u -m MaxText.maxengine_server MaxText/configs/base.yml \
-  model_name=${TEACHER_MODEL_NAME} \
-  tokenizer_path=${TOKENIZER_PATH} \
-  tokenizer_type=huggingface \
-  load_parameters_path=${TEACHER_PARAMETERS_PATH} \
-  max_target_length=${MAX_TARGET_LENGTH} \
-  max_prefill_predict_length=${MAX_PREFILL_LENGTH} \
-  per_device_batch_size=${SERVER_PER_DEVICE_BATCH} \
-  decode_sampling_strategy=${DECODE_SAMPLING_STRATEGY} \
-  multi_sampling=False \
-  ${ENGINE_PARALLEL_FLAGS} \
-  > ${SERVER_LOG} 2>&1 &
+python3 -u -m MaxText.maxengine_server MaxText/configs/base.yml \\
+  model_name=${TEACHER_MODEL_NAME} \\
+  tokenizer_path=${TOKENIZER_PATH} \\
+  tokenizer_type=huggingface \\
+  load_parameters_path=${TEACHER_PARAMETERS_PATH} \\
+  max_target_length=${MAX_TARGET_LENGTH} \\
+  max_prefill_predict_length=${MAX_PREFILL_LENGTH} \\
+  per_device_batch_size=${SERVER_PER_DEVICE_BATCH} \\
+  decode_sampling_strategy=${DECODE_SAMPLING_STRATEGY} \\
+  multi_sampling=False \\
+  ${ENGINE_PARALLEL_FLAGS} \\
+  > \"\${SERVER_LOG}\" 2>&1 &
 
-SERVER_PID=$!
+SERVER_PID=\$!
 ready=0
 for ((elapsed=0; elapsed<${SERVER_READY_TIMEOUT_SEC}; elapsed+=5)); do
   if ss -ltn | grep -q \"${JETSTREAM_SERVER_PORT}\"; then
     ready=1
     break
   fi
-  if ! kill -0 ${SERVER_PID} >/dev/null 2>&1; then
+  if ! kill -0 \"\${SERVER_PID}\" >/dev/null 2>&1; then
     echo \"[ERROR] maxengine_server exited early\"
     exit 1
   fi
@@ -106,23 +106,23 @@ for ((elapsed=0; elapsed<${SERVER_READY_TIMEOUT_SEC}; elapsed+=5)); do
   sleep 5
 done
 
-if [[ ${ready} -ne 1 ]]; then
+if [[ \${ready} -ne 1 ]]; then
   echo \"[ERROR] maxengine_server did not start within ${SERVER_READY_TIMEOUT_SEC}s\"
   exit 1
 fi
 
-python3 -u -m MaxText.sequence_KD_data \
-  --jetstream-server-port ${JETSTREAM_SERVER_PORT} \
-  --dataset-path ${DATASET_PATH} \
-  --data-split ${DATA_SPLIT} \
-  --text-column ${TEXT_COLUMN} \
-  --tokenizer-path ${TOKENIZER_PATH} \
-  --hf-access-token ${HF_ACCESS_TOKEN} \
-  --batch-size ${GEN_BATCH_SIZE} \
-  --max-prefill-length ${MAX_PREFILL_LENGTH} \
-  --max-target-length ${MAX_TARGET_LENGTH} \
-  --progress-path ${PROGRESS_PATH} \
-  upload-to-gcs \
-  --gcs-bucket ${BUCKET_NAME} \
-  --gcs-data-path ${GCS_DATA_PATH}
+python3 -u -m MaxText.sequence_KD_data \\
+  --jetstream-server-port ${JETSTREAM_SERVER_PORT} \\
+  --dataset-path ${DATASET_PATH} \\
+  --data-split ${DATA_SPLIT} \\
+  --text-column ${TEXT_COLUMN} \\
+  --tokenizer-path ${TOKENIZER_PATH} \\
+  --hf-access-token \"\${HF_ACCESS_TOKEN}\" \\
+  --batch-size ${GEN_BATCH_SIZE} \\
+  --max-prefill-length ${MAX_PREFILL_LENGTH} \\
+  --max-target-length ${MAX_TARGET_LENGTH} \\
+  --progress-path \"\${PROGRESS_PATH}\" \\
+  upload-to-gcs \\
+  --gcs-bucket \"\${BUCKET_NAME}\" \\
+  --gcs-data-path \"\${GCS_DATA_PATH}\"
 "
