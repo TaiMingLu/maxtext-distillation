@@ -22,6 +22,8 @@ PROGRESS_PATH="/home/terry/gcs-bucket/sequence_kd_progress/${RUN_NAME}.json"
 SERVER_LOG="/tmp/sequence_kd/server.log"
 PROGRESS_DIR="/home/terry/gcs-bucket/sequence_kd_progress"
 
+source ~/maxtext_env/bin/activate
+
 printf '\n=== Multihost Runner Config ===\n'
 printf 'Run name: %s\n' "$RUN_NAME"
 printf 'Progress file: %s\n' "$PROGRESS_PATH"
