@@ -53,6 +53,8 @@ python -u multihost_runner_orig.py \
   --COMMAND="
 set -euo pipefail
 
+source ~/maxtext_env/bin/activate
+
 WORKER_ID=\${TPU_WORKER_ID:-0}
 if [[ \"\${WORKER_ID}\" != \"0\" ]]; then
   echo \"[INFO] Skipping TPU worker \${WORKER_ID}\"
