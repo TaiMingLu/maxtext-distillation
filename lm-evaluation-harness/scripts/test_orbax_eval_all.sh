@@ -136,9 +136,12 @@ for parent_dir in distill_pretrain pretrain; do
       python -u multihost_runner_orig.py \
         --TPU_PREFIX=${TPU_PREFIX} \
         --INTERNAL_IP=true \
-        --RUN_NAME=maxtext \
+        --RUN_NAME=maxtext_eval \
         --COMMAND="
+    cd ~/maxtext
+    cd lm-evaluation-harness
     ROOT=\$(pwd)
+    cd ~/maxtext
     cd lm-evaluation-harness
     export TPU_LOG_DIR=/home/terry/tpu_logs
     source ~/maxtext_env/bin/activate
