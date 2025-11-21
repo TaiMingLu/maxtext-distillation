@@ -152,7 +152,8 @@ python3 -u -m MaxText.sequence_KD_data \
   --gcs-data-path {GCS_DATA_PATH}
 """
 script = template.format(**values)
-print(base64.b64encode(script.encode()).decode())
+encoded = base64.b64encode(script.encode()).decode()
+print(encoded)
 PY)
 
 python -u multihost_runner_orig.py \
@@ -160,4 +161,4 @@ python -u multihost_runner_orig.py \
   --RUN_NAME="${RUN_NAME}" \
   --SCRIPT_DIR="$(pwd)" \
   --INTERNAL_IP=true \
-  --COMMAND "mkdir -p ${LOG_ROOT} && echo ${REMOTE_B64} | base64 -d > ${SCRIPT_PATH} && chmod +x ${SCRIPT_PATH} && bash ${SCRIPT_PATH}"
+  --COMMAND "mkdir -p ${LOG_ROOT} && printf '%s' "${REMOTE_B64}" | base64 -d > ${SCRIPT_PATH} && chmod +x ${SCRIPT_PATH} && bash ${SCRIPT_PATH}"
