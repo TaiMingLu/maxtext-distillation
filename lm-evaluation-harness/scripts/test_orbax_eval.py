@@ -19,7 +19,7 @@ import argparse
 
 from tqdm import tqdm
 from functools import partial
-from datasets import load_dataset
+import datasets as hf_datasets
 from omegaconf import DictConfig, OmegaConf
 from transformers import AutoModelForCausalLM, AutoTokenizer
 from lm_eval import evaluator
@@ -237,6 +237,67 @@ ACC_TASKS = [
     # },
 ]
 
+DATASET_SPLIT_EXCLUDES = {
+    # "auxiliary_train" has ~100k examples and drastically slows evaluation.
+    "cais/mmlu": {"auxiliary_train"},
+}
+
+_ORIGINAL_LOAD_DATASET = hf_datasets.load_dataset
+
+
+def _filtered_load_dataset(*args, **kwargs):
+    dataset_path = kwargs.get("path") or (args[0] if args else None)
+    ds = _ORIGINAL_LOAD_DATASET(*args, **kwargs)
+    splits_to_skip = DATASET_SPLIT_EXCLUDES.get(dataset_path)
+    if not splits_to_skip:
+        return ds
+
+    if isinstance(ds, hf_datasets.DatasetDict):
+        kept = {
+            split_name: split_ds
+            for split_name, split_ds in ds.items()
+            if split_name not in splits_to_skip
+        }
+        if len(kept) != len(ds):
+            # Re-wrap to ensure downstream consumers cannot access skipped splits.
+            ds = hf_datasets.DatasetDict(kept)
+    return ds
+
+
+hf_datasets.load_dataset = _filtered_load_dataset
+load_dataset = hf_datasets.load_dataset
+
+EXCLUDED_METRIC_FILTERS = {
+    # Prevent auxiliary splits from skewing reported metrics.
+    "mmlu": ("auxiliary_train",),
+}
+
+
+def _select_metric_value(task_name, task_metrics, preferred_keys):
+    """Return the first matching metric that should be surfaced."""
+
+    def is_allowed(key: str) -> bool:
+        if not key or key not in task_metrics:
+            return False
+        metric_name = key.split(",")[0]
+        if metric_name.endswith("_stderr"):
+            return False
+        for forbidden in EXCLUDED_METRIC_FILTERS.get(task_name, []):
+            if forbidden in key:
+                return False
+        return True
+
+    for key in preferred_keys:
+        if is_allowed(key):
+            return task_metrics[key]
+
+    for key, value in task_metrics.items():
+        if is_allowed(key):
+            return value
+
+    return None
+
+
 def set_seed(seed: int):
     random.seed(seed)
     np.random.seed(seed)
@@ -393,15 +454,11 @@ def get_acc(model, tokenizer, tasks, task_range=[], limit=1000000, batch_size=32
         acc_times[times_key] = duration_s
         print(f"{times_key} ACC eval time: {duration_s:.2f}s")
         acc_key = cfg["acc_key"]
-        summary_value = None
-        if acc_key is not None and acc_key in task_metrics:
-            summary_value = task_metrics[acc_key]
-        else:
-            fallback_keys = ["acc,none", "acc_norm,none", "acc", "acc_norm"]
-            for key in fallback_keys:
-                if key in task_metrics:
-                    summary_value = task_metrics[key]
-                    break
+        preferred_keys = []
+        if acc_key is not None:
+            preferred_keys.append(acc_key)
+        preferred_keys.extend(["acc,none", "acc_norm,none", "acc", "acc_norm"])
+        summary_value = _select_metric_value(task, task_metrics, preferred_keys)
         if summary_value is not None:
             acc_res[task] = summary_value
         full_res_by_task[task] = res
