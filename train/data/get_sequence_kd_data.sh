@@ -28,7 +28,7 @@ GEN_BATCH_SIZE=512
 SERVER_PER_DEVICE_BATCH=8
 JETSTREAM_SERVER_PORT=9000
 SERVER_READY_TIMEOUT_SEC=900
-ENGINE_PARALLEL_FLAGS="ici_tensor_parallelism=8 ici_fsdp_parallelism=1 ici_autoregressive_parallelism=-1"
+ENGINE_PARALLEL_FLAGS="ici_tensor_parallelism=4 ici_fsdp_parallelism=4 ici_autoregressive_parallelism=4"
 DECODE_SAMPLING_STRATEGY="greedy"
 PROGRESS_PATH="/home/terry/gcs-bucket/sequence_kd_progress/${RUN_NAME}.json"
 SERVER_LOG="/tmp/sequence_kd/server.log"
