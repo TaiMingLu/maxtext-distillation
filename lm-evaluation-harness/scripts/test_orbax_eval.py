@@ -126,10 +126,10 @@ def str2bool(v):
         raise argparse.ArgumentTypeError("Boolean value expected (yes/no/true/false)")
 
 PPL_TASKS = [
-    # "c4",
+    "c4",
     "wikitext",
     # "wikitext2",
-    "cnn_dailymail",
+    # "cnn_dailymail",
     "finewebedu-test-100M",
     # "dclm"
 ]
@@ -150,11 +150,11 @@ ACC_TASKS = [
         "num_fewshot": 0,
         "acc_key": "acc_norm,none",
     },
-    {
-        "name": "arc_challenge",
-        "num_fewshot": 0,
-        "acc_key": "acc_norm,none",
-    },
+    # {
+    #     "name": "arc_challenge",
+    #     "num_fewshot": 0,
+    #     "acc_key": "acc_norm,none",
+    # },
     # {
     #     "name": "arc_challenge",
     #     "num_fewshot": 25,
@@ -170,16 +170,16 @@ ACC_TASKS = [
     #     "num_fewshot": 10,
     #     "acc_key": "acc_norm,none",
     # },
-    {
-        "name": "mmlu",
-        "num_fewshot": 0,
-        "acc_key": None,
-    },
     # {
     #     "name": "mmlu",
-    #     "num_fewshot": 5,
+    #     "num_fewshot": 0,
     #     "acc_key": None,
     # },
+    {
+        "name": "mmlu",
+        "num_fewshot": 5,
+        "acc_key": None,
+    },
     # {
     #     "name": "truthfulqa_mc1",
     #     "num_fewshot": 0,
@@ -195,16 +195,16 @@ ACC_TASKS = [
     #     "num_fewshot": 0,
     #     "acc_key": "acc_norm,none",
     # },
-    # {
-    #     "name": "sciq",
-    #     "num_fewshot": 0,
-    #     "acc_key": "acc,none",
-    # },
-    # {
-    #     "name": "boolq",
-    #     "num_fewshot": 0,
-    #     "acc_key": "acc,none",
-    # },
+    {
+        "name": "sciq",
+        "num_fewshot": 0,
+        "acc_key": "acc,none",
+    },
+    {
+        "name": "boolq",
+        "num_fewshot": 0,
+        "acc_key": "acc,none",
+    },
     # {
     #     "name": "anli_r1",
     #     "num_fewshot": 0,
