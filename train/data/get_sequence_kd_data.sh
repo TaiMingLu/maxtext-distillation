@@ -69,8 +69,9 @@ rm -rf /tmp/sequence_kd
 mkdir -p /tmp/sequence_kd
 mkdir -p $(dirname ${PROGRESS_PATH})
 
+SERVER_PID=""
 cleanup() {
-  if [[ -n \"\${SERVER_PID:-}\" ]]; then
+  if [[ -n \"\${SERVER_PID}\" ]]; then
     kill \"\${SERVER_PID}\" >/dev/null 2>&1 || true
     wait \"\${SERVER_PID}\" >/dev/null 2>&1 || true
   fi
