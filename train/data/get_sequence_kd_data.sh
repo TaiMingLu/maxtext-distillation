@@ -27,12 +27,13 @@ MAX_TARGET_LENGTH=4096
 GEN_BATCH_SIZE=512
 SERVER_PER_DEVICE_BATCH=8
 JETSTREAM_SERVER_PORT=9000
-SERVER_READY_TIMEOUT_SEC=180
+SERVER_READY_TIMEOUT_SEC=900
 ENGINE_PARALLEL_FLAGS="ici_tensor_parallelism=8 ici_fsdp_parallelism=1 ici_autoregressive_parallelism=-1"
 DECODE_SAMPLING_STRATEGY="greedy"
 PROGRESS_PATH="/home/terry/gcs-bucket/sequence_kd_progress/${RUN_NAME}.json"
 SERVER_LOG="/tmp/sequence_kd/server.log"
 GCS_DATA_PATH="sequence_kd/${TEACHER_MODEL_NAME}"
+PROGRESS_DIR="/home/terry/gcs-bucket/sequence_kd_progress"
 
 printf '\n=== Sequence KD Config ===\n'
 printf 'Run name: %s\n' "$RUN_NAME"
@@ -53,13 +54,15 @@ python -u multihost_runner_orig.py \
   --COMMAND="
 set -euo pipefail
 
-source ~/maxtext_env/bin/activate
-
 WORKER_ID=\${TPU_WORKER_ID:-0}
 if [[ \"\${WORKER_ID}\" != \"0\" ]]; then
   echo \"[INFO] Skipping TPU worker \${WORKER_ID}\"
   exit 0
 fi
+
+ROOT=\$(pwd)
+source ~/maxtext_env/bin/activate
+export PYTHONPATH=\"\${ROOT}:\$PYTHONPATH\"
 
 HF_ACCESS_TOKEN=\"${HF_ACCESS_TOKEN}\"
 BUCKET_NAME=\"${BUCKET_NAME}\"
@@ -69,7 +72,7 @@ GCS_DATA_PATH=\"${GCS_DATA_PATH}\"
 
 rm -rf /tmp/sequence_kd
 mkdir -p /tmp/sequence_kd
-mkdir -p \"\$(dirname \"\${PROGRESS_PATH}\")\"
+mkdir -p \"${PROGRESS_DIR}\"
 
 SERVER_PID=\"\"
 cleanup() {
