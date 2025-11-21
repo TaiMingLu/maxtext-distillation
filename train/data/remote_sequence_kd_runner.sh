@@ -27,7 +27,7 @@ GEN_BATCH_SIZE=512
 SERVER_PER_DEVICE_BATCH=8
 JETSTREAM_SERVER_PORT=${JETSTREAM_SERVER_PORT:-9000}
 SERVER_READY_TIMEOUT_SEC=${SERVER_READY_TIMEOUT_SEC:-900}
-ENGINE_PARALLEL_FLAGS=(ici_tensor_parallelism=4 ici_fsdp_parallelism=4 ici_autoregressive_parallelism=4)
+ENGINE_PARALLEL_FLAGS=(ici_tensor_parallelism=4 ici_fsdp_parallelism=4 ici_autoregressive_parallelism=1)
 DECODE_SAMPLING_STRATEGY="greedy"
 
 source ~/maxtext_env/bin/activate
