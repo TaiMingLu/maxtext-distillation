@@ -50,16 +50,15 @@ python -u multihost_runner_orig.py \
   --RUN_NAME="${RUN_NAME}" \
   --SCRIPT_DIR="$(pwd)" \
   --INTERNAL_IP=true \
-  --COMMAND "$(cat <<EOF_REMOTE
-set -euo pipefail
+  --COMMAND "set -euo pipefail
 
-WORKER_ID="\${TPU_WORKER_ID:-0}"
-if [[ "\${WORKER_ID}" != "0" ]]; then
-  echo "[INFO] Skipping TPU worker \${WORKER_ID}"
+WORKER_ID=\"\${TPU_WORKER_ID:-0}\"
+if [[ \"\${WORKER_ID}\" != \"0\" ]]; then
+  echo \"[INFO] Skipping TPU worker \${WORKER_ID}\"
   exit 0
 fi
 
-mkdir -p "$(dirname "$SERVER_LOG")" "$(dirname "$PROGRESS_FILE")"
+mkdir -p \"$(dirname \"$SERVER_LOG\")\" \"$(dirname \"$PROGRESS_FILE\")\"
 
 python3 -u -m MaxText.maxengine_server MaxText/configs/base.yml \\
   model_name=${TEACHER_MODEL_NAME} \\
@@ -73,25 +72,25 @@ python3 -u -m MaxText.maxengine_server MaxText/configs/base.yml \\
   multi_sampling=False \\
   ${ENGINE_PARALLEL_FLAGS} \\
   > ${SERVER_LOG} 2>&1 &
-SERVER_PID=$!
+
+SERVER_PID=\$!
 
 ready=0
 for ((elapsed=0; elapsed<${SERVER_READY_TIMEOUT_SEC}; elapsed+=5)); do
-  if ss -ltn | grep -q ":${JETSTREAM_SERVER_PORT} "; then
+  if ss -ltn | grep -q \":${JETSTREAM_SERVER_PORT} \"; then
     ready=1
     break
   fi
-  if ! kill -0 ${SERVER_PID} >/dev/null 2>&1; then
-    echo "[ERROR] maxengine_server exited early" >&2
+  if ! kill -0 \${SERVER_PID} >/dev/null 2>&1; then
+    echo \"[ERROR] maxengine_server exited early\" >&2
     exit 1
   fi
-  echo "[INFO] Waiting for maxengine_server..."
+  echo \"[INFO] Waiting for maxengine_server...\"
   sleep 5
-
 done
-if [[ ${ready} -ne 1 ]]; then
-  echo "[ERROR] maxengine_server did not start within ${SERVER_READY_TIMEOUT_SEC}s" >&2
-  kill ${SERVER_PID} >/dev/null 2>&1 || true
+if [[ \${ready} -ne 1 ]]; then
+  echo \"[ERROR] maxengine_server did not start within ${SERVER_READY_TIMEOUT_SEC}s\" >&2
+  kill \${SERVER_PID} >/dev/null 2>&1 || true
   exit 1
 fi
 
@@ -110,7 +109,5 @@ python3 -u -m MaxText.sequence_KD_data \\
   --gcs-bucket ${BUCKET_NAME} \\
   --gcs-data-path ${GCS_DATA_PATH}
 
-kill ${SERVER_PID} >/dev/null 2>&1 || true
-wait ${SERVER_PID} >/dev/null 2>&1 || true
-EOF_REMOTE
-)"
+kill \${SERVER_PID} >/dev/null 2>&1 || true
+wait \${SERVER_PID} >/dev/null 2>&1 || true"
