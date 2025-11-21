@@ -20,9 +20,12 @@ DESIRED_MODELS=(
   # 'llama3.1-1b_finewebedu_distill_hard_pretrain_A_1B_T_50B_S42_alpha_06_seed43'
   # 'llama3.1-1b_finewebedu_distill_pretrain_A_1B_T_50B_S42_alpha_05_seed43'
   # 'llama3.1-1b_finewebedu_distill_pretrain_A_1B_T_50B_S42_alpha_1_seed43'
-  'llama3.1-1b-finewebedu-distill-soft-T50BS42-a02-s43'
-  'llama3.1-1b-finewebedu-distill-soft-T50BS42-a04-s43'
-  'llama3.1-1b-finewebedu-distill-soft-T50BS42-a08-s43'
+  llama3.1-1b_finewebedu_distill_pretrain_A_1B_T_50B_S42_alpha_1_seed43
+  llama3.1-1b_finewebedu_distill_pretrain_A_1B_T_50B_S42_alpha_05_seed43
+  llama3.1-1b_finewebedu_pretrain_shuffled_lr_3e-4_seed_43
+  # 'llama3.1-1b-finewebedu-distill-soft-T50BS42-a02-s43'
+  # 'llama3.1-1b-finewebedu-distill-soft-T50BS42-a04-s43'
+  # 'llama3.1-1b-finewebedu-distill-soft-T50BS42-a08-s43'
 )
 DESIRED_STEPS=(0 2500 5000 7500 10000 12500 15000 17500 20000 22500 24999)
 
