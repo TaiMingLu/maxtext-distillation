@@ -28,10 +28,12 @@ GEN_BATCH_SIZE=512
 SERVER_PER_DEVICE_BATCH=8
 JETSTREAM_SERVER_PORT=9000
 SERVER_READY_TIMEOUT_SEC=180
-ENGINE_PARALLEL_FLAGS="ici_tensor_parallelism=8 ici_fsdp_parallelism=1 ici_autoregressive_parallelism=-1"
+ENGINE_PARALLEL_FLAGS=(ici_tensor_parallelism=8 ici_fsdp_parallelism=1 ici_autoregressive_parallelism=-1)
 DECODE_SAMPLING_STRATEGY="greedy"
-PROGRESS_FILE="/home/terry/gcs-bucket/sequence_kd_progress/${RUN_NAME}.json"
-SERVER_LOG="/tmp/sequence_kd/logs/server.log"
+PROGRESS_DIR="/home/terry/gcs-bucket/sequence_kd_progress"
+PROGRESS_FILE="${PROGRESS_DIR}/${RUN_NAME}.json"
+LOG_DIR="/tmp/sequence_kd/logs"
+SERVER_LOG="${LOG_DIR}/server.log"
 GCS_DATA_PATH="sequence_kd/${TEACHER_MODEL_NAME}"
 
 printf '\n=== Sequence KD Config ===\n'
@@ -45,20 +47,32 @@ printf 'Server log: %s\n' "$SERVER_LOG"
 printf 'Output bucket path: gs://%s/%s\n' "$BUCKET_NAME" "$GCS_DATA_PATH"
 printf '==========================\n\n'
 
+ENGINE_PARALLEL_FLAGS_STR="${ENGINE_PARALLEL_FLAGS[*]}"
+
 python -u multihost_runner_orig.py \
   --TPU_PREFIX="${TPU_PREFIX}" \
   --RUN_NAME="${RUN_NAME}" \
   --SCRIPT_DIR="$(pwd)" \
   --INTERNAL_IP=true \
-  --COMMAND "set -euo pipefail
+  --COMMAND "$(cat <<EOF_REMOTE
+set -euo pipefail
 
-WORKER_ID=\"\${TPU_WORKER_ID:-0}\"
-if [[ \"\${WORKER_ID}\" != \"0\" ]]; then
-  echo \"[INFO] Skipping TPU worker \${WORKER_ID}\"
+WORKER_ID="\${TPU_WORKER_ID:-0}"
+if [[ "\${WORKER_ID}" != "0" ]]; then
+  echo "[INFO] Skipping TPU worker \${WORKER_ID}"
   exit 0
 fi
 
-mkdir -p \"$(dirname \"$SERVER_LOG\")\" \"$(dirname \"$PROGRESS_FILE\")\"
+rm -rf /tmp/sequence_kd
+mkdir -p ${LOG_DIR} ${PROGRESS_DIR}
+
+cleanup() {
+  if [[ -n "\${SERVER_PID:-}" ]]; then
+    kill "\${SERVER_PID}" >/dev/null 2>&1 || true
+    wait "\${SERVER_PID}" >/dev/null 2>&1 || true
+  fi
+}
+trap cleanup EXIT
 
 python3 -u -m MaxText.maxengine_server MaxText/configs/base.yml \\
   model_name=${TEACHER_MODEL_NAME} \\
@@ -70,27 +84,25 @@ python3 -u -m MaxText.maxengine_server MaxText/configs/base.yml \\
   per_device_batch_size=${SERVER_PER_DEVICE_BATCH} \\
   decode_sampling_strategy=${DECODE_SAMPLING_STRATEGY} \\
   multi_sampling=False \\
-  ${ENGINE_PARALLEL_FLAGS} \\
+  ${ENGINE_PARALLEL_FLAGS_STR} \\
   > ${SERVER_LOG} 2>&1 &
-
-SERVER_PID=\$!
+SERVER_PID=$!
 
 ready=0
 for ((elapsed=0; elapsed<${SERVER_READY_TIMEOUT_SEC}; elapsed+=5)); do
-  if ss -ltn | grep -q \":${JETSTREAM_SERVER_PORT} \"; then
+  if ss -ltn | grep -q ":${JETSTREAM_SERVER_PORT} "; then
     ready=1
     break
   fi
-  if ! kill -0 \${SERVER_PID} >/dev/null 2>&1; then
-    echo \"[ERROR] maxengine_server exited early\" >&2
+  if ! kill -0 ${SERVER_PID} >/dev/null 2>&1; then
+    echo "[ERROR] maxengine_server exited early" >&2
     exit 1
   fi
-  echo \"[INFO] Waiting for maxengine_server...\"
+  echo "[INFO] Waiting for maxengine_server..."
   sleep 5
 done
-if [[ \${ready} -ne 1 ]]; then
-  echo \"[ERROR] maxengine_server did not start within ${SERVER_READY_TIMEOUT_SEC}s\" >&2
-  kill \${SERVER_PID} >/dev/null 2>&1 || true
+if [[ ${ready} -ne 1 ]]; then
+  echo "[ERROR] maxengine_server did not start within ${SERVER_READY_TIMEOUT_SEC}s" >&2
   exit 1
 fi
 
@@ -108,6 +120,5 @@ python3 -u -m MaxText.sequence_KD_data \\
   upload-to-gcs \\
   --gcs-bucket ${BUCKET_NAME} \\
   --gcs-data-path ${GCS_DATA_PATH}
-
-kill \${SERVER_PID} >/dev/null 2>&1 || true
-wait \${SERVER_PID} >/dev/null 2>&1 || true"
+EOF_REMOTE
+)"

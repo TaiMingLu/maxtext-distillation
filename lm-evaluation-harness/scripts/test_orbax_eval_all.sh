@@ -111,6 +111,7 @@ for parent_dir in distill_pretrain pretrain; do
       echo "Converting ${parent_dir}/${MODEL_RUN_NAME} at step ${STEP}"
       rm -rf "${BASE_OUTPUT_DIRECTORY_DISK}/${DIRECT_PARAMETER_CHECKPOINT_RUN}"
 
+    cd ~/maxtext
       python -u multihost_runner_orig.py \
         --TPU_PREFIX=${TPU_PREFIX} \
         --INTERNAL_IP=true \
@@ -123,6 +124,9 @@ for parent_dir in distill_pretrain pretrain; do
     export WANDB_PROJECT=maxtext_1b
     export WANDB_NAME=\${RUN_NAME}
     export PYTHONPATH=\${ROOT}:\$PYTHONPATH
+    echo '====================='
+    pwd
+    echo '====================='
     python3.10 -u -m MaxText.generate_param_only_checkpoint MaxText/configs/base.yml \
         checkpoint_dir=${BASE_OUTPUT_DIRECTORY} \
         base_output_directory=${BASE_OUTPUT_DIRECTORY} \
