@@ -29,6 +29,11 @@ DESIRED_MODELS=(
 )
 DESIRED_STEPS=(0 2500 5000 7500 10000 12500 15000 17500 20000 22500 24999)
 
+cd lm-evaluation-harness
+python3.10 -m pip install -e .
+export PYTHONPATH=${ROOT}:$(pwd):${PYTHONPATH}
+cd ${ROOT}
+
 for parent_dir in distill_pretrain pretrain; do
   if ! model_paths=$(gsutil ls "gs://taiming_us_central2_b/ckpts/${parent_dir}/" 2>/dev/null | shuf); then
     echo "Failed to list models under ${parent_dir}, skipping."
@@ -118,8 +123,6 @@ for parent_dir in distill_pretrain pretrain; do
 
       echo "Evaluating ${parent_dir}/${MODEL_RUN_NAME} at step ${STEP}"
       cd lm-evaluation-harness
-      export PYTHONPATH=${ROOT}:$(pwd):${PYTHONPATH}
-      python3.10 -m pip install -e .
       python3.10 -u scripts/test_orbax_eval.py ../MaxText/configs/base.yml \
           load_parameters_path=${UNSCANNED_CKPT_PATH} \
           run_name=${DIRECT_PARAMETER_CHECKPOINT_RUN} \
