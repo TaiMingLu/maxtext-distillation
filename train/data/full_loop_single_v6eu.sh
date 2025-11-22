@@ -4,6 +4,11 @@ set -euo pipefail
 cd ~/maxtext
 ROOT=$(pwd)
 
+# TPU v6e environment variables
+export TPU_CHIPS_PER_HOST_BOUNDS=2,2,1
+export TPU_HOST_BOUNDS=1,1,1
+export ALLOW_MULTIPLE_LIBTPU_LOAD=1
+
 # Required environment variables
 HF_ACCESS_TOKEN=${HF_ACCESS_TOKEN:?HF_ACCESS_TOKEN is required}
 BUCKET_NAME=${BUCKET_NAME:-taiming_europe_west4_a}
@@ -22,7 +27,8 @@ GEN_BATCH_SIZE=512
 SERVER_PER_DEVICE_BATCH=8
 JETSTREAM_SERVER_PORT=9000
 SERVER_READY_TIMEOUT_SEC=900
-ENGINE_PARALLEL_FLAGS=(ici_data_parallelism=2 ici_tensor_parallelism=4 ici_fsdp_parallelism=4 ici_autoregressive_parallelism=1)
+ENGINE_PARALLEL_FLAGS=(ici_data_parallelism=1 ici_tensor_parallelism=4 ici_fsdp_parallelism=2 ici_autoregressive_parallelism=1)
+# Product: 1 × 4 × 2 × 1 = 8 (for v6e-8)
 DECODE_SAMPLING_STRATEGY="greedy"
 MAX_EXAMPLES=20000000
 
