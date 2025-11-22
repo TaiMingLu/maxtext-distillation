@@ -19,7 +19,7 @@ RUN_NAME="sequence-kd"
 JETSTREAM_SERVER_PORT=9000
 SERVER_READY_TIMEOUT_SEC=900
 PROGRESS_PATH="/home/terry/gcs-bucket/sequence_kd_progress/${RUN_NAME}.json"
-SERVER_LOG="/tmp/sequence_kd/server.log"
+SERVER_LOG="/tmp/sequence-kd/server.log"
 PROGRESS_DIR="/home/terry/gcs-bucket/sequence_kd_progress"
 GCS_DATA_PATH="sequence_kd_data/${RUN_NAME}"
 

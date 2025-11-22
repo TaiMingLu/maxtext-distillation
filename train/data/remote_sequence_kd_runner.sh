@@ -42,8 +42,7 @@ printf '==========================\n\n'
 source ~/maxtext_env/bin/activate
 export PYTHONPATH="${ROOT}:${PYTHONPATH:-}"
 
-rm -rf /tmp/sequence_kd
-mkdir -p /tmp/sequence_kd
+mkdir -p /tmp/sequence-kd
 mkdir -p "$(dirname "${PROGRESS_PATH}")"
 
 cleanup() {
