@@ -125,14 +125,22 @@ _METADATA  _sharding  array_metadatas  commit_success.txt  manifest.ocdbt
 The `/d/` subdirectory with ocdbt database files is NOT visible via gcsfuse, even though it exists in GCS.
 **Cause:** gcsfuse limitation with ocdbt's nested directory structure
 
-### Attempt 5: Use GCS path directly (PENDING)
+### Attempt 5: Use GCS path directly (PARTIAL SUCCESS)
 **Configuration:** Changed `TEACHER_PARAMETERS_PATH` from gcsfuse mount path to direct GCS path:
 ```bash
-# Before (gcsfuse mount - doesn't work with ocdbt)
-TEACHER_PARAMETERS_PATH="/home/terry/gcs-bucket/ckpts/..."
-
-# After (direct GCS access)
 TEACHER_PARAMETERS_PATH="gs://${BUCKET_NAME}/ckpts/pretrain_param_only/llama3.1-1b_finewebedu_pretrain_shuffled_lr_3e-4_seed_42/checkpoint_24999/0/items"
 ```
-This bypasses gcsfuse and uses GCS client directly, which properly handles ocdbt file access.
+**Result:** Checkpoint loaded successfully!
+**New Error:** Splash attention dimension mismatch:
+```
+TypeError: broadcast_in_dim operand dimension sizes must either be 1, or be equal to their corresponding dimensions in the target broadcast shape; got operand of shape (4096,), target broadcast shape (256, 128)
+```
+**Cause:** Splash attention (flash on TPU) has dimension requirements incompatible with prefill_length=256 and target_length=4096
+
+### Attempt 6: Use dot_product attention kernel (PENDING)
+**Configuration:** Added `attention_kernel=dot_product` to bypass splash attention issues:
+```bash
+attention_kernel=dot_product
+```
+Valid options: autoselected, dot_product, flash, cudnn_flash_te, cudnn_flash_jax, paged
 **Outcome:** Awaiting test
