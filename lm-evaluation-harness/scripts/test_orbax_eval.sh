@@ -163,7 +163,7 @@ for parent_dir in distill_pretrain pretrain; do
         --add_special_tokens=False \
         --eval_save_dir=${EVAL_RESULTS_DIR} \
         --ppl_batch_size=2 \
-        --acc_batch_size=64 \
+        --acc_batch_size=16 \
     "
 
       # echo "Cleaning up converted checkpoint for ${parent_dir}/${MODEL_RUN_NAME} step ${STEP}"
