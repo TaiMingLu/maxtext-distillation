@@ -122,7 +122,7 @@ def forward_jax(model, params, input_ids, positions, segment_ids):
 
 @register_model("orbax_lm")
 class OrbaxLM(LM):
-    def __init__(self, model, state, tokenizer, config, state_mesh_shardings, mesh) -> None:
+    def __init__(self, model, state, tokenizer, config, state_mesh_shardings, mesh, loglikelihood_batch_size=32) -> None:
         super().__init__()
         self.model = model
         self.state = state
@@ -130,6 +130,7 @@ class OrbaxLM(LM):
         self.config = config
         self.state_mesh_shardings = state_mesh_shardings
         self.mesh = mesh
+        self.loglikelihood_batch_size = loglikelihood_batch_size
 
         self._compiled_forward = self._create_fast_forward()
         
@@ -185,21 +186,11 @@ class OrbaxLM(LM):
         add_special_tokens: bool | None = None,
     ) -> list[int]:
         """ """
-        # default for None - empty dict, use predefined tokenizer param
-        # used for all models except for CausalLM or predefined value
-        special_tokens_kwargs = {}
+        # Default to False for causal LM - don't add special tokens
+        if add_special_tokens is None:
+            add_special_tokens = False
 
-        # by default for CausalLM - false or self.add_bos_token is set
-        # if add_special_tokens is None:
-        #     if self.backend == "causal":
-        #         special_tokens_kwargs = {
-        #             "add_special_tokens": False or self.add_bos_token
-        #         }
-        # # otherwise the method explicitly defines the value
-        # else:
-        # special_tokens_kwargs = {"add_special_tokens": add_special_tokens}
-
-        encoding = self.tokenizer.encode(string)
+        encoding = self.tokenizer.encode(string, add_special_tokens=add_special_tokens)
 
         # left-truncate the encoded context to be at most `left_truncate_len` tokens long
         if left_truncate_len:
@@ -233,38 +224,69 @@ class OrbaxLM(LM):
     ) -> list[tuple[float, bool]]:
         results = []
 
-        for (_text, context_enc, continuation_enc) in tqdm(requests, disable=disable_tqdm):
-            input_ids = context_enc + continuation_enc
-            input_ids = jnp.asarray([input_ids], dtype=jnp.int32)
+        # Use override_bs if provided, otherwise use instance's loglikelihood_batch_size
+        batch_size = override_bs if override_bs is not None else self.loglikelihood_batch_size
 
-            batch_size, seq_len = input_ids.shape
-            segment_ids = jnp.ones((batch_size, seq_len), dtype=jnp.int32)
-            positions = jnp.tile(jnp.arange(seq_len, dtype=jnp.int32), (batch_size, 1))
+        # Process in batches
+        for batch_start in tqdm(range(0, len(requests), batch_size), disable=disable_tqdm, desc="Batched loglikelihood"):
+            batch_end = min(batch_start + batch_size, len(requests))
+            batch_requests = requests[batch_start:batch_end]
 
+            # Prepare batch data
+            batch_input_ids = []
+            batch_cont_lens = []
+            batch_cont_encs = []
+
+            for (_text, context_enc, continuation_enc) in batch_requests:
+                input_ids = context_enc + continuation_enc
+                batch_input_ids.append(input_ids)
+                batch_cont_lens.append(len(continuation_enc))
+                batch_cont_encs.append(continuation_enc)
+
+            # Pad to max length in batch
+            max_len = max(len(ids) for ids in batch_input_ids)
+            padded_input_ids = []
+            for ids in batch_input_ids:
+                pad_len = max_len - len(ids)
+                # Pad on the left with 0 (or pad token)
+                padded = [0] * pad_len + ids
+                padded_input_ids.append(padded)
+
+            input_ids_batch = jnp.asarray(padded_input_ids, dtype=jnp.int32)
+            actual_batch_size, seq_len = input_ids_batch.shape
+
+            # Create segment_ids and positions
+            segment_ids = jnp.ones((actual_batch_size, seq_len), dtype=jnp.int32)
+            positions = jnp.tile(jnp.arange(seq_len, dtype=jnp.int32), (actual_batch_size, 1))
+
+            # Forward pass for entire batch
             logits = self._compiled_forward(
                 self.state.params,
-                input_ids,
+                input_ids_batch,
                 positions,
                 segment_ids,
             )
 
-            # logits: [1, seq_len, vocab_size]
-            # compute log-probs over continuation tokens
+            # logits: [batch_size, seq_len, vocab_size]
             logits = jax.nn.log_softmax(logits, axis=-1)
-            cont_len = len(continuation_enc)
-            cont_start = input_ids.shape[1] - cont_len
 
-            log_probs = []
-            match = True
-            for i, tok in enumerate(continuation_enc):
-                logp = logits[0, cont_start + i - 1, tok]  # use previous token's logits
-                log_probs.append(logp)
-                pred = int(jnp.argmax(logits[0, cont_start + i - 1]))
-                if pred != tok:
-                    match = False
+            # Extract results for each item in batch
+            for i, (cont_len, continuation_enc) in enumerate(zip(batch_cont_lens, batch_cont_encs)):
+                orig_len = len(batch_input_ids[i])
+                pad_len = max_len - orig_len
+                cont_start = max_len - cont_len
 
-            loglikelihood = float(jnp.sum(jnp.stack(log_probs)))
-            results.append((loglikelihood, match))
+                log_probs = []
+                match = True
+                for j, tok in enumerate(continuation_enc):
+                    logp = logits[i, cont_start + j - 1, tok]  # use previous token's logits
+                    log_probs.append(logp)
+                    pred = int(jnp.argmax(logits[i, cont_start + j - 1]))
+                    if pred != tok:
+                        match = False
+
+                loglikelihood = float(jnp.sum(jnp.stack(log_probs)))
+                results.append((loglikelihood, match))
 
         return results
     
