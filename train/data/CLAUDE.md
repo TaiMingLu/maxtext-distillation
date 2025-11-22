@@ -90,11 +90,24 @@ AssertionError: Number of devices per slice 32 does not match the product of the
 ```
 **Cause:** Product 4×4×4×1=64 doesn't match 32 devices
 
-### Attempt 2: Adjusted ICI parallelism (PENDING)
+### Attempt 2: Adjusted ICI parallelism (FAILED)
 **Configuration:**
 ```bash
 ENGINE_PARALLEL_FLAGS=(ici_data_parallelism=2 ici_tensor_parallelism=4 ici_fsdp_parallelism=4 ici_autoregressive_parallelism=1)
 ```
 **TPU:** v4-64 (32 devices per slice)
 **Product:** 2×4×4×1=32 ✓
+**Error:**
+```
+ValueError: NOT_FOUND: Error opening "zarr3" driver: Error reading "params.params.decoder.layers.pre_self_attention_layer_norm.scale/zarr.json" in OCDBT database
+```
+**Cause:** Checkpoint format mismatch - checkpoint was saved with `use_ocdbt=False use_zarr3=False` but loader defaults to `True`
+
+### Attempt 3: Added checkpoint format flags (PENDING)
+**Configuration:**
+```bash
+checkpoint_storage_use_ocdbt=False
+checkpoint_storage_use_zarr3=False
+```
+Added to maxengine_server command to match the format the checkpoint was saved with.
 **Outcome:** Awaiting test
