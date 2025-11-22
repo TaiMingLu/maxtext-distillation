@@ -137,10 +137,36 @@ TypeError: broadcast_in_dim operand dimension sizes must either be 1, or be equa
 ```
 **Cause:** Splash attention (flash on TPU) has dimension requirements incompatible with prefill_length=256 and target_length=4096
 
-### Attempt 6: Use dot_product attention kernel (PENDING)
-**Configuration:** Added `attention_kernel=dot_product` to bypass splash attention issues:
+### Attempt 6: Use dot_product attention kernel - wrong key name (FAILED)
+**Configuration:**
 ```bash
 attention_kernel=dot_product
 ```
-Valid options: autoselected, dot_product, flash, cudnn_flash_te, cudnn_flash_jax, paged
+**Error:** `ValueError: Key attention_kernel was passed at the command line but isn't in config.`
+
+### Attempt 7: Use correct attention config key (PARTIAL SUCCESS)
+**Configuration:** The correct key is `attention`, not `attention_kernel`:
+```bash
+attention=dot_product
+```
+**Result:** Server started and loaded weights successfully!
+**New Error:** Tokenizer pad_token_id overflow:
+```
+OverflowError: out of range integral type conversion attempted
+```
+at `maxengine.py:1365` trying to set `pad_token_id = -1`
+**Cause:** Llama 3.1 tokenizers have no pad_token or unk_token, so code fell back to -1 which is invalid
+
+### Attempt 8: Fix tokenizer pad_token_id fallback (PENDING)
+**Fix:** Modified `MaxText/maxengine.py:1360-1368` to use `eos_token_id` as fallback instead of -1:
+```python
+if tokenizer_model.tokenizer.pad_token_id is None:
+    if tokenizer_model.tokenizer.unk_token_id is not None:
+        tokenizer_model.tokenizer.pad_token_id = tokenizer_model.tokenizer.unk_token_id
+    elif tokenizer_model.tokenizer.eos_token_id is not None:
+        tokenizer_model.tokenizer.pad_token_id = tokenizer_model.tokenizer.eos_token_id
+    else:
+        tokenizer_model.tokenizer.pad_token_id = 0
+```
+**Note:** You need to push this change to your GitHub repo and re-clone on the TPU, or directly edit maxengine.py on the TPU.
 **Outcome:** Awaiting test

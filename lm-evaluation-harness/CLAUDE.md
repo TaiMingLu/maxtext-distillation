@@ -140,3 +140,41 @@ lm_eval --model vllm \
 - `--log_samples`: Log individual sample predictions
 - `--use_cache <DIR>`: Cache results for resuming interrupted runs
 - `--predict_only`: Generate predictions without scoring
+
+## Recent Changes and Implementation Notes
+
+### MMLU auxiliary_train Fix
+- Changed `lm_eval/tasks/mmlu/default/_default_template_yaml` to use `hails/mmlu_no_train` instead of `cais/mmlu`
+- This avoids the `auxiliary_train` split which has ~100k examples and adds 10+ hours to evaluation
+- Removed the DATASET_SPLIT_EXCLUDES monkey-patching from `test_orbax_eval.py` as it's no longer needed
+
+### OrbaxLM Batching Optimization
+- `_loglikelihood_tokens` now batches multiple requests together (default: 32)
+- Previously processed 1 request at a time, now ~30x faster
+- Controlled via `--acc_batch_size` argument
+- Uses **right padding** to preserve correct positional embeddings (left padding breaks positions)
+
+### Tokenization
+- `tok_encode` defaults to `add_special_tokens=False` for causal LM evaluation
+- This is important if your model wasn't trained with special tokens
+
+### Batch Size Arguments
+- `--ppl_batch_size`: Batch size for perplexity evaluation (default: 1)
+- `--acc_batch_size`: Batch size for accuracy evaluation (default: 32)
+- Reduce if running out of memory, increase for faster evaluation
+
+### Progress and Logging
+- Timestamps added to evaluation prints: `[2025-11-22 14:30:45] Currently evaluating ACC task: mmlu`
+- Each task prints result immediately: `mmlu ACC: 0.4521 (time: 120.56s)`
+- Evaluator now logs each subtask: `Evaluating: mmlu_abstract_algebra (100 samples)`
+
+### Multiple Choice Evaluation
+- For tasks like arc_easy, mmlu, each question requires 4 forward passes (one per choice A/B/C/D)
+- Log-likelihood scoring: model predicts which answer completion is most likely
+- With batching, these 4 requests can be batched together for efficiency
+
+### Numerical Precision Note
+- Different batch sizes give slightly different results (~0.1% difference)
+- This is expected due to floating point precision (operations are not associative)
+- Same batch size = deterministic results
+- Different batch size = mathematically equivalent but numerically different due to different reduction order in softmax/matmul
