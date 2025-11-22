@@ -63,8 +63,8 @@ python3 -u -m MaxText.maxengine_server MaxText/configs/base.yml \
   per_device_batch_size=${SERVER_PER_DEVICE_BATCH} \
   decode_sampling_strategy=${DECODE_SAMPLING_STRATEGY} \
   multi_sampling=False \
-  checkpoint_storage_use_ocdbt=False \
-  checkpoint_storage_use_zarr3=False \
+  checkpoint_storage_use_ocdbt=True \
+  checkpoint_storage_use_zarr3=True \
   "${ENGINE_PARALLEL_FLAGS[@]}" \
   > "${SERVER_LOG}" 2>&1 &
 SERVER_PID=$!

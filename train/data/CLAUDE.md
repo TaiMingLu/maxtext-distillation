@@ -103,11 +103,25 @@ ValueError: NOT_FOUND: Error opening "zarr3" driver: Error reading "params.param
 ```
 **Cause:** Checkpoint format mismatch - checkpoint was saved with `use_ocdbt=False use_zarr3=False` but loader defaults to `True`
 
-### Attempt 3: Added checkpoint format flags (PENDING)
+### Attempt 3: Set checkpoint format flags to False (FAILED)
 **Configuration:**
 ```bash
 checkpoint_storage_use_ocdbt=False
 checkpoint_storage_use_zarr3=False
 ```
-Added to maxengine_server command to match the format the checkpoint was saved with.
+**Error:** Same NOT_FOUND error - Orbax auto-detects checkpoint format from metadata and overrides flags
+**Cause:** Checkpoint WAS saved with ocdbt/zarr3=True. The actual issue is file access, not format mismatch.
+
+### Attempt 4: Reverted to True, investigate gcsfuse mount (PENDING)
+**Configuration:**
+```bash
+checkpoint_storage_use_ocdbt=True
+checkpoint_storage_use_zarr3=True
+```
+**Debugging:** The error is `NOT_FOUND` when trying to read ocdbt database files in `/items/d/` directory.
+This is likely a gcsfuse mount issue - verify files exist:
+```bash
+ls -la /home/terry/gcs-bucket/ckpts/pretrain_param_only/llama3.1-1b_finewebedu_pretrain_shuffled_lr_3e-4_seed_42/checkpoint_24999/0/items/d/
+mount | grep gcsfuse
+```
 **Outcome:** Awaiting test
