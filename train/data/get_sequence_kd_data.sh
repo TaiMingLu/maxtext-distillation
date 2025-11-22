@@ -36,12 +36,13 @@ python -u multihost_runner_orig.py \
   --SCRIPT_DIR=$(pwd) \
   --INTERNAL_IP=true \
   --COMMAND="
-source ~/maxtext_env/bin/activate \\
-HF_ACCESS_TOKEN=${HF_ACCESS_TOKEN} \\
-BUCKET_NAME=${BUCKET_NAME} \\
-PROGRESS_PATH=${PROGRESS_PATH} \\
-SERVER_LOG=${SERVER_LOG} \\
-JETSTREAM_SERVER_PORT=${JETSTREAM_SERVER_PORT} \\
-SERVER_READY_TIMEOUT_SEC=${SERVER_READY_TIMEOUT_SEC} \\
-echo 'starting remote sequence kd runner' \\
+source ~/maxtext_env/bin/activate
+export HF_ACCESS_TOKEN=${HF_ACCESS_TOKEN}
+export BUCKET_NAME=${BUCKET_NAME}
+export PROGRESS_PATH=${PROGRESS_PATH}
+export SERVER_LOG=${SERVER_LOG}
+export GCS_DATA_PATH=${GCS_DATA_PATH}
+export JETSTREAM_SERVER_PORT=${JETSTREAM_SERVER_PORT}
+export SERVER_READY_TIMEOUT_SEC=${SERVER_READY_TIMEOUT_SEC}
+echo 'starting remote sequence kd runner'
 bash train/data/remote_sequence_kd_runner.sh"
