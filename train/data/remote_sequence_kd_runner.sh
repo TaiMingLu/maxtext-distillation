@@ -2,9 +2,13 @@
 set -euo pipefail
 
 ROOT=$(pwd)
+# Only run data generation on worker 0
+# Check using TPU_WORKER_ID or by checking if dataset exists (only on worker 0)
 WORKER_ID=${TPU_WORKER_ID:-0}
-if [[ "${WORKER_ID}" != "0" ]]; then
-  echo "[INFO] Skipping TPU worker ${WORKER_ID}"
+DATASET_DIR="/mnt/ramdisk400/finewebedu/sample/100BT"
+
+if [[ "${WORKER_ID}" != "0" ]] || [[ ! -d "${DATASET_DIR}" ]]; then
+  echo "[INFO] Skipping data generation on this worker (WORKER_ID=${WORKER_ID}, dataset_exists=$(test -d ${DATASET_DIR} && echo yes || echo no))"
   exit 0
 fi
 
