@@ -237,40 +237,7 @@ ACC_TASKS = [
     # },
 ]
 
-DATASET_SPLIT_EXCLUDES = {
-    # "auxiliary_train" has ~100k examples and drastically slows evaluation.
-    "cais/mmlu": {"auxiliary_train"},
-}
-
-_ORIGINAL_LOAD_DATASET = hf_datasets.load_dataset
-
-
-def _filtered_load_dataset(*args, **kwargs):
-    dataset_path = kwargs.get("path") or (args[0] if args else None)
-    ds = _ORIGINAL_LOAD_DATASET(*args, **kwargs)
-    splits_to_skip = DATASET_SPLIT_EXCLUDES.get(dataset_path)
-    if not splits_to_skip:
-        return ds
-
-    if isinstance(ds, hf_datasets.DatasetDict):
-        kept = {
-            split_name: split_ds
-            for split_name, split_ds in ds.items()
-            if split_name not in splits_to_skip
-        }
-        if len(kept) != len(ds):
-            # Re-wrap to ensure downstream consumers cannot access skipped splits.
-            ds = hf_datasets.DatasetDict(kept)
-    return ds
-
-
-hf_datasets.load_dataset = _filtered_load_dataset
 load_dataset = hf_datasets.load_dataset
-
-EXCLUDED_METRIC_FILTERS = {
-    # Prevent auxiliary splits from skewing reported metrics.
-    "mmlu": ("auxiliary_train",),
-}
 
 
 def _select_metric_value(task_name, task_metrics, preferred_keys):
@@ -282,9 +249,6 @@ def _select_metric_value(task_name, task_metrics, preferred_keys):
         metric_name = key.split(",")[0]
         if metric_name.endswith("_stderr"):
             return False
-        for forbidden in EXCLUDED_METRIC_FILTERS.get(task_name, []):
-            if forbidden in key:
-                return False
         return True
 
     for key in preferred_keys:

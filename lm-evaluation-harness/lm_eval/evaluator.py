@@ -557,8 +557,8 @@ def evaluate(
             if apply_chat_template
             else "",
         )
-        eval_logger.debug(
-            f"Task: {task_output.task_name}; number of requests on this rank: {len(task.instances)}"
+        eval_logger.info(
+            f"Evaluating: {task_output.task_name} ({len(task.instances)} samples)"
         )
         if write_out:
             print_writeout(task)
