@@ -65,7 +65,7 @@ python3 -u -m MaxText.maxengine_server MaxText/configs/base.yml \
   multi_sampling=False \
   checkpoint_storage_use_ocdbt=True \
   checkpoint_storage_use_zarr3=True \
-  attention_kernel=dot_product \
+  attention=dot_product \
   "${ENGINE_PARALLEL_FLAGS[@]}" \
   > "${SERVER_LOG}" 2>&1 &
 SERVER_PID=$!
