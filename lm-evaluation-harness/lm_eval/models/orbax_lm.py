@@ -243,13 +243,15 @@ class OrbaxLM(LM):
                 batch_cont_lens.append(len(continuation_enc))
                 batch_cont_encs.append(continuation_enc)
 
-            # Pad to max length in batch
+            # Pad to max length in batch (RIGHT padding to preserve positions)
             max_len = max(len(ids) for ids in batch_input_ids)
             padded_input_ids = []
+            seq_lens = []
             for ids in batch_input_ids:
+                seq_lens.append(len(ids))
                 pad_len = max_len - len(ids)
-                # Pad on the left with 0 (or pad token)
-                padded = [0] * pad_len + ids
+                # Pad on the right with 0
+                padded = ids + [0] * pad_len
                 padded_input_ids.append(padded)
 
             input_ids_batch = jnp.asarray(padded_input_ids, dtype=jnp.int32)
@@ -271,10 +273,9 @@ class OrbaxLM(LM):
             logits = jax.nn.log_softmax(logits, axis=-1)
 
             # Extract results for each item in batch
-            for i, (cont_len, continuation_enc) in enumerate(zip(batch_cont_lens, batch_cont_encs)):
-                orig_len = len(batch_input_ids[i])
-                pad_len = max_len - orig_len
-                cont_start = max_len - cont_len
+            for i, (orig_len, cont_len, continuation_enc) in enumerate(zip(seq_lens, batch_cont_lens, batch_cont_encs)):
+                # With right padding, continuation starts at (orig_len - cont_len)
+                cont_start = orig_len - cont_len
 
                 log_probs = []
                 match = True
