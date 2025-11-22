@@ -234,13 +234,34 @@ def upload_data(config, data, batch_num):  # pylint: disable=redefined-outer-nam
 
 
 def load_text_dataset(config):
-  """Loads a Hugging Face text dataset."""
-  assert config.dataset_type == "huggingface", "Only Hugging Face datasets are supported."
-  dataset = datasets.load_dataset(
-      config.dataset_path,
-      split=config.data_split,
-      token=config.hf_access_token,
-  )
+  """Loads a Hugging Face text dataset or local parquet files."""
+  import os
+  import glob
+
+  # Check if dataset_path is a local directory or file pattern
+  if os.path.isdir(config.dataset_path):
+    # Load all parquet files from directory
+    parquet_files = sorted(glob.glob(os.path.join(config.dataset_path, "*.parquet")))
+    if not parquet_files:
+      raise ValueError(f"No parquet files found in {config.dataset_path}")
+    max_logging.log(f"Loading {len(parquet_files)} parquet files from {config.dataset_path}")
+    dataset = datasets.load_dataset("parquet", data_files=parquet_files, split="train")
+  elif config.dataset_path.endswith(".parquet") or "*" in config.dataset_path:
+    # Load from file pattern
+    parquet_files = sorted(glob.glob(config.dataset_path))
+    if not parquet_files:
+      raise ValueError(f"No parquet files found matching {config.dataset_path}")
+    max_logging.log(f"Loading {len(parquet_files)} parquet files from pattern {config.dataset_path}")
+    dataset = datasets.load_dataset("parquet", data_files=parquet_files, split="train")
+  else:
+    # Load from Hugging Face Hub
+    assert config.dataset_type == "huggingface", "Only Hugging Face datasets are supported."
+    dataset = datasets.load_dataset(
+        config.dataset_path,
+        split=config.data_split,
+        token=config.hf_access_token,
+    )
+
   if config.text_column not in dataset.column_names:
     raise ValueError(
         f"Column '{config.text_column}' not found in dataset. Available columns: {dataset.column_names}"
@@ -328,6 +349,9 @@ def generate_data(config):  # pylint: disable=redefined-outer-name
   tokenizer.padding_side = "left"
 
   total_examples = len(dataset)
+  if config.max_examples is not None and config.max_examples < total_examples:
+    total_examples = config.max_examples
+    max_logging.log(f"Limiting processing to {total_examples} examples (--max-examples).")
   start_index, batch_num, progress_state = load_progress(config.progress_path)
   if progress_state:
     last_ts = progress_state.get("last_update_ts", "unknown")
@@ -433,6 +457,12 @@ if __name__ == "__main__":
       "--num-generations", type=int, required=False, default=1, help="Number of samples to generate per prompt."
   )
   parser.add_argument("--batch-size", type=int, required=True, help="Number of prompts to process in a batch.")
+  parser.add_argument(
+      "--max-examples",
+      type=int,
+      default=None,
+      help="Maximum number of examples to process. If not set, processes entire dataset.",
+  )
   parser.add_argument(
       "--remove-local-dataset-files", action="store_true", help="Set to remove local dataset files after upload."
   )

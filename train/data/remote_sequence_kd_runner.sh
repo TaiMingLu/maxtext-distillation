@@ -14,8 +14,8 @@ PROGRESS_PATH=${PROGRESS_PATH:?PROGRESS_PATH is required}
 SERVER_LOG=${SERVER_LOG:?SERVER_LOG is required}
 GCS_DATA_PATH=${GCS_DATA_PATH:?GCS_DATA_PATH is required}
 
-DATASET_PATH="HuggingFaceFW/fineweb-edu"
-DATA_SPLIT="sample-350BT"
+DATASET_PATH="/mnt/ramdisk400/finewebedu/sample/100BT"
+DATA_SPLIT="train"  # Not used for local parquet files
 TEXT_COLUMN="text"
 TEACHER_MODEL_NAME="llama3.1-1b"
 TEACHER_PARAMETERS_PATH="gs://${BUCKET_NAME}/ckpts/pretrain_param_only/llama3.1-1b_finewebedu_pretrain_shuffled_lr_3e-4_seed_42/checkpoint_24999/0/items"
@@ -90,6 +90,8 @@ if [[ ${ready} -ne 1 ]]; then
   exit 1
 fi
 
+MAX_EXAMPLES=20000000
+
 python3 -u -m MaxText.sequence_KD_data \
   --jetstream-server-port ${JETSTREAM_SERVER_PORT} \
   --dataset-path ${DATASET_PATH} \
@@ -100,6 +102,7 @@ python3 -u -m MaxText.sequence_KD_data \
   --batch-size ${GEN_BATCH_SIZE} \
   --max-prefill-length ${MAX_PREFILL_LENGTH} \
   --max-target-length ${MAX_TARGET_LENGTH} \
+  --max-examples ${MAX_EXAMPLES} \
   --progress-path "${PROGRESS_PATH}" \
   upload-to-gcs \
   --gcs-bucket "${BUCKET_NAME}" \
