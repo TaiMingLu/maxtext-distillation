@@ -16,6 +16,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 import random
 import argparse
+from datetime import datetime
 
 from tqdm import tqdm
 from functools import partial
@@ -337,7 +338,7 @@ def get_ppl(
     ppl_res = {}
     ppl_times = {}
     for task in tasks:
-        print(f"Currently evaluating PPL task: {task}")
+        print(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] Currently evaluating PPL task: {task}")
         start_ts = time.perf_counter()
         testenc = get_ppl_enc(task, tokenizer, add_special_tokens=add_special_tokens)
         tot_loss = 0
@@ -398,7 +399,7 @@ def get_acc(model, tokenizer, tasks, task_range=[], limit=1000000, batch_size=32
     acc_times = {}
     for cfg in tasks:
         task = cfg["name"]
-        print(f"Currently evaluating ACC task: {task} (fewshot={cfg['num_fewshot']})")
+        print(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] Currently evaluating ACC task: {task} (fewshot={cfg['num_fewshot']})")
         start_ts = time.perf_counter()
         res = evaluator.simple_evaluate(
             model=model,
@@ -425,6 +426,7 @@ def get_acc(model, tokenizer, tasks, task_range=[], limit=1000000, batch_size=32
         summary_value = _select_metric_value(task, task_metrics, preferred_keys)
         if summary_value is not None:
             acc_res[task] = summary_value
+            print(f"{task} ACC: {summary_value:.4f} (time: {duration_s:.2f}s)")
         full_res_by_task[task] = res
         print_device_memory(f"after ACC task {times_key}")
     return acc_res, full_res_by_task, acc_times
@@ -455,7 +457,7 @@ def main(config, test_args):
         orbax_model, None, config, rng1, mesh, is_training=False
     )
 
-    model = OrbaxLM(orbax_model, orbax_state, tokenizer, config, state_mesh_shardings, mesh)
+    model = OrbaxLM(orbax_model, orbax_state, tokenizer, config, state_mesh_shardings, mesh, loglikelihood_batch_size=test_args.acc_batch_size)
     
     print_device_memory("before PPL eval")
     ppl_res, ppl_times = get_ppl(
