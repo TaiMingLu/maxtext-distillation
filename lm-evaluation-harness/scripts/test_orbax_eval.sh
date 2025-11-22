@@ -108,11 +108,14 @@ for parent_dir in distill_pretrain pretrain; do
       echo "Converting ${parent_dir}/${MODEL_RUN_NAME} at step ${STEP}"
       rm -rf "${BASE_OUTPUT_DIRECTORY_DISK}/${DIRECT_PARAMETER_CHECKPOINT_RUN}"
 
-      python -u multihost_runner_orig.py \
-        --TPU_PREFIX=${TPU_PREFIX} \
-        --INTERNAL_IP=true \
-        --RUN_NAME=maxtext \
-        --COMMAND="
+      if gsutil ls "${UNSCANNED_CKPT_PATH}" >/dev/null 2>&1; then
+        echo "Param-only checkpoint already exists at ${UNSCANNED_CKPT_PATH}; skipping conversion."
+      else
+        python -u multihost_runner_orig.py \
+          --TPU_PREFIX=${TPU_PREFIX} \
+          --INTERNAL_IP=true \
+          --RUN_NAME=maxtext \
+          --COMMAND="
     ROOT=\$(pwd)
     export TPU_LOG_DIR=/home/terry/tpu_logs
     source ~/maxtext_env/bin/activate
@@ -127,6 +130,7 @@ for parent_dir in distill_pretrain pretrain; do
         run_name=${DIRECT_PARAMETER_CHECKPOINT_RUN} \
         model_name=${MODEL} \
         force_unroll=true"
+      fi
 
       cd ~/maxtext/
       echo "Evaluating ${parent_dir}/${MODEL_RUN_NAME} at step ${STEP}"
@@ -158,7 +162,7 @@ for parent_dir in distill_pretrain pretrain; do
         --hf_model_path=${HF_MODEL_PATH} \
         --add_special_tokens=False \
         --eval_save_dir=${EVAL_RESULTS_DIR} \
-        --ppl_batch_size=2 \
+        --ppl_batch_size=4 \
         --acc_batch_size=32 \
     "
 
