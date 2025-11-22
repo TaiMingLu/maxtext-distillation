@@ -112,16 +112,27 @@ checkpoint_storage_use_zarr3=False
 **Error:** Same NOT_FOUND error - Orbax auto-detects checkpoint format from metadata and overrides flags
 **Cause:** Checkpoint WAS saved with ocdbt/zarr3=True. The actual issue is file access, not format mismatch.
 
-### Attempt 4: Reverted to True, investigate gcsfuse mount (PENDING)
+### Attempt 4: Reverted to True, investigate gcsfuse mount (FAILED)
 **Configuration:**
 ```bash
 checkpoint_storage_use_ocdbt=True
 checkpoint_storage_use_zarr3=True
 ```
-**Debugging:** The error is `NOT_FOUND` when trying to read ocdbt database files in `/items/d/` directory.
-This is likely a gcsfuse mount issue - verify files exist:
-```bash
-ls -la /home/terry/gcs-bucket/ckpts/pretrain_param_only/llama3.1-1b_finewebedu_pretrain_shuffled_lr_3e-4_seed_42/checkpoint_24999/0/items/d/
-mount | grep gcsfuse
+**Debugging result:** gcsfuse mount shows only:
 ```
+_METADATA  _sharding  array_metadatas  commit_success.txt  manifest.ocdbt
+```
+The `/d/` subdirectory with ocdbt database files is NOT visible via gcsfuse, even though it exists in GCS.
+**Cause:** gcsfuse limitation with ocdbt's nested directory structure
+
+### Attempt 5: Use GCS path directly (PENDING)
+**Configuration:** Changed `TEACHER_PARAMETERS_PATH` from gcsfuse mount path to direct GCS path:
+```bash
+# Before (gcsfuse mount - doesn't work with ocdbt)
+TEACHER_PARAMETERS_PATH="/home/terry/gcs-bucket/ckpts/..."
+
+# After (direct GCS access)
+TEACHER_PARAMETERS_PATH="gs://${BUCKET_NAME}/ckpts/pretrain_param_only/llama3.1-1b_finewebedu_pretrain_shuffled_lr_3e-4_seed_42/checkpoint_24999/0/items"
+```
+This bypasses gcsfuse and uses GCS client directly, which properly handles ocdbt file access.
 **Outcome:** Awaiting test
