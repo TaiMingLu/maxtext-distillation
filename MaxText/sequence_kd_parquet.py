@@ -354,7 +354,7 @@ if __name__ == "__main__":
     parser.add_argument("--batch-size", type=int, default=512, help="Batch size for inference")
     parser.add_argument("--jetstream-server-port", type=int, default=9000, help="JetStream port")
     parser.add_argument("--gcs-bucket-path", type=str, default=None, help="Path to mounted GCS bucket for final output")
-    parser.add_argument("--save-every-n-batches", type=int, default=10, help="Save checkpoint every N batches")
+    parser.add_argument("--save-every-n-batches", type=int, default=4, help="Save checkpoint every N batches")
 
     config = parser.parse_args()
     main(config)
