@@ -5,10 +5,12 @@ cd ~/maxtext
 ROOT=$(pwd)
 
 # TPU v6e environment variables
-export TPU_CHIPS_PER_HOST_BOUNDS=2,2,1
-export TPU_HOST_BOUNDS=1,1,1
+export TPU_CHIPS_PER_HOST_BOUNDS="2,2,2"
+export TPU_HOST_BOUNDS="1,1,1"
 export ALLOW_MULTIPLE_LIBTPU_LOAD=1
 export TPU_LIBRARY_PATH=/home/terry/maxtext_env/lib/python3.10/site-packages/libtpu/libtpu.so
+export PJRT_DEVICE=TPU
+export ENABLE_PJRT_COMPATIBILITY=true
 
 # Required environment variables
 HF_ACCESS_TOKEN=${HF_ACCESS_TOKEN:?HF_ACCESS_TOKEN is required}
