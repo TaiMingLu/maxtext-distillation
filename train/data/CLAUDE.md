@@ -110,6 +110,8 @@ python3 -m MaxText.sequence_kd_parquet \
 - Missing row ranges are also shuffled
 - Before processing a chunk, re-checks if another instance completed it
 - Multiple instances can process the same parquet file without overlap
+- Uses fixed chunk boundaries (0, chunk_size, 2*chunk_size, ...)
+- If batch size changes between runs, partial chunks may be less efficient (fewer requests per batch), but no data loss or redundant processing
 
 ## Data Generation Pipeline
 

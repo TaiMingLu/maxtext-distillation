@@ -130,25 +130,30 @@ def get_completed_row_ranges(gcs_bucket_path, parquet_basename) -> List[tuple]:
 
 
 def get_missing_row_ranges(completed_ranges, total_rows, chunk_size) -> List[tuple]:
-    """Calculate which row ranges still need processing."""
+    """Calculate which row ranges still need processing.
+
+    Uses fixed chunk boundaries (0, chunk_size, 2*chunk_size, ...) but
+    only includes actually-missing rows within each chunk.
+    """
     # Build set of all completed rows
     completed_rows = set()
     for start, end in completed_ranges:
         for i in range(start, min(end, total_rows)):
             completed_rows.add(i)
 
-    # Find missing ranges
+    # Use fixed chunk boundaries, but only include missing rows
     missing = []
-    i = 0
-    while i < total_rows:
-        if i not in completed_rows:
-            # Start of a missing range
-            start = i
-            end = min(i + chunk_size, total_rows)
-            missing.append((start, end))
-            i = end
-        else:
-            i += 1
+    for chunk_start in range(0, total_rows, chunk_size):
+        chunk_end = min(chunk_start + chunk_size, total_rows)
+
+        # Find actually missing rows within this fixed chunk
+        missing_in_chunk = [i for i in range(chunk_start, chunk_end) if i not in completed_rows]
+
+        if missing_in_chunk:
+            # Use the actual range of missing rows
+            actual_start = missing_in_chunk[0]
+            actual_end = missing_in_chunk[-1] + 1
+            missing.append((actual_start, actual_end))
 
     return missing
 
