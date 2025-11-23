@@ -6,8 +6,9 @@ ROOT=$(pwd)
 
 # TPU v6e environment variables - single host mode
 export PJRT_DEVICE=TPU
-export JAX_COORDINATOR_ADDRESS=""
-export JAX_FORCE_TPU_INIT=true
+unset JAX_COORDINATOR_ADDRESS
+export JAX_PROCESS_COUNT=1
+export JAX_LOCAL_DEVICE_COUNT=8
 
 # Required environment variables
 HF_ACCESS_TOKEN=${HF_ACCESS_TOKEN:?HF_ACCESS_TOKEN is required}
