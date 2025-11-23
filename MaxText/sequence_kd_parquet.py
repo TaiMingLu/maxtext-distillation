@@ -230,9 +230,13 @@ def main(config):
 
         # Process in batches
         all_results = []
+        total_batches = (len(requests) + config.batch_size - 1) // config.batch_size
+        print(f"\nTotal batches to process: {total_batches}")
+
         for i in range(0, len(requests), config.batch_size):
             batch = requests[i:i + config.batch_size]
-            print(f"\nBatch {i//config.batch_size + 1}: {len(batch)} requests")
+            batch_num = i // config.batch_size + 1
+            print(f"\nBatch {batch_num}/{total_batches}: {len(batch)} requests")
 
             results = asyncio.run(run_inference(batch, tokenizer, config))
             all_results.extend(results)
