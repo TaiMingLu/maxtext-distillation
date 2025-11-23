@@ -19,7 +19,7 @@ TEXT_COLUMN="text"
 TEACHER_MODEL_NAME="llama3.1-1b"
 TEACHER_PARAMETERS_PATH="gs://${BUCKET_NAME}/ckpts/pretrain_param_only/llama3.1-1b_finewebedu_pretrain_shuffled_lr_3e-4_seed_42/checkpoint_24999/0/items"
 TOKENIZER_PATH="/home/terry/gcs-bucket/HF_HOME/Llama-3.1-8B"
-MAX_PREFILL_LENGTH=256
+MAX_PREFILL_LENGTH=1024
 MAX_TARGET_LENGTH=4096
 GEN_BATCH_SIZE=512
 SERVER_PER_DEVICE_BATCH=8
@@ -30,9 +30,9 @@ ENGINE_PARALLEL_FLAGS=(ici_data_parallelism=1 ici_tensor_parallelism=4 ici_fsdp_
 DECODE_SAMPLING_STRATEGY="greedy"
 MAX_EXAMPLES=20000000
 
-PROGRESS_PATH="/home/terry/gcs-bucket/sequence_kd_progress/${RUN_NAME}.json"
 SERVER_LOG="/tmp/sequence-kd/server.log"
-GCS_DATA_PATH="sequence_kd_data/${RUN_NAME}"
+OUTPUT_DIR="/tmp/sequence-kd/output"
+GCS_BUCKET_PATH="/home/terry/gcs-bucket/sequence_kd_data/finewebedu/sample-100BT/T50BS42"
 
 printf '\n=== Sequence KD Config ===\n'
 printf 'Run name: %s\n' "$RUN_NAME"
@@ -41,9 +41,9 @@ printf 'Dataset: %s (%s)\n' "$DATASET_PATH" "$DATA_SPLIT"
 printf 'Teacher model: %s\n' "$TEACHER_MODEL_NAME"
 printf 'Teacher checkpoint: %s\n' "$TEACHER_PARAMETERS_PATH"
 printf 'Tokenizer: %s\n' "$TOKENIZER_PATH"
-printf 'Progress file: %s\n' "$PROGRESS_PATH"
 printf 'Server log: %s\n' "$SERVER_LOG"
-printf 'Output bucket path: gs://%s/%s\n' "$BUCKET_NAME" "$GCS_DATA_PATH"
+printf 'Output dir: %s\n' "$OUTPUT_DIR"
+printf 'GCS bucket path: %s\n' "$GCS_BUCKET_PATH"
 printf '==========================\n\n'
 
 source ~/maxtext_env/bin/activate
@@ -52,7 +52,7 @@ export PYTHONPATH="${ROOT}:${PYTHONPATH:-}"
 # pip install 'huggingface-hub>=0.34.0,<1.0'
 
 mkdir -p /tmp/sequence-kd
-mkdir -p "$(dirname "${PROGRESS_PATH}")"
+mkdir -p "${OUTPUT_DIR}"
 
 cleanup() {
   if [[ -n "${SERVER_PID:-}" ]]; then
@@ -68,7 +68,7 @@ python3 -u -m MaxText.maxengine_server MaxText/configs/base.yml \
   tokenizer_type=huggingface \
   load_parameters_path=${TEACHER_PARAMETERS_PATH} \
   max_target_length=${MAX_TARGET_LENGTH} \
-  max_prefill_predict_length=${MAX_PREFILL_LENGTH} \
+  max_prefill_predict_length=1024 \
   per_device_batch_size=${SERVER_PER_DEVICE_BATCH} \
   decode_sampling_strategy=${DECODE_SAMPLING_STRATEGY} \
   multi_sampling=False \
@@ -99,18 +99,16 @@ if [[ ${ready} -ne 1 ]]; then
   exit 1
 fi
 
-python3 -u -m MaxText.sequence_KD_data \
-  --jetstream-server-port ${JETSTREAM_SERVER_PORT} \
-  --dataset-path ${DATASET_PATH} \
-  --data-split ${DATA_SPLIT} \
-  --text-column ${TEXT_COLUMN} \
+mkdir -p "${GCS_BUCKET_PATH}"
+
+python3 -u -m MaxText.sequence_kd_parquet \
+  --input-dir ${DATASET_PATH} \
+  --output-dir ${OUTPUT_DIR} \
   --tokenizer-path ${TOKENIZER_PATH} \
   --hf-access-token "${HF_ACCESS_TOKEN}" \
+  --text-column ${TEXT_COLUMN} \
   --batch-size ${GEN_BATCH_SIZE} \
   --max-prefill-length ${MAX_PREFILL_LENGTH} \
   --max-target-length ${MAX_TARGET_LENGTH} \
-  --max-examples ${MAX_EXAMPLES} \
-  --progress-path "${PROGRESS_PATH}" \
-  upload-to-gcs \
-  --gcs-bucket "${BUCKET_NAME}" \
-  --gcs-data-path "${GCS_DATA_PATH}"
+  --jetstream-server-port ${JETSTREAM_SERVER_PORT} \
+  --gcs-bucket-path ${GCS_BUCKET_PATH}
