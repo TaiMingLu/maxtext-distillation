@@ -4,8 +4,10 @@ set -euo pipefail
 cd ~/maxtext
 ROOT=$(pwd)
 
-# TPU v6e environment variables - let auto-detect work
+# TPU v6e environment variables - single host mode
 export PJRT_DEVICE=TPU
+export JAX_COORDINATOR_ADDRESS=""
+export JAX_FORCE_TPU_INIT=true
 
 # Required environment variables
 HF_ACCESS_TOKEN=${HF_ACCESS_TOKEN:?HF_ACCESS_TOKEN is required}
@@ -98,6 +100,10 @@ if [[ ${ready} -ne 1 ]]; then
   echo "[ERROR] maxengine_server did not start within ${SERVER_READY_TIMEOUT_SEC}s"
   exit 1
 fi
+
+# Give server time to warm up after listening starts
+echo "[INFO] Waiting 60s for server warmup..."
+sleep 60
 
 mkdir -p "${GCS_BUCKET_PATH}"
 
