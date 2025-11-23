@@ -4,13 +4,8 @@ set -euo pipefail
 cd ~/maxtext
 ROOT=$(pwd)
 
-# TPU v6e environment variables
-export TPU_CHIPS_PER_HOST_BOUNDS="2,2,2"
-export TPU_HOST_BOUNDS="1,1,1"
-export ALLOW_MULTIPLE_LIBTPU_LOAD=1
-export TPU_LIBRARY_PATH=/home/terry/maxtext_env/lib/python3.10/site-packages/libtpu/libtpu.so
+# TPU v6e environment variables - let auto-detect work
 export PJRT_DEVICE=TPU
-export ENABLE_PJRT_COMPATIBILITY=true
 
 # Required environment variables
 HF_ACCESS_TOKEN=${HF_ACCESS_TOKEN:?HF_ACCESS_TOKEN is required}
@@ -53,6 +48,8 @@ printf '==========================\n\n'
 
 source ~/maxtext_env/bin/activate
 export PYTHONPATH="${ROOT}:${PYTHONPATH:-}"
+
+# pip install 'huggingface-hub>=0.34.0,<1.0'
 
 mkdir -p /tmp/sequence-kd
 mkdir -p "$(dirname "${PROGRESS_PATH}")"
