@@ -30,7 +30,7 @@ JETSTREAM_SERVER_PORT=9000
 SERVER_READY_TIMEOUT_SEC=900
 ENGINE_PARALLEL_FLAGS=(ici_data_parallelism=1 ici_tensor_parallelism=4 ici_fsdp_parallelism=2 ici_autoregressive_parallelism=1)
 # Product: 1 × 4 × 2 × 1 = 8 (for v6e-8)
-DECODE_SAMPLING_STRATEGY="greedy"
+DECODE_SAMPLING_STRATEGY="weighted"
 MAX_EXAMPLES=20000000
 
 SERVER_LOG="/tmp/sequence-kd/server.log"
@@ -74,6 +74,7 @@ python3 -u -m MaxText.maxengine_server MaxText/configs/base.yml \
   max_prefill_predict_length=1024 \
   per_device_batch_size=${SERVER_PER_DEVICE_BATCH} \
   decode_sampling_strategy=${DECODE_SAMPLING_STRATEGY} \
+  temperature=0.7 \
   multi_sampling=False \
   checkpoint_storage_use_ocdbt=True \
   checkpoint_storage_use_zarr3=True \
