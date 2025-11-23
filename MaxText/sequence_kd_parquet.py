@@ -23,6 +23,7 @@ from dataclasses import dataclass
 from typing import List, Set
 
 import pandas as pd
+import pyarrow.parquet as pq
 import transformers
 
 from jetstream.core.proto import jetstream_pb2
@@ -109,27 +110,47 @@ async def run_inference(requests, tokenizer, config):
     return results
 
 
-def get_completed_from_bucket(gcs_bucket_path) -> Set[str]:
-    """Check bucket for completed jsonl files."""
+def get_completed_row_ranges(gcs_bucket_path, parquet_basename) -> List[tuple]:
+    """Get list of completed (start, end) row ranges for a parquet file."""
     if not gcs_bucket_path or not os.path.exists(gcs_bucket_path):
-        return set()
+        return []
 
-    completed = set()
+    completed = []
+    prefix = parquet_basename.replace(".parquet", "_rows_")
     for f in os.listdir(gcs_bucket_path):
-        if f.endswith(".jsonl"):
-            # Convert jsonl name back to parquet name
-            parquet_name = f.replace(".jsonl", ".parquet")
-            completed.add(parquet_name)
-    return completed
+        if f.startswith(prefix) and f.endswith(".jsonl"):
+            # Extract row range from filename like "file_rows_0000000_0005120.jsonl"
+            try:
+                range_str = f.replace(prefix, "").replace(".jsonl", "")
+                start, end = range_str.split("_")
+                completed.append((int(start), int(end)))
+            except (ValueError, IndexError):
+                pass
+    return sorted(completed)
 
 
-def is_completed_in_bucket(gcs_bucket_path, parquet_filename) -> bool:
-    """Check if specific file is completed in bucket."""
-    if not gcs_bucket_path:
-        return False
-    jsonl_name = parquet_filename.replace(".parquet", ".jsonl")
-    jsonl_path = os.path.join(gcs_bucket_path, jsonl_name)
-    return os.path.exists(jsonl_path)
+def get_missing_row_ranges(completed_ranges, total_rows, chunk_size) -> List[tuple]:
+    """Calculate which row ranges still need processing."""
+    # Build set of all completed rows
+    completed_rows = set()
+    for start, end in completed_ranges:
+        for i in range(start, min(end, total_rows)):
+            completed_rows.add(i)
+
+    # Find missing ranges
+    missing = []
+    i = 0
+    while i < total_rows:
+        if i not in completed_rows:
+            # Start of a missing range
+            start = i
+            end = min(i + chunk_size, total_rows)
+            missing.append((start, end))
+            i = end
+        else:
+            i += 1
+
+    return missing
 
 
 def process_parquet_file(parquet_path, tokenizer, config):
@@ -193,74 +214,127 @@ def main(config):
             config.tokenizer_path, token=config.hf_access_token
         )
 
-    # Check bucket for completed files
-    completed_files = get_completed_from_bucket(config.gcs_bucket_path)
-    print(f"Already completed in bucket: {len(completed_files)} files")
-
-    # Filter out completed files and shuffle remaining
-    remaining_files = [f for f in parquet_files if os.path.basename(f) not in completed_files]
-    random.shuffle(remaining_files)
-    print(f"Remaining to process: {len(remaining_files)} files (shuffled)")
+    # Shuffle parquet files for distributed processing
+    random.shuffle(parquet_files)
+    print(f"Processing {len(parquet_files)} files (shuffled)")
 
     # Create output directory
     os.makedirs(config.output_dir, exist_ok=True)
 
+    # Chunk size in rows (batch_size * save_every_n_batches)
+    chunk_size = config.batch_size * config.save_every_n_batches
+
     # Process each parquet file in random order
     processed_count = 0
-    for parquet_path in remaining_files:
+    for parquet_path in parquet_files:
         filename = os.path.basename(parquet_path)
 
-        # Re-check bucket before starting (another instance might have completed it)
-        if is_completed_in_bucket(config.gcs_bucket_path, filename):
-            print(f"Skipping {filename} (completed by another instance)")
+        # Get row count from metadata (instant, no data loading)
+        total_rows = pq.ParquetFile(parquet_path).metadata.num_rows
+
+        # Check completed row ranges
+        completed_ranges = get_completed_row_ranges(config.gcs_bucket_path, filename)
+        missing_ranges = get_missing_row_ranges(completed_ranges, total_rows, chunk_size)
+
+        if not missing_ranges:
+            print(f"Skipping {filename} - all {total_rows} rows completed")
             continue
+
+        total_chunks = (total_rows + chunk_size - 1) // chunk_size
+        completed_rows = sum(end - start for start, end in completed_ranges)
 
         print(f"\n{'='*60}")
         print(f"Processing: {filename}")
         print(f"{'='*60}")
+        print(f"Total rows: {total_rows}, Chunk size: {chunk_size}")
+        print(f"Completed: {completed_rows}/{total_rows} rows, Missing chunks: {len(missing_ranges)}/{total_chunks}")
 
-        # Build requests
-        requests = process_parquet_file(parquet_path, tokenizer, config)
+        # Load full parquet data now that we know we need to process it
+        print(f"Loading data from {parquet_path}")
+        df = pd.read_parquet(parquet_path)
 
-        if not requests:
-            print(f"No valid requests for {filename}, marking as complete")
-            completed_files.add(filename)
-            save_progress(progress_path, completed_files)
+        if config.text_column not in df.columns:
+            print(f"Column '{config.text_column}' not found, skipping")
             continue
 
-        # Process in batches
-        all_results = []
-        total_batches = (len(requests) + config.batch_size - 1) // config.batch_size
-        print(f"\nTotal batches to process: {total_batches}")
+        # Shuffle missing ranges so different instances work on different chunks
+        random.shuffle(missing_ranges)
 
-        for i in range(0, len(requests), config.batch_size):
-            batch = requests[i:i + config.batch_size]
-            batch_num = i // config.batch_size + 1
-            print(f"\nBatch {batch_num}/{total_batches}: {len(batch)} requests")
+        # Process each missing range
+        for start_row, end_row in missing_ranges:
+            # Re-check if this range was completed by another instance
+            current_completed = get_completed_row_ranges(config.gcs_bucket_path, filename)
+            if any(s <= start_row and e >= end_row for s, e in current_completed):
+                print(f"Rows {start_row}-{end_row} completed by another instance, skipping")
+                continue
 
-            results = asyncio.run(run_inference(batch, tokenizer, config))
-            all_results.extend(results)
+            print(f"\nProcessing rows {start_row}-{end_row}")
 
-        # Save to temp file first
-        jsonl_name = filename.replace(".parquet", ".jsonl")
-        temp_file = os.path.join(config.output_dir, jsonl_name)
+            # Build requests for this row range
+            requests = []
+            for idx in range(start_row, end_row):
+                text = df.iloc[idx][config.text_column]
+                if not isinstance(text, str) or not text.strip():
+                    continue
 
-        print(f"Saving {len(all_results)} results to: {temp_file}")
-        with open(temp_file, "w") as f:
-            for result in all_results:
-                f.write(json.dumps(result) + "\n")
+                tokens = tokenizer.encode(text, add_special_tokens=False)
+                if not tokens:
+                    continue
 
-        # Copy to bucket (only after complete)
-        if config.gcs_bucket_path:
-            bucket_file = os.path.join(config.gcs_bucket_path, jsonl_name)
-            print(f"Copying to bucket: {bucket_file}")
-            shutil.copy(temp_file, bucket_file)
+                if len(tokens) > config.max_prefill_length:
+                    tokens = tokens[:config.max_prefill_length]
 
-        # Mark as complete
-        processed_count += 1
-        print(f"Completed {filename} ({processed_count} processed this session)")
+                max_output = config.max_target_length - len(tokens)
+                if max_output <= 0:
+                    continue
 
-    print(f"\nAll done! Processed {processed_count} files this session")
+                prefix_text = tokenizer.decode(tokens, skip_special_tokens=True)
+                requests.append(Request(
+                    parquet_file=parquet_path,
+                    row_idx=idx,
+                    prefix_text=prefix_text,
+                    prompt_token_ids=tokens,
+                    max_output_tokens=max_output,
+                ))
+
+            if not requests:
+                print(f"No valid requests for rows {start_row}-{end_row}")
+                continue
+
+            print(f"Built {len(requests)} requests")
+
+            # Process in batches
+            all_results = []
+            total_batches = (len(requests) + config.batch_size - 1) // config.batch_size
+
+            for i in range(0, len(requests), config.batch_size):
+                batch = requests[i:i + config.batch_size]
+                batch_num = i // config.batch_size + 1
+                print(f"Batch {batch_num}/{total_batches}: {len(batch)} requests")
+
+                results = asyncio.run(run_inference(batch, tokenizer, config))
+                all_results.extend(results)
+
+            # Save chunk
+            chunk_name = filename.replace(".parquet", f"_rows_{start_row:07d}_{end_row:07d}.jsonl")
+            temp_file = os.path.join(config.output_dir, chunk_name)
+
+            print(f"Saving {len(all_results)} results to {temp_file}")
+            with open(temp_file, "w") as f:
+                for result in all_results:
+                    f.write(json.dumps(result) + "\n")
+
+            # Copy to bucket
+            if config.gcs_bucket_path:
+                bucket_file = os.path.join(config.gcs_bucket_path, chunk_name)
+                print(f"Copying to bucket: {bucket_file}")
+                shutil.copy(temp_file, bucket_file)
+
+            processed_count += 1
+
+        print(f"Completed {filename}")
+
+    print(f"\nAll done! Saved {processed_count} chunks this session")
 
 
 if __name__ == "__main__":
@@ -275,6 +349,7 @@ if __name__ == "__main__":
     parser.add_argument("--batch-size", type=int, default=512, help="Batch size for inference")
     parser.add_argument("--jetstream-server-port", type=int, default=9000, help="JetStream port")
     parser.add_argument("--gcs-bucket-path", type=str, default=None, help="Path to mounted GCS bucket for final output")
+    parser.add_argument("--save-every-n-batches", type=int, default=10, help="Save checkpoint every N batches")
 
     config = parser.parse_args()
     main(config)

@@ -42,6 +42,75 @@ Runs on TPU worker 0. Starts a MaxEngine server with the teacher model, then run
 - Server log: `/tmp/sequence-kd/server.log`
 - Output: `gs://{BUCKET_NAME}/sequence_kd_data/{run_name}/`
 
+### full_loop_single_v6eu.sh
+
+**Single-worker script for TPU v6e-8** (europe-west4). No multihost coordination needed.
+
+**TPU v6e Environment Setup:**
+```bash
+export PJRT_DEVICE=TPU
+unset JAX_COORDINATOR_ADDRESS
+export JAX_PROCESS_COUNT=1
+export JAX_LOCAL_DEVICE_COUNT=8
+```
+
+**Configuration:**
+- Teacher model: `llama3.1-1b`
+- Dataset: Local parquet files at `/mnt/ramdisk400/finewebedu/sample/100BT`
+- Max prefill length: 1024 tokens
+- Max target length: 4096 tokens
+- Generation batch size: 128
+- Server per-device batch: 16
+- ICI parallelism: 1×4×2×1=8 (matches v6e-8 devices)
+
+**Output:**
+- JSONL files saved to `/home/terry/gcs-bucket/sequence_kd_data/finewebedu/sample-100BT/T50BS42/`
+
+**Usage:**
+```bash
+export HF_ACCESS_TOKEN=hf_xxx
+bash full_loop_single_v6eu.sh
+```
+
+### sequence_kd_parquet.py
+
+**Parquet-based data generator** with preemption resilience and distributed processing support.
+
+**Key Features:**
+1. Processes parquet files one at a time
+2. Saves progress in row-based chunks (batch-size independent)
+3. Uses pyarrow metadata for instant row counting (no full parquet load)
+4. Supports multiple TPU instances working in parallel without overlap
+5. Automatically skips completed chunks
+
+**Output Format (JSONL):**
+```json
+{"parquet_file": "006_00009.parquet", "row_idx": 0, "prefix": "...", "generated": "..."}
+```
+
+**Chunk Naming Scheme:**
+```
+{parquet_name}_rows_{start:07d}_{end:07d}.jsonl
+Example: 006_00009_rows_0000000_0005120.jsonl
+```
+
+**Command Line Arguments:**
+```bash
+python3 -m MaxText.sequence_kd_parquet \
+  --input-dir /path/to/parquets \
+  --output-dir /tmp/output \
+  --tokenizer-path /path/to/tokenizer \
+  --gcs-bucket-path /path/to/bucket/output \
+  --batch-size 512 \
+  --save-every-n-batches 10  # Chunk size = 512 × 10 = 5120 rows
+```
+
+**Distributed Processing:**
+- Each parquet file is shuffled randomly
+- Missing row ranges are also shuffled
+- Before processing a chunk, re-checks if another instance completed it
+- Multiple instances can process the same parquet file without overlap
+
 ## Data Generation Pipeline
 
 1. `get_sequence_kd_data.sh` invokes `multihost_runner_orig.py` to distribute work
@@ -67,10 +136,17 @@ The `ENGINE_PARALLEL_FLAGS` must have a product equal to the number of devices p
 
 | TPU Type | Chips | Devices per Slice | Required Product |
 |----------|-------|-------------------|------------------|
+| v6e-8    | 8     | 8                 | 8                |
 | v4-64    | 32    | 32                | 32               |
 | v4-128   | 64    | 64                | 64               |
 
-**Current configuration (for v4-64):**
+**Configuration for v6e-8:**
+```bash
+ENGINE_PARALLEL_FLAGS=(ici_data_parallelism=1 ici_tensor_parallelism=4 ici_fsdp_parallelism=2 ici_autoregressive_parallelism=1)
+# Product: 1 × 4 × 2 × 1 = 8
+```
+
+**Configuration for v4-64:**
 ```bash
 ENGINE_PARALLEL_FLAGS=(ici_data_parallelism=2 ici_tensor_parallelism=4 ici_fsdp_parallelism=4 ici_autoregressive_parallelism=1)
 # Product: 2 × 4 × 4 × 1 = 32
