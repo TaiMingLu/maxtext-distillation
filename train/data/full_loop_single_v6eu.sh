@@ -74,7 +74,7 @@ python3 -u -m MaxText.maxengine_server MaxText/configs/base.yml \
   max_prefill_predict_length=1024 \
   per_device_batch_size=${SERVER_PER_DEVICE_BATCH} \
   decode_sampling_strategy=${DECODE_SAMPLING_STRATEGY} \
-  temperature=0.7 \
+  decode_sampling_temperature=0.8 \
   multi_sampling=False \
   checkpoint_storage_use_ocdbt=True \
   checkpoint_storage_use_zarr3=True \
