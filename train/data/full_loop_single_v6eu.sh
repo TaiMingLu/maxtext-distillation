@@ -24,8 +24,8 @@ TEACHER_PARAMETERS_PATH="gs://${BUCKET_NAME}/ckpts/pretrain_param_only/llama3.1-
 TOKENIZER_PATH="/home/terry/gcs-bucket/HF_HOME/Llama-3.1-8B"
 MAX_PREFILL_LENGTH=1024
 MAX_TARGET_LENGTH=4096
-GEN_BATCH_SIZE=384
-SERVER_PER_DEVICE_BATCH=48
+GEN_BATCH_SIZE=256
+SERVER_PER_DEVICE_BATCH=32
 JETSTREAM_SERVER_PORT=9000
 SERVER_READY_TIMEOUT_SEC=900
 ENGINE_PARALLEL_FLAGS=(ici_data_parallelism=1 ici_tensor_parallelism=4 ici_fsdp_parallelism=2 ici_autoregressive_parallelism=1)
