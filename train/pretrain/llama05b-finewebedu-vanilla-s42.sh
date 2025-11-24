@@ -23,7 +23,7 @@ for var in "${required_vars[@]}"; do
   fi
 done
 
-export MODEL_NAME='llama3.1-1b'
+export MODEL_NAME='llama3.1-05b'
 export NUM_STEPS=25000
 export SEQ_LEN=8192
 export BATCH_SIZE=4
@@ -35,11 +35,11 @@ export ASYNC_CHECKPOINTING=false
 export BASE_OUTPUT_DIRECTORY="gs://$BUCKET_NAME/ckpts/pretrain"
 export DATA_FILES='/home/terry/gcs-bucket/datasets/fineweb-edu/*.array_record'
 
-export RUN_NAME="${MODEL_NAME}_finewebedu_pretrain_shuffled_lr_3e-4_seed_42"
-export RUN_ID="llama3-1b_finewebedu_pretrain_shuffled_lr_3e-4_seed_42"
+export RUN_NAME="${MODEL_NAME}-finewebedu-vanilla-s42"
+export RUN_ID="llama05b_finewebedu_vanilla_s42"
 
 echo "========================"
-echo "running llama3_8b_1b_3e-4.sh"
+echo "running llama05b-finewebedu-vanilla-s42.sh"
 echo "parameters:"
 echo "MODEL_NAME: $MODEL_NAME"
 echo "SEQ_LEN: $SEQ_LEN"
