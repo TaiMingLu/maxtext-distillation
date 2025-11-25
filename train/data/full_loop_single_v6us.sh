@@ -16,7 +16,7 @@ BUCKET_NAME=${BUCKET_NAME:-taiming_us_east1_d}
 
 # Configuration
 RUN_NAME="sequence-kd-v6us"
-DATASET_PATH="/mnt/ramdisk400/finewebedu/sample/100BT"
+DATASET_PATH="/home/terry/gcs-bucket/HF_HOME/finewebedu/sample/100BT"
 DATA_SPLIT="train"
 TEXT_COLUMN="text"
 TEACHER_MODEL_NAME="llama3.1-1b"
