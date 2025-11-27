@@ -771,48 +771,33 @@ def setup_train_loop(config, recorder, devices=None):
       if not getattr(config, "kd_teacher_parameters_path", ""):
         raise ValueError("use_kd=True requires kd_teacher_parameters_path to be set to a valid checkpoint path.")
 
-      # Prepare a teacher config; default to student unless kd_teacher_model_name is set
-      class _DictConfig:
-        def __init__(self, d):
-          self._d = d
-          # Convert string enum values back to enums
-          if "decoder_block" in self._d and isinstance(self._d["decoder_block"], str):
-            self._d["decoder_block"] = DecoderBlockType(self._d["decoder_block"])
-        def __getattr__(self, k):
-          if k == "_d":
-            return object.__getattribute__(self, k)
-          return self._d[k]
-        def __getitem__(self, k):
-          return self._d[k]
-        def __contains__(self, k):
-          return k in self._d
-        def get(self, k, default=None):
-          return self._d.get(k, default)
-        def get_keys(self):
-          return self._d
-        def keys(self):
-          return self._d.keys()
-
-      teacher_cfg_dict = dict(config.get_keys())
-      teacher_model_name = teacher_cfg_dict.get("kd_teacher_model_name", "") or teacher_cfg_dict.get("model_name")
-      max_logging.log(f"[KD DEBUG] kd_teacher_model_name from config: {teacher_cfg_dict.get('kd_teacher_model_name')}")
-      max_logging.log(f"[KD DEBUG] student model_name: {teacher_cfg_dict.get('model_name')}")
+      teacher_model_name = config.kd_teacher_model_name or config.model_name
+      max_logging.log(f"[KD DEBUG] kd_teacher_model_name from config: {config.kd_teacher_model_name}")
+      max_logging.log(f"[KD DEBUG] student model_name: {config.model_name}")
       max_logging.log(f"[KD DEBUG] resolved teacher_model_name: {teacher_model_name}")
-      if teacher_model_name and teacher_model_name != teacher_cfg_dict.get("model_name"):
+
+      if teacher_model_name and teacher_model_name != config.model_name:
+        # Teacher has different architecture - need to load teacher model config
         model_cfg_path = os.path.join(os.path.dirname(__file__), "configs", "models", f"{teacher_model_name}.yml")
         if not os.path.isfile(model_cfg_path):
           raise ValueError(f"kd_teacher_model_name='{teacher_model_name}' not found at {model_cfg_path}")
-        model_vars = omegaconf.OmegaConf.to_container(omegaconf.OmegaConf.load(model_cfg_path), resolve=True)
-        for k, v in model_vars.items():
-          teacher_cfg_dict[k] = v
-        teacher_cfg_dict["model_name"] = teacher_model_name
 
-      teacher_config = _DictConfig(teacher_cfg_dict)
-      max_logging.log(f"[KD DEBUG] teacher base_emb_dim: {teacher_cfg_dict.get('base_emb_dim')}")
-      max_logging.log(f"[KD DEBUG] teacher base_num_decoder_layers: {teacher_cfg_dict.get('base_num_decoder_layers')}")
-      max_logging.log(f"[KD DEBUG] teacher_config.base_emb_dim (via attr): {teacher_config.base_emb_dim}")
-      max_logging.log(f"[KD DEBUG] teacher_config['base_emb_dim'] (via item): {teacher_config['base_emb_dim']}")
-      teacher_model = train_utils.create_model(teacher_config, mesh)
+        # Load teacher model config as OmegaConf
+        teacher_model_cfg = omegaconf.OmegaConf.load(model_cfg_path)
+        # Merge with base student config, teacher model params override
+        teacher_cfg_merged = omegaconf.OmegaConf.merge(config.get_keys(), teacher_model_cfg)
+        teacher_cfg_merged.model_name = teacher_model_name
+
+        # Use mt.from_pretrained with the merged config (same as student model creation)
+        max_logging.log(f"[KD DEBUG] teacher base_emb_dim from merged config: {teacher_cfg_merged.base_emb_dim}")
+        max_logging.log(f"[KD DEBUG] teacher base_num_decoder_layers from merged config: {teacher_cfg_merged.base_num_decoder_layers}")
+        teacher_model = mt.from_pretrained(teacher_cfg_merged, devices)
+        teacher_config = teacher_cfg_merged
+      else:
+        # Teacher same as student
+        teacher_model = model
+        teacher_config = config
+
       max_logging.log(f"[KD DEBUG] teacher_model created, type: {type(teacher_model)}")
       teacher_abstract_state, _, teacher_state_mesh_shardings = maxtext_utils.get_abstract_state(
           teacher_model, tx, teacher_config, init_rng, mesh, is_training=True
