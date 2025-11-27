@@ -787,6 +787,9 @@ def setup_train_loop(config, recorder, devices=None):
 
       teacher_cfg_dict = dict(config.get_keys())
       teacher_model_name = teacher_cfg_dict.get("kd_teacher_model_name", "") or teacher_cfg_dict.get("model_name")
+      max_logging.log(f"[KD DEBUG] kd_teacher_model_name from config: {teacher_cfg_dict.get('kd_teacher_model_name')}")
+      max_logging.log(f"[KD DEBUG] student model_name: {teacher_cfg_dict.get('model_name')}")
+      max_logging.log(f"[KD DEBUG] resolved teacher_model_name: {teacher_model_name}")
       if teacher_model_name and teacher_model_name != teacher_cfg_dict.get("model_name"):
         model_cfg_path = os.path.join(os.path.dirname(__file__), "configs", "models", f"{teacher_model_name}.yml")
         if not os.path.isfile(model_cfg_path):
@@ -797,6 +800,8 @@ def setup_train_loop(config, recorder, devices=None):
         teacher_cfg_dict["model_name"] = teacher_model_name
 
       teacher_config = _DictConfig(teacher_cfg_dict)
+      max_logging.log(f"[KD DEBUG] teacher base_emb_dim: {teacher_cfg_dict.get('base_emb_dim')}")
+      max_logging.log(f"[KD DEBUG] teacher base_num_decoder_layers: {teacher_cfg_dict.get('base_num_decoder_layers')}")
       teacher_model = train_utils.create_model(teacher_config, mesh)
       teacher_abstract_state, _, teacher_state_mesh_shardings = maxtext_utils.get_abstract_state(
           teacher_model, tx, teacher_config, init_rng, mesh, is_training=True
