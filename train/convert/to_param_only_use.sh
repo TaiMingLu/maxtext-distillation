@@ -41,7 +41,7 @@ for checkpoint in 24999; do
           load_full_state_path=gs://taiming_us_central2_b/ckpts/pretrain/maxtext/llama3.1-3b-finewebedu-vanilla-s42/checkpoints/$checkpoint/items \
           checkpoint_dir=gs://taiming_us_central2_b/ckpts/pretrain_param_only/llama3.1-3b-finewebedu-vanilla-s42/checkpoint_$checkpoint \
           enable_checkpointing=True async_checkpointing=False \
-          model_name=llama3.1-1b
+          model_name=llama3.1-3b
         "
 done
 
