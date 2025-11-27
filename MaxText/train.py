@@ -794,6 +794,17 @@ def setup_train_loop(config, recorder, devices=None):
             # Convert string enums back to enum objects
             if 'decoder_block' in overrides and isinstance(overrides['decoder_block'], str):
               overrides['decoder_block'] = DecoderBlockType(overrides['decoder_block'])
+
+            # CRITICAL: Compute derived values that models actually use!
+            # Models use emb_dim (not base_emb_dim) and num_decoder_layers (not base_num_decoder_layers)
+            if 'base_emb_dim' in overrides:
+              emb_scale = base_config.emb_scale if hasattr(base_config, 'emb_scale') else 0
+              overrides['emb_dim'] = (2 ** emb_scale) * overrides['base_emb_dim']
+
+            if 'base_num_decoder_layers' in overrides:
+              layer_scale = base_config.layer_scale if hasattr(base_config, 'layer_scale') else 0
+              overrides['num_decoder_layers'] = (2 ** layer_scale) * overrides['base_num_decoder_layers']
+
             object.__setattr__(self, '_overrides', overrides)
 
           def __getattr__(self, key):
