@@ -39,7 +39,7 @@ export BASE_OUTPUT_DIRECTORY="gs://$BUCKET_NAME/ckpts/distill_pretrain"
 export DATA_FILES='/home/terry/gcs-bucket/datasets/fineweb-edu/*.array_record'
 
 export RUN_NAME="${MODEL_NAME}-finewebedu-distill-soft-A3BT50BS42-a1-s43"
-export RUN_ID="llama1b_finewebedu_distill_soft_A3BT50BS42_a1_s43"
+export RUN_ID="llama1b_finewebedu_distill_soft_A3BT50BS42_a1_s43_2"
 
 # Distillation parameters
 
