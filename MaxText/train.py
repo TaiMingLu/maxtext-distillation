@@ -810,10 +810,28 @@ def setup_train_loop(config, recorder, devices=None):
       teacher_config = _DictConfig(teacher_cfg_dict)
       max_logging.log(f"[KD DEBUG] teacher base_emb_dim: {teacher_cfg_dict.get('base_emb_dim')}")
       max_logging.log(f"[KD DEBUG] teacher base_num_decoder_layers: {teacher_cfg_dict.get('base_num_decoder_layers')}")
+      max_logging.log(f"[KD DEBUG] teacher_config.base_emb_dim (via attr): {teacher_config.base_emb_dim}")
+      max_logging.log(f"[KD DEBUG] teacher_config['base_emb_dim'] (via item): {teacher_config['base_emb_dim']}")
       teacher_model = train_utils.create_model(teacher_config, mesh)
+      max_logging.log(f"[KD DEBUG] teacher_model created, type: {type(teacher_model)}")
       teacher_abstract_state, _, teacher_state_mesh_shardings = maxtext_utils.get_abstract_state(
           teacher_model, tx, teacher_config, init_rng, mesh, is_training=True
       )
+
+      # Debug: Check actual shapes in abstract state
+      if hasattr(teacher_abstract_state.params, 'keys'):
+        first_param_key = list(teacher_abstract_state.params.keys())[0] if teacher_abstract_state.params.keys() else None
+        if first_param_key:
+          max_logging.log(f"[KD DEBUG] First param key in abstract state: {first_param_key}")
+      # Check for a specific parameter to verify dimensions
+      try:
+        import jax
+        def _check_shape(path, value):
+          if 'embedding' in str(path).lower() or 'norm' in str(path).lower():
+            max_logging.log(f"[KD DEBUG] Param {path}: shape = {value.shape if hasattr(value, 'shape') else 'no shape'}")
+        jax.tree_util.tree_map_with_path(_check_shape, teacher_abstract_state.params)
+      except Exception as e:
+        max_logging.log(f"[KD DEBUG] Could not check param shapes: {e}")
 
       # Restore teacher parameters.
       # 1) Try params-only restore using the TEACHER abstract state
