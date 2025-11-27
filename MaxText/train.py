@@ -784,8 +784,9 @@ def setup_train_loop(config, recorder, devices=None):
 
         # Load teacher model config as OmegaConf
         teacher_model_cfg = omegaconf.OmegaConf.load(model_cfg_path)
-        # Merge with base student config, teacher model params override
-        teacher_cfg_merged = omegaconf.OmegaConf.merge(config.get_keys(), teacher_model_cfg)
+        # Convert student config dict to OmegaConf, then merge with teacher config
+        student_cfg_omega = omegaconf.OmegaConf.create(config.get_keys())
+        teacher_cfg_merged = omegaconf.OmegaConf.merge(student_cfg_omega, teacher_model_cfg)
         teacher_cfg_merged.model_name = teacher_model_name
 
         # Use mt.from_pretrained with the merged config (same as student model creation)
