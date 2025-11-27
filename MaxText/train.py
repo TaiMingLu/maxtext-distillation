@@ -52,6 +52,7 @@ from MaxText import maxtext_utils
 from MaxText import train_utils
 from MaxText import profiler
 from MaxText import pyconfig
+from MaxText.common_types import DecoderBlockType
 from MaxText.layers.multi_token_prediction import calculate_mtp_acceptance_rate, calculate_mtp_loss
 from MaxText.data_loader import DataLoader
 from MaxText.input_pipeline.input_pipeline_interface import create_data_iterator
