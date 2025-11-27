@@ -779,11 +779,19 @@ def setup_train_loop(config, recorder, devices=None):
           if "decoder_block" in self._d and isinstance(self._d["decoder_block"], str):
             self._d["decoder_block"] = DecoderBlockType(self._d["decoder_block"])
         def __getattr__(self, k):
+          if k == "_d":
+            return object.__getattribute__(self, k)
           return self._d[k]
+        def __getitem__(self, k):
+          return self._d[k]
+        def __contains__(self, k):
+          return k in self._d
         def get(self, k, default=None):
           return self._d.get(k, default)
         def get_keys(self):
           return self._d
+        def keys(self):
+          return self._d.keys()
 
       teacher_cfg_dict = dict(config.get_keys())
       teacher_model_name = teacher_cfg_dict.get("kd_teacher_model_name", "") or teacher_cfg_dict.get("model_name")
