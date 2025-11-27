@@ -31,7 +31,7 @@ export ASYNC_CHECKPOINTING=false
 
 
 export USE_KD=true
-export KD_ALPHA=1.0  #KD_ALPHA=0.0 -- pure cross-entropy (no KD), KD_ALPHA=1.0 -- makes purely the KD term
+export KD_ALPHA=0.5  #KD_ALPHA=0.0 -- pure cross-entropy (no KD), KD_ALPHA=1.0 -- makes purely the KD term
 export KD_TEMPERATURE=1.0
 export KD_USE_HARD_LABELS=true
 # export KD_TEACHER_PARAMETERS_PATH="/home/terry/gcs-bucket/model_ckpts/maxtext/llama3.1-1b_seqlen_8192_bs_4_grad_accum_1_lr_2.e-4_min_lr_ratio_0.1_warmup_ratio_0.05_quadratic_warmup/checkpoints/500"
