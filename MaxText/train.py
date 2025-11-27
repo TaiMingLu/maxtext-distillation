@@ -782,18 +782,20 @@ def setup_train_loop(config, recorder, devices=None):
         if not os.path.isfile(model_cfg_path):
           raise ValueError(f"kd_teacher_model_name='{teacher_model_name}' not found at {model_cfg_path}")
 
-        # Load teacher model config as OmegaConf
+        # Load teacher model config and manually override student config values
         teacher_model_cfg = omegaconf.OmegaConf.load(model_cfg_path)
-        # Convert student config dict to OmegaConf, then merge with teacher config
-        student_cfg_omega = omegaconf.OmegaConf.create(config.get_keys())
-        teacher_cfg_merged = omegaconf.OmegaConf.merge(student_cfg_omega, teacher_model_cfg)
-        teacher_cfg_merged.model_name = teacher_model_name
 
-        # Use mt.from_pretrained with the merged config (same as student model creation)
-        max_logging.log(f"[KD DEBUG] teacher base_emb_dim from merged config: {teacher_cfg_merged.base_emb_dim}")
-        max_logging.log(f"[KD DEBUG] teacher base_num_decoder_layers from merged config: {teacher_cfg_merged.base_num_decoder_layers}")
-        teacher_model = mt.from_pretrained(teacher_cfg_merged, devices)
-        teacher_config = teacher_cfg_merged
+        # Create a copy of student config and update with teacher model params
+        import copy
+        teacher_config = copy.deepcopy(config)
+        for key, value in teacher_model_cfg.items():
+          setattr(teacher_config, key, value)
+        teacher_config.model_name = teacher_model_name
+
+        # Use mt.from_pretrained with the updated config (same as student model creation)
+        max_logging.log(f"[KD DEBUG] teacher base_emb_dim: {teacher_config.base_emb_dim}")
+        max_logging.log(f"[KD DEBUG] teacher base_num_decoder_layers: {teacher_config.base_num_decoder_layers}")
+        teacher_model = mt.from_pretrained(teacher_config, devices)
       else:
         # Teacher same as student
         teacher_model = model
