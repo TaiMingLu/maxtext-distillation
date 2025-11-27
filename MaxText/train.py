@@ -777,36 +777,28 @@ def setup_train_loop(config, recorder, devices=None):
       max_logging.log(f"[KD DEBUG] resolved teacher_model_name: {teacher_model_name}")
 
       if teacher_model_name and teacher_model_name != config.model_name:
-        # Teacher has different architecture - temporarily modify config to create teacher model
+        # Teacher has different architecture - create a new config with teacher model_name
         model_cfg_path = os.path.join(os.path.dirname(__file__), "configs", "models", f"{teacher_model_name}.yml")
         if not os.path.isfile(model_cfg_path):
           raise ValueError(f"kd_teacher_model_name='{teacher_model_name}' not found at {model_cfg_path}")
 
-        # Load teacher model config YAML
-        teacher_model_cfg = omegaconf.OmegaConf.load(model_cfg_path)
+        # Create teacher config by passing all student config values as kwargs, but override model_name
+        # This will trigger pyconfig to load the teacher model YAML automatically
+        teacher_config_kwargs = dict(config.get_keys())
+        teacher_config_kwargs['model_name'] = teacher_model_name
 
-        # Save original student values so we can restore them
-        original_values = {}
-        for key in teacher_model_cfg.keys():
-          if hasattr(config, key):
-            original_values[key] = getattr(config, key)
-        original_values['model_name'] = config.model_name
+        # Initialize teacher config using pyconfig (will load teacher model YAML based on model_name)
+        import sys
+        teacher_config = pyconfig.initialize(
+            [sys.argv[0], 'MaxText/configs/base.yml'],
+            **teacher_config_kwargs
+        )
 
-        # Temporarily set teacher values on the config object
-        for key, value in teacher_model_cfg.items():
-          setattr(config, key, value)
-        config.model_name = teacher_model_name
+        max_logging.log(f"[KD DEBUG] teacher base_emb_dim: {teacher_config.base_emb_dim}")
+        max_logging.log(f"[KD DEBUG] teacher base_num_decoder_layers: {teacher_config.base_num_decoder_layers}")
 
-        max_logging.log(f"[KD DEBUG] teacher base_emb_dim: {config.base_emb_dim}")
-        max_logging.log(f"[KD DEBUG] teacher base_num_decoder_layers: {config.base_num_decoder_layers}")
-
-        # Create teacher model with modified config and existing mesh
-        teacher_model = train_utils.create_model(config, mesh)
-        teacher_config = config
-
-        # Restore original student values
-        for key, value in original_values.items():
-          setattr(config, key, value)
+        # Create teacher model with proper teacher config
+        teacher_model = train_utils.create_model(teacher_config, mesh)
       else:
         # Teacher same as student
         teacher_model = model
