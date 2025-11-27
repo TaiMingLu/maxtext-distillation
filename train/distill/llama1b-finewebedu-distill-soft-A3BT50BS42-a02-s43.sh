@@ -34,7 +34,7 @@ export KD_ALPHA=0.2  #KD_ALPHA=0.0 -- pure cross-entropy (no KD), KD_ALPHA=1.0 -
 export KD_TEMPERATURE=1.0
 # export KD_TEACHER_PARAMETERS_PATH="/home/terry/gcs-bucket/model_ckpts/maxtext/llama3.1-1b_seqlen_8192_bs_4_grad_accum_1_lr_2.e-4_min_lr_ratio_0.1_warmup_ratio_0.05_quadratic_warmup/checkpoints/500"
 export KD_TEACHER_PARAMETERS_PATH="/home/terry/gcs-bucket/ckpts/pretrain_param_only/llama3.1-3b-finewebedu-vanilla-s42/checkpoint_24999/0/items"
-
+export TEACHER_MODEL_NAME="llama3.1-3b"
 export BASE_OUTPUT_DIRECTORY="gs://$BUCKET_NAME/ckpts/distill_pretrain"
 export DATA_FILES='/home/terry/gcs-bucket/datasets/fineweb-edu/*.array_record'
 
@@ -113,5 +113,6 @@ python -u multihost_runner_orig.py \
         use_kd=${USE_KD} \
         kd_alpha=${KD_ALPHA} \
         kd_temperature=${KD_TEMPERATURE} \
-        kd_teacher_parameters_path=${KD_TEACHER_PARAMETERS_PATH}
+        kd_teacher_parameters_path=${KD_TEACHER_PARAMETERS_PATH} \
+        kd_teacher_model_name=${TEACHER_MODEL_NAME}
     "
