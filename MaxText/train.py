@@ -774,6 +774,9 @@ def setup_train_loop(config, recorder, devices=None):
       class _DictConfig:
         def __init__(self, d):
           self._d = d
+          # Convert string enum values back to enums
+          if "decoder_block" in self._d and isinstance(self._d["decoder_block"], str):
+            self._d["decoder_block"] = DecoderBlockType(self._d["decoder_block"])
         def __getattr__(self, k):
           return self._d[k]
         def get(self, k, default=None):
