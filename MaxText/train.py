@@ -797,12 +797,13 @@ def setup_train_loop(config, recorder, devices=None):
 
             # CRITICAL: Compute derived values that models actually use!
             # Models use emb_dim (not base_emb_dim) and num_decoder_layers (not base_num_decoder_layers)
+            base_config_keys = base_config.get_keys()
             if 'base_emb_dim' in overrides:
-              emb_scale = base_config.emb_scale if hasattr(base_config, 'emb_scale') else 0
+              emb_scale = base_config_keys.get('emb_scale', 0)
               overrides['emb_dim'] = (2 ** emb_scale) * overrides['base_emb_dim']
 
             if 'base_num_decoder_layers' in overrides:
-              layer_scale = base_config.layer_scale if hasattr(base_config, 'layer_scale') else 0
+              layer_scale = base_config_keys.get('layer_scale', 0)
               overrides['num_decoder_layers'] = (2 ** layer_scale) * overrides['base_num_decoder_layers']
 
             object.__setattr__(self, '_overrides', overrides)
