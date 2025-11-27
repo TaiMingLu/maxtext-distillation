@@ -880,6 +880,23 @@ def setup_train_loop(config, recorder, devices=None):
               f"Failed to restore teacher parameters from '{config.kd_teacher_parameters_path}'."
           ) from e
 
+      # Verify loaded teacher params have correct dimensions
+      max_logging.log(f"[KD CONFIRM] Teacher checkpoint loaded successfully from {config.kd_teacher_parameters_path}")
+      max_logging.log(f"[KD CONFIRM] Teacher model architecture: {teacher_model_name}")
+      max_logging.log(f"[KD CONFIRM] Teacher config - emb_dim: {teacher_config.emb_dim}, num_decoder_layers: {teacher_config.num_decoder_layers}")
+
+      # Check actual loaded parameter shapes
+      try:
+        def _verify_teacher_shape(path, value):
+          path_str = str(path)
+          if 'token_embedder' in path_str and 'embedding' in path_str:
+            max_logging.log(f"[KD CONFIRM] Loaded teacher embedding shape: {value.shape} (expected: [128256, 3072])")
+          elif 'decoder_norm' in path_str and 'scale' in path_str:
+            max_logging.log(f"[KD CONFIRM] Loaded teacher decoder_norm shape: {value.shape} (expected: [3072])")
+        jax.tree_util.tree_map_with_path(_verify_teacher_shape, teacher_params)
+      except Exception as e:
+        max_logging.log(f"[KD CONFIRM] Could not verify teacher param shapes: {e}")
+
       # Merge teacher params and sharding
       state = _merge_kd_state(state, teacher_params)
       teacher_params_sharding = teacher_state_mesh_shardings.params["params"]
@@ -888,6 +905,7 @@ def setup_train_loop(config, recorder, devices=None):
       # Register teacher model for KD loss
       global TEACHER_MODEL
       TEACHER_MODEL = teacher_model
+      max_logging.log(f"[KD CONFIRM] ✓ Teacher model registered successfully! Using {teacher_model_name} to teach {config.model_name}")
 
   return (
       init_rng,
