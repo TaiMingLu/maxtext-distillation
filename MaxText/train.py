@@ -791,6 +791,9 @@ def setup_train_loop(config, recorder, devices=None):
         class _TeacherConfigWrapper:
           def __init__(self, base_config, overrides):
             object.__setattr__(self, '_base_config', base_config)
+            # Convert string enums back to enum objects
+            if 'decoder_block' in overrides and isinstance(overrides['decoder_block'], str):
+              overrides['decoder_block'] = DecoderBlockType(overrides['decoder_block'])
             object.__setattr__(self, '_overrides', overrides)
 
           def __getattr__(self, key):
