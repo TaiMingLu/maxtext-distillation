@@ -333,6 +333,7 @@ def validate_model_name(s: str) -> bool:
       "llama3.1-2b-depth",
       "llama3.1-3b-depth",
       "llama3.1-4b-depth",
+      "llama3.1-05b",
       "llama3.1-8b",
       "llama3.1-8b",
       "llama3.1-1b",
