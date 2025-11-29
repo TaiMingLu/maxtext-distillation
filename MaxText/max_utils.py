@@ -792,11 +792,10 @@ def kl_divergence_between_logits_efficient(
 
   # Get original shape for later reshaping
   original_shape = teacher_logits.shape[:-1]  # [..., vocab] -> [...]
-  batch_size = int(jnp.prod(jnp.array(original_shape)))
 
-  # Flatten to [batch_size, vocab_size] for easier processing
-  teacher_logits_flat = teacher_logits_scaled.reshape(batch_size, vocab_size)
-  student_logits_flat = student_logits_scaled.reshape(batch_size, vocab_size)
+  # Flatten to [-1, vocab_size] for easier processing
+  teacher_logits_flat = teacher_logits_scaled.reshape(-1, vocab_size)
+  student_logits_flat = student_logits_scaled.reshape(-1, vocab_size)
 
   if top_k is not None:
     # ============ TOP-K PATH ============
@@ -807,8 +806,8 @@ def kl_divergence_between_logits_efficient(
     # Shape: top_k_teacher_logits: [batch_size, k]
     #        top_k_indices: [batch_size, k]
 
-    # Gather corresponding student logits
-    batch_indices = jnp.arange(batch_size)[:, None]  # [batch_size, 1]
+    # Gather corresponding student logits using advanced indexing
+    batch_indices = jnp.arange(teacher_logits_flat.shape[0])[:, None]  # [batch_size, 1]
     top_k_student_logits = student_logits_flat[batch_indices, top_k_indices]
     # Shape: [batch_size, k]
 
@@ -820,7 +819,7 @@ def kl_divergence_between_logits_efficient(
       student_probs_full = jnp.exp(student_log_probs_full)
 
       # Create mask for top-k tokens
-      mask = jnp.zeros((batch_size, vocab_size), dtype=bool)
+      mask = jnp.zeros_like(teacher_logits_flat, dtype=bool)
       mask = mask.at[batch_indices, top_k_indices].set(True)
 
       # Kept probabilities (no renormalization)
@@ -875,9 +874,9 @@ def kl_divergence_between_logits_efficient(
     keep_mask_sorted = prev_cumulative < float(top_p)
 
     # Scatter mask back to original vocab order
-    batch_indices = jnp.arange(batch_size)[:, None]
-    mask = jnp.zeros((batch_size, vocab_size), dtype=bool)
-    mask = mask.at[batch_indices, sorted_indices].set(keep_mask_sorted)
+    batch_indices_p = jnp.arange(teacher_logits_flat.shape[0])[:, None]
+    mask = jnp.zeros_like(teacher_logits_flat, dtype=bool)
+    mask = mask.at[batch_indices_p, sorted_indices].set(keep_mask_sorted)
 
     mask_f = mask.astype(teacher_probs_flat.dtype)
 
