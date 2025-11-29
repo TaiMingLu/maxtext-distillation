@@ -743,6 +743,174 @@ def kl_divergence_between_logits(
   return jnp.sum(renorm_teacher_probs * (renorm_teacher_log_probs - student_log_probs), axis=-1)
 
 
+def kl_divergence_between_logits_efficient(
+    student_logits: jnp.ndarray,
+    teacher_logits: jnp.ndarray,
+    temperature: float,
+    top_k: Optional[int] = None,
+    top_p: Optional[float] = None,
+    use_other_bucket: bool = False,
+) -> jnp.ndarray:
+  """Memory-efficient KL(teacher || student) that avoids full vocab softmax.
+
+  This version selects top-k in logit space BEFORE computing softmax, avoiding
+  the need to materialize full vocabulary probability distributions.
+
+  Args:
+    student_logits: Logits from the student model, shape [..., vocab_size].
+    teacher_logits: Logits from the teacher model, shape [..., vocab_size].
+    temperature: Temperature used to soften both distributions.
+    top_k: If set, keep only the ``top_k`` teacher tokens per position.
+    top_p: If set, keep the smallest teacher token set whose cumulative mass is
+      at least ``top_p``.
+    use_other_bucket: When truncating, aggregate the discarded probability mass
+      into a single "OTHER" bucket instead of renormalizing over the kept set.
+
+  Returns:
+    KL divergence per position with the last dimension reduced, shape [...].
+  """
+  inv_t = 1.0 / temperature
+  vocab_size = teacher_logits.shape[-1]
+  eps = jnp.finfo(teacher_logits.dtype).eps
+
+  # Normalize configuration defaults
+  if top_k is not None and (top_k <= 0 or top_k >= vocab_size):
+    top_k = None
+  if top_p is not None and (top_p <= 0.0 or top_p >= 1.0):
+    top_p = None
+
+  # If no truncation, use original implementation for full KL
+  if top_k is None and top_p is None:
+    student_log_probs = jax.nn.log_softmax(student_logits * inv_t, axis=-1)
+    teacher_log_probs = jax.nn.log_softmax(teacher_logits * inv_t, axis=-1)
+    teacher_probs = jnp.exp(teacher_log_probs)
+    return jnp.sum(teacher_probs * (teacher_log_probs - student_log_probs), axis=-1)
+
+  # Scale logits by temperature
+  teacher_logits_scaled = teacher_logits * inv_t
+  student_logits_scaled = student_logits * inv_t
+
+  # Get original shape for later reshaping
+  original_shape = teacher_logits.shape[:-1]  # [..., vocab] -> [...]
+  batch_size = int(jnp.prod(jnp.array(original_shape)))
+
+  # Flatten to [batch_size, vocab_size] for easier processing
+  teacher_logits_flat = teacher_logits_scaled.reshape(batch_size, vocab_size)
+  student_logits_flat = student_logits_scaled.reshape(batch_size, vocab_size)
+
+  if top_k is not None:
+    # ============ TOP-K PATH ============
+    k = int(top_k)
+
+    # Select top-k teacher logits (cheap operation in logit space!)
+    top_k_teacher_logits, top_k_indices = jax.lax.top_k(teacher_logits_flat, k)
+    # Shape: top_k_teacher_logits: [batch_size, k]
+    #        top_k_indices: [batch_size, k]
+
+    # Gather corresponding student logits
+    batch_indices = jnp.arange(batch_size)[:, None]  # [batch_size, 1]
+    top_k_student_logits = student_logits_flat[batch_indices, top_k_indices]
+    # Shape: [batch_size, k]
+
+    if use_other_bucket:
+      # Compute full softmax to get OTHER bucket probability
+      teacher_log_probs_full = jax.nn.log_softmax(teacher_logits_flat, axis=-1)
+      teacher_probs_full = jnp.exp(teacher_log_probs_full)
+      student_log_probs_full = jax.nn.log_softmax(student_logits_flat, axis=-1)
+      student_probs_full = jnp.exp(student_log_probs_full)
+
+      # Create mask for top-k tokens
+      mask = jnp.zeros((batch_size, vocab_size), dtype=bool)
+      mask = mask.at[batch_indices, top_k_indices].set(True)
+
+      # Kept probabilities (no renormalization)
+      kept_teacher_probs = teacher_probs_full * mask
+      kept_teacher_log_probs = teacher_log_probs_full * mask
+
+      # OTHER bucket: sum of probabilities outside top-k
+      teacher_other_prob = jnp.sum(teacher_probs_full * (~mask), axis=-1)
+      student_other_prob = jnp.sum(student_probs_full * (~mask), axis=-1)
+
+      teacher_other_log_prob = jnp.log(jnp.maximum(teacher_other_prob, eps))
+      student_other_log_prob = jnp.log(jnp.maximum(student_other_prob, eps))
+
+      # KL for kept tokens + KL for OTHER bucket
+      kl_kept = jnp.sum(kept_teacher_probs * (kept_teacher_log_probs - student_log_probs_full), axis=-1)
+      kl_other = teacher_other_prob * (teacher_other_log_prob - student_other_log_prob)
+
+      kl_flat = kl_kept + kl_other
+
+    else:
+      # Renormalization path: only compute softmax over top-k tokens
+      # Compute log_softmax over just the top-k logits
+      teacher_log_probs_topk = jax.nn.log_softmax(top_k_teacher_logits, axis=-1)
+      teacher_probs_topk = jnp.exp(teacher_log_probs_topk)
+
+      # For student, we need log_softmax over FULL vocab, then gather top-k
+      student_log_probs_full = jax.nn.log_softmax(student_logits_flat, axis=-1)
+      student_log_probs_topk = student_log_probs_full[batch_indices, top_k_indices]
+
+      # Compute KL over renormalized top-k distribution
+      kl_flat = jnp.sum(
+          teacher_probs_topk * (teacher_log_probs_topk - student_log_probs_topk),
+          axis=-1
+      )
+
+  else:
+    # ============ TOP-P PATH ============
+    # For top-p, we still need full softmax to compute cumulative mass
+    # This is unavoidable for top-p, but top-k is the common case
+    teacher_log_probs_flat = jax.nn.log_softmax(teacher_logits_flat, axis=-1)
+    teacher_probs_flat = jnp.exp(teacher_log_probs_flat)
+    student_log_probs_flat = jax.nn.log_softmax(student_logits_flat, axis=-1)
+
+    # Sort by teacher probability (descending)
+    sorted_teacher_probs, sorted_indices = jax.lax.top_k(teacher_probs_flat, vocab_size)
+
+    # Compute cumulative sum to find nucleus
+    cumulative = jnp.cumsum(sorted_teacher_probs, axis=-1)
+    prev_cumulative = cumulative - sorted_teacher_probs
+
+    # Keep tokens while cumulative mass < p
+    keep_mask_sorted = prev_cumulative < float(top_p)
+
+    # Scatter mask back to original vocab order
+    batch_indices = jnp.arange(batch_size)[:, None]
+    mask = jnp.zeros((batch_size, vocab_size), dtype=bool)
+    mask = mask.at[batch_indices, sorted_indices].set(keep_mask_sorted)
+
+    mask_f = mask.astype(teacher_probs_flat.dtype)
+
+    if use_other_bucket:
+      kept_teacher_probs = teacher_probs_flat * mask_f
+      teacher_other_prob = jnp.sum(teacher_probs_flat * (1.0 - mask_f), axis=-1)
+      teacher_other_log_prob = jnp.log(jnp.maximum(teacher_other_prob, eps))
+
+      student_probs_flat = jnp.exp(student_log_probs_flat)
+      student_other_prob = jnp.sum(student_probs_flat * (1.0 - mask_f), axis=-1)
+      student_other_log_prob = jnp.log(jnp.maximum(student_other_prob, eps))
+
+      kl_kept = jnp.sum(kept_teacher_probs * (teacher_log_probs_flat - student_log_probs_flat), axis=-1)
+      kl_other = teacher_other_prob * (teacher_other_log_prob - student_other_log_prob)
+      kl_flat = kl_kept + kl_other
+
+    else:
+      # Renormalize kept tokens
+      masked_probs = teacher_probs_flat * mask_f
+      denom = jnp.sum(masked_probs, axis=-1, keepdims=True)
+      denom = jnp.maximum(denom, eps)
+      renorm_teacher_probs = masked_probs / denom
+      renorm_teacher_log_probs = jnp.log(jnp.maximum(renorm_teacher_probs, eps))
+
+      kl_flat = jnp.sum(
+          renorm_teacher_probs * (renorm_teacher_log_probs - student_log_probs_flat),
+          axis=-1
+      )
+
+  # Reshape back to original batch shape
+  return kl_flat.reshape(original_shape)
+
+
 def print_pytree_shape(print_str, ptree):
   print("\n")
   print(print_str)

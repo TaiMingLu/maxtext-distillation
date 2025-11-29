@@ -349,7 +349,8 @@ def kd_loss_fn(model, config, data, dropout_rng, params, teacher_params, is_trai
   else:
     top_k_arg = int(kd_top_k) if kd_top_k and kd_top_k > 0 else None
     top_p_arg = float(kd_top_p) if kd_top_p and kd_top_p > 0.0 else None
-    kd_kl = max_utils.kl_divergence_between_logits(
+    # Use efficient version to avoid OOM with large vocabularies
+    kd_kl = max_utils.kl_divergence_between_logits_efficient(
         logits,
         teacher_logits,
         kd_temperature,
