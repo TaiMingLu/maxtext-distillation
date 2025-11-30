@@ -5,7 +5,7 @@ cd ~/maxtext
 source ~/maxtext_env/bin/activate
 
 export BUCKET_NAME=taiming_us_central2_b
-export TPU_PREFIX=taiming-v4-128_000054
+export TPU_PREFIX=taiming-v4-128_000051
 gcloud config set project vision-mix
 gcloud config set compute/zone us-central2-b
 
