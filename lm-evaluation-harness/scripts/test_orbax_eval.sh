@@ -6,7 +6,7 @@ set -eo pipefail
 bucket_name='taiming_us_central2_b'
 export TPU_PREFIX="taiming-v4-64"
 export HF_MODEL_PATH='/home/terry/gcs-bucket/HF_HOME/Llama-3.1-8B'
-EVAL_RESULTS_DIR="/home/terry/gcs-bucket/eval/results"
+EVAL_RESULTS_DIR="/home/terry/gcs-bucket/eval/results_new"
 
 BASE_OUTPUT_DIRECTORY="gs://$bucket_name/eval_param_only"
 BASE_OUTPUT_DIRECTORY_DISK="${HOME}/gsc-bucket/eval_param_only"
@@ -17,14 +17,23 @@ export JAX_DISABLE_MOST_OPTIMIZATIONS=False
 
 DESIRED_MODELS=(
   'llama3.1-1b_finewebedu_pretrain_shuffled_lr_3e-4_seed_43'
-  # 'llama3.1-1b_finewebedu_distill_hard_pretrain_A_1B_T_50B_S42_alpha_06_seed43'
-  'llama3.1-1b_finewebedu_distill_pretrain_A_1B_T_50B_S42_alpha_05_seed43'
-  'llama3.1-1b_finewebedu_distill_pretrain_A_1B_T_50B_S42_alpha_1_seed43'
-  # 'llama3.1-1b-finewebedu-distill-soft-T50BS42-a02-s43'
-  # 'llama3.1-1b-finewebedu-distill-soft-T50BS42-a04-s43'
-  # 'llama3.1-1b-finewebedu-distill-soft-T50BS42-a08-s43'
+  'llama3.1-3b-finewebedu-vanilla-s42'
+  'llama3.1-05b-finewebedu-vanilla-s42'
+  'llama3.1-1b-finewebedu-distill-soft-T50BS42-a02-s43'
+  'llama3.1-1b-finewebedu-distill-soft-T50BS42-a04-s43'
+  'llama3.1-1b-finewebedu-distill-soft-T50BS42-a05-s43'
+  'llama3.1-1b-finewebedu-distill-soft-T50BS42-a06-s43'
+  'llama3.1-1b-finewebedu-distill-soft-T50BS42-a08-s43'
+  'llama3.1-1b-finewebedu-distill-soft-T50BS42-a1-s43'
+  'llama3.1-1b-finewebedu-distill-soft-A3BT50BS42-a02-s43'
+  # 'llama3.1-1b-finewebedu-distill-soft-A3BT50BS42-a04-s43'
+  'llama3.1-1b-finewebedu-distill-soft-A3BT50BS42-a05-s43'
+  # 'llama3.1-1b-finewebedu-distill-soft-A3BT50BS42-a06-s43'
+  'llama3.1-1b-finewebedu-distill-soft-A3BT50BS42-a08-s43'
+  'llama3.1-1b-finewebedu-distill-soft-A3BT50BS42-a1-s43'
 )
-DESIRED_STEPS=(0 2500 5000 7500 10000 12500 15000 17500 20000 22500 24999)
+# DESIRED_STEPS=(0 2500 5000 7500 10000 12500 15000 17500 20000 22500 24999)
+DESIRED_STEPS=(24999)
 
 cd "${HOME}/maxtext"
 export PYTHONPATH="$(pwd):${PYTHONPATH}"
