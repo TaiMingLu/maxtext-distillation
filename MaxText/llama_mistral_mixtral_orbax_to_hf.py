@@ -74,6 +74,48 @@ def load_hf_model(model_size):
     model = MistralForCausalLM.from_pretrained("mistralai/Mistral-7B-v0.1")
   elif model_size == "mixtral-8x7b":
     model = AutoModelForCausalLM.from_pretrained("mistralai/Mixtral-8x7B-v0.1", device_map="auto")
+  elif model_size == "llama3.1-05b":
+    # Create config for 0.5b model
+    from transformers import LlamaConfig
+    config = LlamaConfig(
+        hidden_size=1024,
+        intermediate_size=8192,
+        num_attention_heads=32,
+        num_hidden_layers=12,
+        num_key_value_heads=8,
+        vocab_size=128256,
+        rms_norm_eps=1e-5,
+        rope_theta=500000,
+    )
+    model = AutoModelForCausalLM.from_config(config)
+  elif model_size == "llama3.1-1b":
+    # Create config for 1b model
+    from transformers import LlamaConfig
+    config = LlamaConfig(
+        hidden_size=2048,
+        intermediate_size=8192,
+        num_attention_heads=32,
+        num_hidden_layers=16,
+        num_key_value_heads=8,
+        vocab_size=128256,
+        rms_norm_eps=1e-5,
+        rope_theta=500000,
+    )
+    model = AutoModelForCausalLM.from_config(config)
+  elif model_size == "llama3.1-3b":
+    # Create config for 3b model
+    from transformers import LlamaConfig
+    config = LlamaConfig(
+        hidden_size=3072,
+        intermediate_size=8192,
+        num_attention_heads=32,
+        num_hidden_layers=28,
+        num_key_value_heads=8,
+        vocab_size=128256,
+        rms_norm_eps=1e-5,
+        rope_theta=500000,
+    )
+    model = AutoModelForCausalLM.from_config(config)
   elif model_size == "llama3.1-8b":
     # Create config manually (avoids HuggingFace authentication)
     from transformers import LlamaConfig
