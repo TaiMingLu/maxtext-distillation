@@ -75,13 +75,21 @@ def load_hf_model(model_size):
   elif model_size == "mixtral-8x7b":
     model = AutoModelForCausalLM.from_pretrained("mistralai/Mixtral-8x7B-v0.1", device_map="auto")
   elif model_size == "llama3.1-8b":
-    config = AutoConfig.from_pretrained("/home/zephyr/gcs-bucket/model_ckpts/Llama-3.1-8B")
+    config = AutoConfig.from_pretrained("meta-llama/Llama-3.1-8B")
     model = AutoModelForCausalLM.from_config(config)
   elif model_size == 'llama3.1-4b-depth':
-    config = AutoConfig.from_pretrained("/home/zephyr/gcs-bucket/model_ckpts/llama3_4b_depth_hf")
+    # Create config for 4b-depth model
+    config = AutoConfig.from_pretrained("meta-llama/Llama-3.1-8B")
+    config.hidden_size = 3072
+    config.intermediate_size = 8192
+    config.num_hidden_layers = 32
     model = AutoModelForCausalLM.from_config(config)
   elif model_size == 'llama3.1-4b-width':
-    config = AutoConfig.from_pretrained("/home/zephyr/gcs-bucket/model_ckpts/llama3_4b_width_hf")
+    # Create config for 4b-width model
+    config = AutoConfig.from_pretrained("meta-llama/Llama-3.1-8B")
+    config.hidden_size = 3072
+    config.intermediate_size = 9216
+    config.num_hidden_layers = 32
     model = AutoModelForCausalLM.from_config(config)
   else:
     raise NotImplementedError
