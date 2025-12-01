@@ -137,10 +137,15 @@ PPL_TASKS = [
 
 ACC_TASKS = [
     {
-        "name": "winogrande",
-        "num_fewshot": 0,
-        "acc_key": "acc,none",
+        "name": "hellaswag",        
+        "num_fewshot": 10,
+        "acc_key": "acc_norm,none",
     },
+    # {
+    #     "name": "winogrande",
+    #     "num_fewshot": 0,
+    #     "acc_key": "acc,none",
+    # },
     # {
     #     "name": "winogrande",
     #     "num_fewshot": 5,
@@ -148,7 +153,7 @@ ACC_TASKS = [
     # },
     {
         "name": "arc_easy",
-        "num_fewshot": 0,
+        "num_fewshot": 10,
         "acc_key": "acc_norm,none",
     },
     # {
@@ -167,18 +172,13 @@ ACC_TASKS = [
     #     "acc_key": "acc_norm,none",
     # },
     # {
-    #     "name": "hellaswag",        
-    #     "num_fewshot": 10,
-    #     "acc_key": "acc_norm,none",
-    # },
-    # {
     #     "name": "mmlu",
     #     "num_fewshot": 0,
     #     "acc_key": None,
     # },
     {
         "name": "mmlu",
-        "num_fewshot": 5,
+        "num_fewshot": 10,
         "acc_key": None,
     },
     # {
@@ -198,12 +198,12 @@ ACC_TASKS = [
     # },
     {
         "name": "sciq",
-        "num_fewshot": 0,
+        "num_fewshot": 10,
         "acc_key": "acc,none",
     },
     {
         "name": "boolq",
-        "num_fewshot": 0,
+        "num_fewshot": 10,
         "acc_key": "acc,none",
     },
     # {
