@@ -16,6 +16,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 import random
 import argparse
+import errno
 from datetime import datetime
 
 from tqdm import tqdm
@@ -159,6 +160,24 @@ def parse_task_limit_overrides(spec: str) -> dict:
         except ValueError as err:
             raise ValueError(f"Invalid integer value in task limit entry '{raw}'") from err
     return overrides
+
+
+def copy_file_with_retries(src: Path, dst: Path, retries: int = 3, delay_s: float = 1.0):
+    last_err = None
+    for attempt in range(retries):
+        try:
+            if dst.exists():
+                dst.unlink()
+        except OSError:
+            pass
+        try:
+            shutil.copy2(src, dst)
+            return
+        except OSError as err:
+            last_err = err
+            time.sleep(delay_s)
+    if last_err is not None:
+        raise last_err
 
 PPL_TASKS = [
     "c4",
@@ -666,14 +685,31 @@ def main(config, test_args):
 
         try:
             shutil.move(str(tmp_path), save_path)
-        except Exception:
-            # Clean up the temporary file if the move failed before re-raising
-            try:
-                if tmp_path is not None and tmp_path.exists():
-                    tmp_path.unlink()
-            except Exception:
-                pass
-            raise
+            tmp_path = None
+        except OSError as err:
+            needs_fallback = err.errno in (errno.EXDEV, errno.ESTALE)
+            if needs_fallback:
+                print(
+                    f"shutil.move failed with errno {err.errno}; falling back to copy2 with retries"
+                )
+                try:
+                    copy_file_with_retries(tmp_path, save_path)
+                    tmp_path.unlink(missing_ok=True)
+                    tmp_path = None
+                except Exception:
+                    try:
+                        if tmp_path is not None and tmp_path.exists():
+                            tmp_path.unlink()
+                    except Exception:
+                        pass
+                    raise
+            else:
+                try:
+                    if tmp_path is not None and tmp_path.exists():
+                        tmp_path.unlink()
+                except Exception:
+                    pass
+                raise
 
         print(f"Saved results to {save_path}")
     
