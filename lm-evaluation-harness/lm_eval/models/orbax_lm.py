@@ -141,6 +141,7 @@ class OrbaxLM(LM):
         self.state_mesh_shardings = state_mesh_shardings
         self.mesh = mesh
         self.loglikelihood_batch_size = loglikelihood_batch_size
+        self._default_loglikelihood_batch_size = loglikelihood_batch_size
         max_seq = max_loglikelihood_seq_length or getattr(self.config, "max_target_length", None)
         if max_seq is None:
             raise ValueError("A max sequence length is required for OrbaxLM loglikelihood evaluation")
@@ -192,6 +193,19 @@ class OrbaxLM(LM):
             return
         print(f"Updating OrbaxLM eval_seq_len from {self.eval_seq_len} to {seq_len}")
         self.eval_seq_len = int(seq_len)
+
+    def set_loglikelihood_batch_size(self, batch_size: int):
+        if batch_size <= 0:
+            raise ValueError("loglikelihood batch size must be positive")
+        if batch_size == self.loglikelihood_batch_size:
+            return
+        print(
+            f"Updating OrbaxLM loglikelihood_batch_size from {self.loglikelihood_batch_size} to {batch_size}"
+        )
+        self.loglikelihood_batch_size = int(batch_size)
+
+    def reset_loglikelihood_batch_size(self):
+        self.loglikelihood_batch_size = self._default_loglikelihood_batch_size
 
     @classmethod
     def create_from_arg_string(cls, arg_string, additional_config=None):

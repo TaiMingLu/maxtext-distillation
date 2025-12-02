@@ -458,6 +458,7 @@ def get_acc(
     task_seq_overrides = task_seq_overrides or {}
     task_batch_overrides = task_batch_overrides or {}
     default_seq_len = getattr(model, "eval_seq_len", None)
+    default_loglikelihood_bs = getattr(model, "loglikelihood_batch_size", None)
 
     for cfg in tasks:
         task = cfg["name"]
@@ -495,6 +496,9 @@ def get_acc(
             model.set_eval_seq_length(desired_seq_len)
         print(f"  -> Using acc_seq_length={getattr(model, 'eval_seq_len', desired_seq_len)}")
 
+        if task_batch_size is not None and hasattr(model, "set_loglikelihood_batch_size"):
+            model.set_loglikelihood_batch_size(task_batch_size)
+
         res = evaluator.simple_evaluate(
             model=model,
             tasks=[task],
@@ -525,6 +529,8 @@ def get_acc(
         print_device_memory(f"after ACC task {times_key}")
     if default_seq_len is not None and hasattr(model, "set_eval_seq_length"):
         model.set_eval_seq_length(default_seq_len)
+    if default_loglikelihood_bs is not None and hasattr(model, "set_loglikelihood_batch_size"):
+        model.set_loglikelihood_batch_size(default_loglikelihood_bs)
 
     return acc_res, full_res_by_task, acc_times
 
