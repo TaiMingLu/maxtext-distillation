@@ -480,7 +480,7 @@ def get_acc(
 
         print(
             f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] Currently evaluating ACC task: {task} "
-            f"(fewshot={cfg['num_fewshot']}, batch_size={task_batch_size})"
+            f"(fewshot={cfg['num_fewshot']}, batch_size={task_batch_size}, limit={eval_limit})"
         )
         start_ts = time.perf_counter()
         cfg_seq_len = cfg.get("acc_seq_length")
@@ -493,6 +493,7 @@ def get_acc(
 
         if desired_seq_len is not None and hasattr(model, "set_eval_seq_length"):
             model.set_eval_seq_length(desired_seq_len)
+        print(f"  -> Using acc_seq_length={getattr(model, 'eval_seq_len', desired_seq_len)}")
 
         res = evaluator.simple_evaluate(
             model=model,
