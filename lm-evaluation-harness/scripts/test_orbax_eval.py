@@ -126,6 +126,40 @@ def str2bool(v):
     else:
         raise argparse.ArgumentTypeError("Boolean value expected (yes/no/true/false)")
 
+
+def parse_task_limit_overrides(spec: str) -> dict:
+    overrides = {}
+    if not spec:
+        return overrides
+
+    def split_entry(entry: str):
+        entry = entry.strip()
+        if not entry:
+            return None
+        for sep in (":", "="):
+            if sep in entry:
+                return [part.strip() for part in entry.split(sep, 1)]
+        parts = entry.split()
+        if len(parts) == 2:
+            return [parts[0].strip(), parts[1].strip()]
+        raise ValueError(f"Invalid task limit entry '{entry}'. Use format task:limit")
+
+    for raw in spec.split(","):
+        raw = raw.strip()
+        if not raw:
+            continue
+        name_value = split_entry(raw)
+        if not name_value:
+            continue
+        name, value = name_value
+        if not name:
+            raise ValueError(f"Invalid task name in task limit entry '{raw}'")
+        try:
+            overrides[name] = int(value)
+        except ValueError as err:
+            raise ValueError(f"Invalid integer value in task limit entry '{raw}'") from err
+    return overrides
+
 PPL_TASKS = [
     # "c4",
     # "wikitext",
@@ -383,7 +417,7 @@ def get_ppl(
                 
     return ppl_res, ppl_times
 
-def get_acc(model, tokenizer, tasks, task_range=[], limit=1000000, batch_size=32):
+def get_acc(model, tokenizer, tasks, task_range=[], limit=1000000, batch_size=32, per_task_limit=None, task_limit_overrides=None):
     # lm_eval_model = models.orbax_lm.HFLM(
     #     pretrained=model,
     #     tokenizer=tokenizer,
@@ -402,10 +436,21 @@ def get_acc(model, tokenizer, tasks, task_range=[], limit=1000000, batch_size=32
     acc_res = {}
     full_res_by_task = {}
     acc_times = {}
+    task_limit_overrides = task_limit_overrides or {}
+
     for cfg in tasks:
         task = cfg["name"]
         print(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] Currently evaluating ACC task: {task} (fewshot={cfg['num_fewshot']})")
         start_ts = time.perf_counter()
+        cfg_limit = cfg.get("limit")
+        if task in task_limit_overrides:
+            eval_limit = task_limit_overrides[task]
+        elif per_task_limit is not None:
+            eval_limit = per_task_limit
+        elif cfg_limit is not None:
+            eval_limit = cfg_limit
+        else:
+            eval_limit = limit
         res = evaluator.simple_evaluate(
             model=model,
             tasks=[task],
@@ -414,7 +459,7 @@ def get_acc(model, tokenizer, tasks, task_range=[], limit=1000000, batch_size=32
             log_samples=True,
             # task_kwargs={"limit": 256},
             confirm_run_unsafe_code=True,
-            limit=limit
+            limit=eval_limit
         )
         
         task_metrics = res['results'][task]
@@ -445,16 +490,20 @@ def cast_orbax_state_to_bf16(orbax_state):
     return orbax_state
 
 def main(config, test_args):
-    eval_seq_len = test_args.eval_seq_length or getattr(config, "max_target_length", None)
-    if eval_seq_len is None:
-        raise ValueError("max_target_length must be set either in the config or via --eval_seq_length")
-    if getattr(config, "max_target_length", None) != eval_seq_len:
-        print(f"Overriding config.max_target_length from {getattr(config, 'max_target_length', None)} to {eval_seq_len} for evaluation")
-        config.max_target_length = eval_seq_len
+    ppl_seq_len = test_args.ppl_seq_length or getattr(config, "max_target_length", None)
+    if ppl_seq_len is None:
+        raise ValueError("ppl sequence length must be set either via config.max_target_length or --ppl_seq_length")
+    acc_seq_len = test_args.acc_seq_length or ppl_seq_len
+
+    if getattr(config, "max_target_length", None) != ppl_seq_len:
+        print(f"Overriding config.max_target_length from {getattr(config, 'max_target_length', None)} to {ppl_seq_len} for model init/PPL")
+        config.max_target_length = ppl_seq_len
     else:
-        print(f"Using config.max_target_length={config.max_target_length} for evaluation")
+        print(f"Using config.max_target_length={config.max_target_length} for model init/PPL")
+    print(f"Accuracy evaluation sequence length set to {acc_seq_len}")
 
     tokenizer = AutoTokenizer.from_pretrained(test_args.hf_model_path)
+    task_limit_overrides = parse_task_limit_overrides(test_args.acc_task_limits)
     
     init_rng = jax.random.PRNGKey(config.init_weights_seed)
     init_rng, rng1 = jax.random.split(init_rng)
@@ -479,7 +528,7 @@ def main(config, test_args):
         state_mesh_shardings,
         mesh,
         loglikelihood_batch_size=test_args.acc_batch_size,
-        max_loglikelihood_seq_length=config.max_target_length,
+        max_loglikelihood_seq_length=acc_seq_len,
     )
     
     print_device_memory("before PPL eval")
@@ -503,7 +552,9 @@ def main(config, test_args):
         tasks=ACC_TASKS,
         task_range=test_args.tasks,
         limit=test_args.limit,
-        batch_size=test_args.acc_batch_size
+        batch_size=test_args.acc_batch_size,
+        per_task_limit=test_args.acc_limit,
+        task_limit_overrides=task_limit_overrides,
     )
     print(acc_res)
     print({"acc_times_s": acc_times})
@@ -587,7 +638,10 @@ if __name__ == "__main__":
     parser.add_argument("--eval_save_dir", type=str, required=False, default="")
     parser.add_argument("--ppl_batch_size", type=int, default=1, help="Batch size for PPL evaluation (default: 1)")
     parser.add_argument("--acc_batch_size", type=int, default=32, help="Batch size for accuracy evaluation (default: 32)")
-    parser.add_argument("--eval_seq_length", type=int, default=None, help="Override the evaluation context length (defaults to config max_target_length)")
+    parser.add_argument("--ppl_seq_length", type=int, default=None, help="Override the context length used for PPL/model init")
+    parser.add_argument("--acc_seq_length", type=int, default=None, help="Override the context length used for accuracy evaluation")
+    parser.add_argument("--acc_limit", type=int, default=None, help="Limit number of evaluation examples per accuracy task")
+    parser.add_argument("--acc_task_limits", type=str, default="", help="Comma separated overrides like 'mmlu:10,arc_easy:50'")
     test_args, _ = parser.parse_known_args()
 
     # Remove args defined in this test file to avoid error from pyconfig
@@ -607,7 +661,10 @@ if __name__ == "__main__":
         "--eval_save_dir",
         "--ppl_batch_size",
         "--acc_batch_size",
-        "--eval_seq_length",
+        "--ppl_seq_length",
+        "--acc_seq_length",
+        "--acc_limit",
+        "--acc_task_limits",
     ]
     for arg in to_remove_args:
         model_args = [s for s in model_args if not s.startswith(arg)]
