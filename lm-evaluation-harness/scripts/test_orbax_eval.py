@@ -170,31 +170,36 @@ PPL_TASKS = [
 ]
 
 ACC_TASKS = [
-    { 
-        "name": "winogrande",
-        "num_fewshot": 5,
-        "acc_key": "acc,none",
-    },
-    {
-        "name": "arc_easy",
-        "num_fewshot": 5,
-        "acc_key": "acc_norm,none",
-    },
+    # { 
+    #     "name": "winogrande",
+    #     "num_fewshot": 5,
+    #     "acc_key": "acc,none",
+    # },
+    # {
+    #     "name": "arc_easy",
+    #     "num_fewshot": 5,
+    #     "acc_key": "acc_norm,none",
+    # },
     {
         "name": "mmlu",
         "num_fewshot": 5,
         "acc_key": None,
     },
     {
-        "name": "sciq",
+        "name": "piqa",
         "num_fewshot": 5,
-        "acc_key": "acc,none",
+        "acc_key": "acc_norm,none",
     },
-    {
-        "name": "boolq",
-        "num_fewshot": 5,
-        "acc_key": "acc,none",
-    },
+    # {
+    #     "name": "sciq",
+    #     "num_fewshot": 5,
+    #     "acc_key": "acc,none",
+    # },
+    # {
+    #     "name": "boolq",
+    #     "num_fewshot": 5,
+    #     "acc_key": "acc,none",
+    # },
     # {
     #     "name": "hellaswag",        
     #     "num_fewshot": 5,
