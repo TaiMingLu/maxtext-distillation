@@ -138,8 +138,28 @@ PPL_TASKS = [
 ACC_TASKS = [
     {
         "name": "hellaswag",        
-        "num_fewshot": 10,
+        "num_fewshot": 5,
         "acc_key": "acc_norm,none",
+    },
+    {
+        "name": "arc_easy",
+        "num_fewshot": 5,
+        "acc_key": "acc_norm,none",
+    },
+    {
+        "name": "mmlu",
+        "num_fewshot": 5,
+        "acc_key": None,
+    },
+    {
+        "name": "sciq",
+        "num_fewshot": 5,
+        "acc_key": "acc,none",
+    },
+    {
+        "name": "boolq",
+        "num_fewshot": 5,
+        "acc_key": "acc,none",
     },
     # {
     #     "name": "winogrande",
@@ -151,11 +171,6 @@ ACC_TASKS = [
     #     "num_fewshot": 5,
     #     "acc_key": "acc,none",
     # },
-    {
-        "name": "arc_easy",
-        "num_fewshot": 10,
-        "acc_key": "acc_norm,none",
-    },
     # {
     #     "name": "arc_challenge",
     #     "num_fewshot": 0,
@@ -176,11 +191,6 @@ ACC_TASKS = [
     #     "num_fewshot": 0,
     #     "acc_key": None,
     # },
-    {
-        "name": "mmlu",
-        "num_fewshot": 10,
-        "acc_key": None,
-    },
     # {
     #     "name": "truthfulqa_mc1",
     #     "num_fewshot": 0,
@@ -196,16 +206,6 @@ ACC_TASKS = [
     #     "num_fewshot": 0,
     #     "acc_key": "acc_norm,none",
     # },
-    {
-        "name": "sciq",
-        "num_fewshot": 10,
-        "acc_key": "acc,none",
-    },
-    {
-        "name": "boolq",
-        "num_fewshot": 10,
-        "acc_key": "acc,none",
-    },
     # {
     #     "name": "anli_r1",
     #     "num_fewshot": 0,
@@ -440,6 +440,15 @@ def cast_orbax_state_to_bf16(orbax_state):
     return orbax_state
 
 def main(config, test_args):
+    eval_seq_len = test_args.eval_seq_length or getattr(config, "max_target_length", None)
+    if eval_seq_len is None:
+        raise ValueError("max_target_length must be set either in the config or via --eval_seq_length")
+    if getattr(config, "max_target_length", None) != eval_seq_len:
+        print(f"Overriding config.max_target_length from {getattr(config, 'max_target_length', None)} to {eval_seq_len} for evaluation")
+        config.max_target_length = eval_seq_len
+    else:
+        print(f"Using config.max_target_length={config.max_target_length} for evaluation")
+
     tokenizer = AutoTokenizer.from_pretrained(test_args.hf_model_path)
     
     init_rng = jax.random.PRNGKey(config.init_weights_seed)
@@ -457,7 +466,16 @@ def main(config, test_args):
         orbax_model, None, config, rng1, mesh, is_training=False
     )
 
-    model = OrbaxLM(orbax_model, orbax_state, tokenizer, config, state_mesh_shardings, mesh, loglikelihood_batch_size=test_args.acc_batch_size)
+    model = OrbaxLM(
+        orbax_model,
+        orbax_state,
+        tokenizer,
+        config,
+        state_mesh_shardings,
+        mesh,
+        loglikelihood_batch_size=test_args.acc_batch_size,
+        max_loglikelihood_seq_length=config.max_target_length,
+    )
     
     print_device_memory("before PPL eval")
     ppl_res, ppl_times = get_ppl(
@@ -564,6 +582,7 @@ if __name__ == "__main__":
     parser.add_argument("--eval_save_dir", type=str, required=False, default="")
     parser.add_argument("--ppl_batch_size", type=int, default=1, help="Batch size for PPL evaluation (default: 1)")
     parser.add_argument("--acc_batch_size", type=int, default=32, help="Batch size for accuracy evaluation (default: 32)")
+    parser.add_argument("--eval_seq_length", type=int, default=None, help="Override the evaluation context length (defaults to config max_target_length)")
     test_args, _ = parser.parse_known_args()
 
     # Remove args defined in this test file to avoid error from pyconfig
@@ -582,7 +601,8 @@ if __name__ == "__main__":
         "--save_dir",
         "--eval_save_dir",
         "--ppl_batch_size",
-        "--acc_batch_size"
+        "--acc_batch_size",
+        "--eval_seq_length",
     ]
     for arg in to_remove_args:
         model_args = [s for s in model_args if not s.startswith(arg)]

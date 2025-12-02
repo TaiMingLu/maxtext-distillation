@@ -122,7 +122,17 @@ def forward_jax(model, params, input_ids, positions, segment_ids):
 
 @register_model("orbax_lm")
 class OrbaxLM(LM):
-    def __init__(self, model, state, tokenizer, config, state_mesh_shardings, mesh, loglikelihood_batch_size=32) -> None:
+    def __init__(
+        self,
+        model,
+        state,
+        tokenizer,
+        config,
+        state_mesh_shardings,
+        mesh,
+        loglikelihood_batch_size=32,
+        max_loglikelihood_seq_length=None,
+    ) -> None:
         super().__init__()
         self.model = model
         self.state = state
@@ -131,6 +141,10 @@ class OrbaxLM(LM):
         self.state_mesh_shardings = state_mesh_shardings
         self.mesh = mesh
         self.loglikelihood_batch_size = loglikelihood_batch_size
+        max_seq = max_loglikelihood_seq_length or getattr(self.config, "max_target_length", None)
+        if max_seq is None:
+            raise ValueError("A max sequence length is required for OrbaxLM loglikelihood evaluation")
+        self.eval_seq_len = int(max_seq)
 
         self._compiled_forward = self._create_fast_forward()
         
@@ -216,6 +230,33 @@ class OrbaxLM(LM):
 
         return self._loglikelihood_tokens(new_reqs, disable_tqdm=disable_tqdm)
 
+    def _truncate_to_eval_window(self, context_enc, continuation_enc):
+        if not context_enc:
+            context_enc = [self.prefix_token_id]
+
+        max_len = self.eval_seq_len
+        total = len(context_enc) + len(continuation_enc)
+        if total <= max_len:
+            return context_enc, continuation_enc
+
+        overflow = total - max_len
+        if len(context_enc) > 1:
+            drop_from_context = min(overflow, len(context_enc) - 1)
+            context_enc = context_enc[drop_from_context:]
+            overflow -= drop_from_context
+
+        if overflow > 0:
+            continuation_enc = continuation_enc[overflow:]
+
+        if not context_enc:
+            context_enc = [self.prefix_token_id]
+            total = len(context_enc) + len(continuation_enc)
+            excess = total - max_len
+            if excess > 0:
+                continuation_enc = continuation_enc[excess:]
+
+        return context_enc, continuation_enc
+
     def _loglikelihood_tokens(
         self,
         requests: list[tuple[tuple[str, str], list[int], list[int]]],
@@ -226,6 +267,14 @@ class OrbaxLM(LM):
 
         # Use override_bs if provided, otherwise use instance's loglikelihood_batch_size
         batch_size = override_bs if override_bs is not None else self.loglikelihood_batch_size
+        if batch_size <= 0:
+            raise ValueError("loglikelihood_batch_size must be > 0")
+
+        eval_seq_len = self.eval_seq_len
+        static_positions = jnp.broadcast_to(
+            jnp.arange(eval_seq_len, dtype=jnp.int32), (batch_size, eval_seq_len)
+        )
+        static_segment_ids = jnp.ones((batch_size, eval_seq_len), dtype=jnp.int32)
 
         # Process in batches
         for batch_start in tqdm(range(0, len(requests), batch_size), disable=disable_tqdm, desc="Batched loglikelihood"):
@@ -233,47 +282,53 @@ class OrbaxLM(LM):
             batch_requests = requests[batch_start:batch_end]
 
             # Prepare batch data
-            batch_input_ids = []
-            batch_cont_lens = []
-            batch_cont_encs = []
-
+            truncated_pairs = []
             for (_text, context_enc, continuation_enc) in batch_requests:
-                input_ids = context_enc + continuation_enc
-                batch_input_ids.append(input_ids)
-                batch_cont_lens.append(len(continuation_enc))
-                batch_cont_encs.append(continuation_enc)
+                c_enc, cont_enc = self._truncate_to_eval_window(context_enc, continuation_enc)
+                truncated_pairs.append((c_enc, cont_enc))
 
-            # Pad to max length in batch (RIGHT padding to preserve positions)
-            max_len = max(len(ids) for ids in batch_input_ids)
-            padded_input_ids = []
+            if truncated_pairs:
+                filler = truncated_pairs[0]
+            else:
+                filler = ([self.prefix_token_id], [self.prefix_token_id])
+
+            while len(truncated_pairs) < batch_size:
+                truncated_pairs.append(filler)
+
+            padded_input_ids = np.zeros((batch_size, eval_seq_len), dtype=np.int32)
             seq_lens = []
-            for ids in batch_input_ids:
-                seq_lens.append(len(ids))
-                pad_len = max_len - len(ids)
-                # Pad on the right with 0
-                padded = ids + [0] * pad_len
-                padded_input_ids.append(padded)
+            cont_lens = []
+            cont_encs = []
+            for idx, (context_enc, continuation_enc) in enumerate(truncated_pairs):
+                combined = context_enc + continuation_enc
+                seq_len = len(combined)
+                if seq_len > eval_seq_len:
+                    combined = combined[-eval_seq_len:]
+                    seq_len = len(combined)
+                padded_input_ids[idx, :seq_len] = combined
+                seq_lens.append(seq_len)
+                cont_lens.append(len(continuation_enc))
+                cont_encs.append(continuation_enc)
 
             input_ids_batch = jnp.asarray(padded_input_ids, dtype=jnp.int32)
-            actual_batch_size, seq_len = input_ids_batch.shape
-
-            # Create segment_ids and positions
-            segment_ids = jnp.ones((actual_batch_size, seq_len), dtype=jnp.int32)
-            positions = jnp.tile(jnp.arange(seq_len, dtype=jnp.int32), (actual_batch_size, 1))
 
             # Forward pass for entire batch
-            logits = self._compiled_forward(
-                self.state.params,
-                input_ids_batch,
-                positions,
-                segment_ids,
-            )
+            with self.mesh, nn_partitioning.axis_rules(self.config.logical_axis_rules):
+                logits = self._compiled_forward(
+                    self.state.params,
+                    input_ids_batch,
+                    static_positions,
+                    static_segment_ids,
+                )
 
             # logits: [batch_size, seq_len, vocab_size]
             logits = jax.nn.log_softmax(logits, axis=-1)
 
             # Extract results for each item in batch
-            for i, (orig_len, cont_len, continuation_enc) in enumerate(zip(seq_lens, batch_cont_lens, batch_cont_encs)):
+            for i in range(batch_end - batch_start):
+                orig_len = seq_lens[i]
+                cont_len = cont_lens[i]
+                continuation_enc = cont_encs[i]
                 # With right padding, continuation starts at (orig_len - cont_len)
                 cont_start = orig_len - cont_len
 

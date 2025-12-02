@@ -164,7 +164,7 @@ for parent_dir in distill_pretrain pretrain; do
         per_device_batch_size=4 \
         model_name=${MODEL} \
         max_prefill_predict_length=4 \
-        max_target_length=8192 \
+        max_target_length=4096 \
         dataset_type=synthetic \
         dtype=bfloat16 \
         scan_layers=false \
@@ -174,6 +174,7 @@ for parent_dir in distill_pretrain pretrain; do
         --eval_save_dir=${EVAL_RESULTS_DIR} \
         --ppl_batch_size=2 \
         --acc_batch_size=16 \
+        --eval_seq_length=4096 \
     "
 
       # echo "Cleaning up converted checkpoint for ${parent_dir}/${MODEL_RUN_NAME} step ${STEP}"
