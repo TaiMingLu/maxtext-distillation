@@ -147,7 +147,7 @@ class OrbaxLM(LM):
         self.eval_seq_len = int(max_seq)
 
         self._compiled_forward = self._create_fast_forward()
-        
+
     def _create_fast_forward(self):
         @partial(pjit,
                  in_shardings=(self.state_mesh_shardings.params, None, None, None),
@@ -184,6 +184,14 @@ class OrbaxLM(LM):
                 self.logits = convert_jax_weight_to_torch(logits)
 
         return Output(jax_logits)
+
+    def set_eval_seq_length(self, seq_len: int):
+        if seq_len <= 0:
+            raise ValueError("Evaluation sequence length must be positive")
+        if seq_len == self.eval_seq_len:
+            return
+        print(f"Updating OrbaxLM eval_seq_len from {self.eval_seq_len} to {seq_len}")
+        self.eval_seq_len = int(seq_len)
 
     @classmethod
     def create_from_arg_string(cls, arg_string, additional_config=None):

@@ -189,6 +189,8 @@ ACC_TASKS = [
         "name": "piqa",
         "num_fewshot": 5,
         "acc_key": "acc_norm,none",
+        "acc_seq_length": 4096,
+        "acc_batch_size": 4,
     },
     # {
     #     "name": "sciq",
@@ -422,7 +424,18 @@ def get_ppl(
                 
     return ppl_res, ppl_times
 
-def get_acc(model, tokenizer, tasks, task_range=[], limit=1000000, batch_size=32, per_task_limit=None, task_limit_overrides=None):
+def get_acc(
+    model,
+    tokenizer,
+    tasks,
+    task_range=[],
+    limit=1000000,
+    batch_size=32,
+    per_task_limit=None,
+    task_limit_overrides=None,
+    task_seq_overrides=None,
+    task_batch_overrides=None,
+):
     # lm_eval_model = models.orbax_lm.HFLM(
     #     pretrained=model,
     #     tokenizer=tokenizer,
@@ -442,12 +455,20 @@ def get_acc(model, tokenizer, tasks, task_range=[], limit=1000000, batch_size=32
     full_res_by_task = {}
     acc_times = {}
     task_limit_overrides = task_limit_overrides or {}
+    task_seq_overrides = task_seq_overrides or {}
+    task_batch_overrides = task_batch_overrides or {}
+    default_seq_len = getattr(model, "eval_seq_len", None)
 
     for cfg in tasks:
         task = cfg["name"]
-        print(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] Currently evaluating ACC task: {task} (fewshot={cfg['num_fewshot']})")
-        start_ts = time.perf_counter()
         cfg_limit = cfg.get("limit")
+        cfg_batch_size = cfg.get("acc_batch_size", batch_size)
+
+        if task in task_batch_overrides:
+            task_batch_size = task_batch_overrides[task]
+        else:
+            task_batch_size = cfg_batch_size
+
         if task in task_limit_overrides:
             eval_limit = task_limit_overrides[task]
         elif per_task_limit is not None:
@@ -456,15 +477,32 @@ def get_acc(model, tokenizer, tasks, task_range=[], limit=1000000, batch_size=32
             eval_limit = cfg_limit
         else:
             eval_limit = limit
+
+        print(
+            f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] Currently evaluating ACC task: {task} "
+            f"(fewshot={cfg['num_fewshot']}, batch_size={task_batch_size})"
+        )
+        start_ts = time.perf_counter()
+        cfg_seq_len = cfg.get("acc_seq_length")
+        if task in task_seq_overrides:
+            desired_seq_len = task_seq_overrides[task]
+        elif cfg_seq_len is not None:
+            desired_seq_len = cfg_seq_len
+        else:
+            desired_seq_len = default_seq_len
+
+        if desired_seq_len is not None and hasattr(model, "set_eval_seq_length"):
+            model.set_eval_seq_length(desired_seq_len)
+
         res = evaluator.simple_evaluate(
             model=model,
             tasks=[task],
             num_fewshot=cfg["num_fewshot"],
-            max_batch_size=batch_size,
+            max_batch_size=task_batch_size,
             log_samples=True,
             # task_kwargs={"limit": 256},
             confirm_run_unsafe_code=True,
-            limit=eval_limit
+            limit=eval_limit,
         )
         
         task_metrics = res['results'][task]
@@ -484,6 +522,9 @@ def get_acc(model, tokenizer, tasks, task_range=[], limit=1000000, batch_size=32
             print(f"{task} ACC: {summary_value:.4f} (time: {duration_s:.2f}s)")
         full_res_by_task[task] = res
         print_device_memory(f"after ACC task {times_key}")
+    if default_seq_len is not None and hasattr(model, "set_eval_seq_length"):
+        model.set_eval_seq_length(default_seq_len)
+
     return acc_res, full_res_by_task, acc_times
 
 def cast_orbax_state_to_bf16(orbax_state):
@@ -509,6 +550,8 @@ def main(config, test_args):
 
     tokenizer = AutoTokenizer.from_pretrained(test_args.hf_model_path)
     task_limit_overrides = parse_task_limit_overrides(test_args.acc_task_limits)
+    task_seq_overrides = parse_task_limit_overrides(test_args.acc_task_seq_lens)
+    task_batch_overrides = parse_task_limit_overrides(test_args.acc_task_batch_sizes)
     
     init_rng = jax.random.PRNGKey(config.init_weights_seed)
     init_rng, rng1 = jax.random.split(init_rng)
@@ -560,6 +603,8 @@ def main(config, test_args):
         batch_size=test_args.acc_batch_size,
         per_task_limit=test_args.acc_limit,
         task_limit_overrides=task_limit_overrides,
+        task_seq_overrides=task_seq_overrides,
+        task_batch_overrides=task_batch_overrides,
     )
     print(acc_res)
     print({"acc_times_s": acc_times})
@@ -647,6 +692,8 @@ if __name__ == "__main__":
     parser.add_argument("--acc_seq_length", type=int, default=None, help="Override the context length used for accuracy evaluation")
     parser.add_argument("--acc_limit", type=int, default=None, help="Limit number of evaluation examples per accuracy task")
     parser.add_argument("--acc_task_limits", type=str, default="", help="Comma separated overrides like 'mmlu:10,arc_easy:50'")
+    parser.add_argument("--acc_task_seq_lens", type=str, default="", help="Per-task accuracy sequence lengths, e.g. 'piqa:2304,arc_easy:3000'")
+    parser.add_argument("--acc_task_batch_sizes", type=str, default="", help="Per-task accuracy batch sizes, e.g. 'piqa:4,arc_easy:8'")
     test_args, _ = parser.parse_known_args()
 
     # Remove args defined in this test file to avoid error from pyconfig
@@ -670,6 +717,8 @@ if __name__ == "__main__":
         "--acc_seq_length",
         "--acc_limit",
         "--acc_task_limits",
+        "--acc_task_seq_lens",
+        "--acc_task_batch_sizes",
     ]
     for arg in to_remove_args:
         model_args = [s for s in model_args if not s.startswith(arg)]
