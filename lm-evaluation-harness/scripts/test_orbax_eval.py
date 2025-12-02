@@ -136,10 +136,10 @@ PPL_TASKS = [
 ]
 
 ACC_TASKS = [
-    {
-        "name": "hellaswag",        
+    { 
+        "name": "winogrande",
         "num_fewshot": 5,
-        "acc_key": "acc_norm,none",
+        "acc_key": "acc,none",
     },
     {
         "name": "arc_easy",
@@ -161,6 +161,11 @@ ACC_TASKS = [
         "num_fewshot": 5,
         "acc_key": "acc,none",
     },
+    # {
+    #     "name": "hellaswag",        
+    #     "num_fewshot": 5,
+    #     "acc_key": "acc_norm,none",
+    # },
     # {
     #     "name": "winogrande",
     #     "num_fewshot": 0,
