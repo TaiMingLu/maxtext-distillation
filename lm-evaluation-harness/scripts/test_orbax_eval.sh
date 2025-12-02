@@ -54,7 +54,8 @@ for parent_dir in distill_pretrain pretrain; do
     model_run_name="${model_run_name##*/}"
     [[ -z "${model_run_name}" ]] && continue
 
-    MODEL="${model_run_name%%_*}"
+    # Extract base model name as one of: llama3.1-05b, llama3.1-1b, llama3.1-3b
+    MODEL="$(echo "${model_run_name}" | sed -E 's/^([^-]+-[0-9]+b).*/\1/')"
 
     if [[ ${#DESIRED_MODELS[@]} -gt 0 ]]; then
       allowed=false
