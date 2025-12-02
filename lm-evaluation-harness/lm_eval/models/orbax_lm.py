@@ -236,24 +236,11 @@ class OrbaxLM(LM):
 
         max_len = self.eval_seq_len
         total = len(context_enc) + len(continuation_enc)
-        if total <= max_len:
-            return context_enc, continuation_enc
-
-        overflow = total - max_len
-        if len(context_enc) > 1:
-            drop_from_context = min(overflow, len(context_enc) - 1)
-            context_enc = context_enc[drop_from_context:]
-            overflow -= drop_from_context
-
-        if overflow > 0:
-            continuation_enc = continuation_enc[overflow:]
-
-        if not context_enc:
-            context_enc = [self.prefix_token_id]
-            total = len(context_enc) + len(continuation_enc)
-            excess = total - max_len
-            if excess > 0:
-                continuation_enc = continuation_enc[excess:]
+        if total > max_len:
+            raise ValueError(
+                f"Combined context ({len(context_enc)}) + continuation ({len(continuation_enc)}) length "
+                f"{total} exceeds evaluation window {max_len}. Reduce --eval_seq_length or num_fewshot."
+            )
 
         return context_enc, continuation_enc
 
