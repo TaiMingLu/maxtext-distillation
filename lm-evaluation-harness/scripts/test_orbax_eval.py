@@ -215,6 +215,8 @@ ACC_TASKS = [
         "name": "sciq",
         "num_fewshot": 5,
         "acc_key": "acc,none",
+        "acc_seq_length": 4096,
+        "acc_batch_size": 4,
     },
     {
         "name": "boolq",
