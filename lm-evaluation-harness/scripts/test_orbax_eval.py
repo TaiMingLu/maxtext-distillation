@@ -210,6 +210,8 @@ ACC_TASKS = [
         "name": "piqa",
         "num_fewshot": 5,
         "acc_key": "acc_norm,none",
+        "acc_seq_length": 4096,
+        "acc_batch_size": 4,
     },
     {
         "name": "sciq",
@@ -222,6 +224,8 @@ ACC_TASKS = [
         "name": "boolq",
         "num_fewshot": 5,
         "acc_key": "acc,none",
+        "acc_seq_length": 4096,
+        "acc_batch_size": 4,
     },
     # {
     #     "name": "hellaswag",        
