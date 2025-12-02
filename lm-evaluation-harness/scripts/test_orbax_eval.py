@@ -182,15 +182,15 @@ ACC_TASKS = [
     # },
     {
         "name": "mmlu",
-        "num_fewshot": 5,
+        "num_fewshot": 25,
         "acc_key": None,
+        "acc_seq_length": 4096,
+        "acc_batch_size": 4,
     },
     {
         "name": "piqa",
         "num_fewshot": 5,
         "acc_key": "acc_norm,none",
-        "acc_seq_length": 4096,
-        "acc_batch_size": 4,
     },
     # {
     #     "name": "sciq",

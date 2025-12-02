@@ -177,8 +177,8 @@ for parent_dir in distill_pretrain pretrain; do
         --ppl_seq_length=4096 \
         --acc_seq_length=2048 \
         --acc_task_limits="mmlu:10" \
-        --acc_task_seq_lens="piqa:4096" \
-        --acc_task_batch_sizes="piqa:4" \
+        --acc_task_seq_lens="mmlu:4096" \
+        --acc_task_batch_sizes="mmlu:4" \
     "
 
       # echo "Cleaning up converted checkpoint for ${parent_dir}/${MODEL_RUN_NAME} step ${STEP}"
