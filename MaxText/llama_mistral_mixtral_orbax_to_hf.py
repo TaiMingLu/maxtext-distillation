@@ -86,6 +86,7 @@ def load_hf_model(model_size):
         vocab_size=128256,
         rms_norm_eps=1e-5,
         rope_theta=500000,
+        head_dim=128,  # Custom: expansion architecture with head_dim > hidden_size/num_heads
     )
     model = AutoModelForCausalLM.from_config(config)
   elif model_size == "llama3.1-1b":
@@ -100,6 +101,7 @@ def load_hf_model(model_size):
         vocab_size=128256,
         rms_norm_eps=1e-5,
         rope_theta=500000,
+        head_dim=128,  # Custom: expansion architecture with head_dim > hidden_size/num_heads
     )
     model = AutoModelForCausalLM.from_config(config)
   elif model_size == "llama3.1-3b":
@@ -114,6 +116,7 @@ def load_hf_model(model_size):
         vocab_size=128256,
         rms_norm_eps=1e-5,
         rope_theta=500000,
+        head_dim=128,  # Custom: expansion architecture with head_dim > hidden_size/num_heads
     )
     model = AutoModelForCausalLM.from_config(config)
   elif model_size == "llama3.1-8b":
