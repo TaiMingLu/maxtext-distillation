@@ -127,12 +127,12 @@ def str2bool(v):
         raise argparse.ArgumentTypeError("Boolean value expected (yes/no/true/false)")
 
 PPL_TASKS = [
-    "c4",
-    "wikitext",
-    # "wikitext2",
-    # "cnn_dailymail",
-    "finewebedu-test-100M",
-    # "dclm"
+    # "c4",
+    # "wikitext",
+    # # "wikitext2",
+    # # "cnn_dailymail",
+    # "finewebedu-test-100M",
+    # # "dclm"
 ]
 
 ACC_TASKS = [
