@@ -86,6 +86,7 @@ def load_hf_model(model_size):
         vocab_size=128256,
         rms_norm_eps=1e-5,
         rope_theta=500000,
+        max_position_embeddings=4096,  # Trained with 4096 sequence length
         head_dim=128,  # Custom: expansion architecture with head_dim > hidden_size/num_heads
     )
     model = AutoModelForCausalLM.from_config(config)
@@ -101,6 +102,7 @@ def load_hf_model(model_size):
         vocab_size=128256,
         rms_norm_eps=1e-5,
         rope_theta=500000,
+        max_position_embeddings=4096,  # Trained with 4096 sequence length
         head_dim=128,  # Custom: expansion architecture with head_dim > hidden_size/num_heads
     )
     model = AutoModelForCausalLM.from_config(config)
@@ -116,6 +118,7 @@ def load_hf_model(model_size):
         vocab_size=128256,
         rms_norm_eps=1e-5,
         rope_theta=500000,
+        max_position_embeddings=4096,  # Trained with 4096 sequence length
         head_dim=128,  # Custom: expansion architecture with head_dim > hidden_size/num_heads
     )
     model = AutoModelForCausalLM.from_config(config)
