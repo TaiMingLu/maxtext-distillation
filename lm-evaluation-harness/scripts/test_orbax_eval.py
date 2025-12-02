@@ -161,47 +161,47 @@ def parse_task_limit_overrides(spec: str) -> dict:
     return overrides
 
 PPL_TASKS = [
-    # "c4",
-    # "wikitext",
-    # # "wikitext2",
-    # # "cnn_dailymail",
-    # "finewebedu-test-100M",
-    # # "dclm"
+    "c4",
+    "wikitext",
+    # "wikitext2",
+    # "cnn_dailymail",
+    "finewebedu-test-100M",
+    # "dclm"
 ]
 
 ACC_TASKS = [
-    # { 
-    #     "name": "winogrande",
-    #     "num_fewshot": 5,
-    #     "acc_key": "acc,none",
-    # },
-    # {
-    #     "name": "arc_easy",
-    #     "num_fewshot": 5,
-    #     "acc_key": "acc_norm,none",
-    # },
-    {
-        "name": "mmlu",
+    { 
+        "name": "winogrande",
         "num_fewshot": 5,
-        "acc_key": None,
-        "acc_seq_length": 4096,
-        "acc_batch_size": 4,
+        "acc_key": "acc,none",
     },
+    {
+        "name": "arc_easy",
+        "num_fewshot": 5,
+        "acc_key": "acc_norm,none",
+    },
+    # {
+    #     "name": "mmlu",
+    #     "num_fewshot": 5,
+    #     "acc_key": None,
+    #     "acc_seq_length": 4096,
+    #     "acc_batch_size": 4,
+    # },
     {
         "name": "piqa",
         "num_fewshot": 5,
         "acc_key": "acc_norm,none",
     },
-    # {
-    #     "name": "sciq",
-    #     "num_fewshot": 5,
-    #     "acc_key": "acc,none",
-    # },
-    # {
-    #     "name": "boolq",
-    #     "num_fewshot": 5,
-    #     "acc_key": "acc,none",
-    # },
+    {
+        "name": "sciq",
+        "num_fewshot": 5,
+        "acc_key": "acc,none",
+    },
+    {
+        "name": "boolq",
+        "num_fewshot": 5,
+        "acc_key": "acc,none",
+    },
     # {
     #     "name": "hellaswag",        
     #     "num_fewshot": 5,
