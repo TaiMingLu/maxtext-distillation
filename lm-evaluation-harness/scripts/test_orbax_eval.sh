@@ -188,6 +188,7 @@ for parent_dir in distill_pretrain pretrain; do
   done
 done
 
+echo "Done with 24999 steps"
 
 DESIRED_STEPS=(0 2500 5000 7500 10000 12500 15000 17500 20000 22500)
 # DESIRED_STEPS=(24999)
@@ -336,6 +337,7 @@ for parent_dir in distill_pretrain pretrain; do
         --acc_task_seq_lens="sciq:4096,boolq:4096" \
         --acc_task_batch_sizes="sciq:4,boolq:4" \
     "
+        # --acc_task_limits="sciq:10" \
 
       # echo "Cleaning up converted checkpoint for ${parent_dir}/${MODEL_RUN_NAME} step ${STEP}"
       # rm -rf "${BASE_OUTPUT_DIRECTORY}/${DIRECT_PARAMETER_CHECKPOINT_RUN}"
