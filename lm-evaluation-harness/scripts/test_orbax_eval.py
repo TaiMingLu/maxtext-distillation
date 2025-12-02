@@ -182,7 +182,7 @@ ACC_TASKS = [
     # },
     {
         "name": "mmlu",
-        "num_fewshot": 25,
+        "num_fewshot": 5,
         "acc_key": None,
         "acc_seq_length": 4096,
         "acc_batch_size": 4,
