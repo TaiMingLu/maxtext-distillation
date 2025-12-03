@@ -41,13 +41,13 @@ export KD_TOP_K=1
 export BASE_OUTPUT_DIRECTORY="gs://$BUCKET_NAME/ckpts/distill_pretrain"
 export DATA_FILES='/home/terry/gcs-bucket/datasets/fineweb-edu/*.array_record'
 
-export RUN_NAME="${MODEL_NAME}-finewebedu-distill-top1-A05BT50BS42-a1-s43"
-export RUN_ID="llama1b_finewebedu_distill_top1_A05BT50BS42_a1_s43"
+export RUN_NAME="${MODEL_NAME}-finewebedu-distill-top1-A05BT50BS42-a1-s43_v6"
+export RUN_ID="llama1b_finewebedu_distill_top1_A05BT50BS42_a1_s43_v6"
 
 # Distillation parameters
 
 echo "========================"
-echo "running llama1b-finewebedu-distill-top1-A05BT50BS42-a1-s43.sh"
+echo "running llama1b-finewebedu-distill-top1-A3BT50BS42-a1-s43.sh"
 echo "parameters:"
 echo "MODEL_NAME: $MODEL_NAME"
 echo "SEQ_LEN: $SEQ_LEN"
