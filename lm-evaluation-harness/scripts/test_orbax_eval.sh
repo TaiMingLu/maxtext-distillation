@@ -27,7 +27,7 @@ DESIRED_MODELS=(
   'llama3.1-1b-finewebedu-distill-soft-T50BS42-a08-s43'
   'llama3.1-1b-finewebedu-distill-soft-T50BS42-a1-s43'
   'llama3.1-1b-finewebedu-distill-soft-A3BT50BS42-a02-s43'
-  # 'llama3.1-1b-finewebedu-distill-soft-A3BT50BS42-a04-s43'
+  'llama3.1-1b-finewebedu-distill-soft-A3BT50BS42-a04-s43'
   'llama3.1-1b-finewebedu-distill-soft-A3BT50BS42-a05-s43'
   'llama3.1-1b-finewebedu-distill-soft-A3BT50BS42-a06-s43'
   'llama3.1-1b-finewebedu-distill-soft-A3BT50BS42-a08-s43'
