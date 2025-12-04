@@ -39,7 +39,7 @@ export RUN_NAME="${MODEL_NAME}-finewebedu-vanilla-100B-s42_v6"
 export RUN_ID="llama05b_finewebedu_vanilla_100B_s42_v6"
 
 echo "========================"
-echo "running llama05b-finewebedu-vanilla-s42.sh"
+echo "running llama05b-finewebedu-vanilla-100B-s42.sh"
 echo "parameters:"
 echo "MODEL_NAME: $MODEL_NAME"
 echo "SEQ_LEN: $SEQ_LEN"
