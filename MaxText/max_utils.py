@@ -819,44 +819,31 @@ def kl_divergence_between_logits_efficient(
           0, k, find_top_k_body, (teacher_for_topk, init_vals, init_inds)
       )
     else:
-      # LARGE K: Use chunked jax.lax.top_k along sequence dimension
-      # This reduces peak memory by processing sequences in chunks
-      # Each chunk: [batch, chunk_size, vocab] -> top_k uses ~4x chunk memory for sorting
+      # LARGE K: Process each sequence position individually with fori_loop
+      # This keeps memory minimal: only one [batch, vocab] slice active at a time
       batch_size = teacher_for_topk.shape[0]
       seq_len = teacher_for_topk.shape[1]
-      chunk_size = 512  # Process 512 sequence positions at a time
-      num_chunks = (seq_len + chunk_size - 1) // chunk_size
 
-      # Pad sequence to be divisible by chunk_size
-      padded_seq = num_chunks * chunk_size
-      if padded_seq > seq_len:
-        pad_amount = padded_seq - seq_len
-        teacher_padded = jnp.pad(teacher_for_topk, ((0, 0), (0, pad_amount), (0, 0)),
-                                  mode='constant', constant_values=-jnp.inf)
-        student_padded = jnp.pad(student_logits_scaled, ((0, 0), (0, pad_amount), (0, 0)),
-                                  mode='constant', constant_values=-jnp.inf)
-      else:
-        teacher_padded = teacher_for_topk
-        student_padded = student_logits_scaled
+      def process_seq_position(i, state):
+        all_vals, all_inds = state
+        # Get teacher logits for this position: [batch, vocab]
+        teacher_slice = jax.lax.dynamic_slice(
+            teacher_for_topk, (0, i, 0), (batch_size, 1, vocab_size)
+        ).squeeze(1)
+        # Get top-k for this position: [batch, k]
+        vals, inds = jax.lax.top_k(teacher_slice, k)
+        # Store in output arrays
+        all_vals = jax.lax.dynamic_update_slice(all_vals, vals[:, None, :], (0, i, 0))
+        all_inds = jax.lax.dynamic_update_slice(all_inds, inds[:, None, :], (0, i, 0))
+        return (all_vals, all_inds)
 
-      # Reshape to [num_chunks, batch, chunk_size, vocab]
-      teacher_chunked = teacher_padded.reshape(batch_size, num_chunks, chunk_size, vocab_size)
-      teacher_chunked = jnp.transpose(teacher_chunked, (1, 0, 2, 3))
+      # Initialize output arrays - these are the only large tensors
+      init_vals = jnp.full((batch_size, seq_len, k), -jnp.inf, dtype=teacher_for_topk.dtype)
+      init_inds = jnp.zeros((batch_size, seq_len, k), dtype=jnp.int32)
 
-      # Process chunks with scan (sequential processing to avoid OOM)
-      def process_chunk(carry, teacher_chunk):
-        # teacher_chunk: [batch, chunk_size, vocab]
-        vals, inds = jax.lax.top_k(teacher_chunk, k)
-        return carry, (vals, inds)
-
-      _, (all_vals, all_inds) = jax.lax.scan(process_chunk, None, teacher_chunked)
-      # all_vals: [num_chunks, batch, chunk_size, k]
-
-      # Reshape back: [num_chunks, batch, chunk_size, k] -> [batch, seq, k]
-      all_vals = jnp.transpose(all_vals, (1, 0, 2, 3))  # [batch, num_chunks, chunk_size, k]
-      all_inds = jnp.transpose(all_inds, (1, 0, 2, 3))
-      top_k_teacher_logits = all_vals.reshape(batch_size, padded_seq, k)[:, :seq_len, :]
-      top_k_indices = all_inds.reshape(batch_size, padded_seq, k)[:, :seq_len, :]
+      top_k_teacher_logits, top_k_indices = jax.lax.fori_loop(
+          0, seq_len, process_seq_position, (init_vals, init_inds)
+      )
 
     # Gather student logits at top-k positions (this needs gradients!)
     top_k_student_logits = jnp.take_along_axis(student_logits_scaled, top_k_indices, axis=-1)
