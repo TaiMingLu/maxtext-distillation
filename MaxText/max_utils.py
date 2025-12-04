@@ -794,29 +794,72 @@ def kl_divergence_between_logits_efficient(
   original_shape = teacher_logits.shape[:-1]  # [..., vocab] -> [...]
 
   if top_k is not None:
-    # ============ TOP-K PATH (sharding-aware) ============
+    # ============ TOP-K PATH (chunked to reduce memory) ============
     k = int(top_k)
 
-    # Use vmap to process each position independently while preserving batch sharding.
-    # This is critical for multi-device training - scan/reshape would break sharding
-    # and cause all-gather of the full tensor across devices.
+    # jax.lax.top_k on TPU uses a full sort which creates huge intermediate tensors.
+    # For vocab=128K, this is 15GB+ per intermediate, causing OOM.
+    #
+    # Solution: Chunked top-k (tournament-style)
+    # 1. Split vocab into chunks (e.g., 32 chunks of 4096)
+    # 2. Find top-k within each chunk
+    # 3. Merge per-chunk results and find global top-k
+    #
+    # Memory: Sort on [batch, seq, chunk_size] instead of [batch, seq, vocab]
 
-    def top_k_single_position(teacher_row, student_row):
-      """Process a single [vocab_size] row."""
-      top_k_vals, top_k_inds = jax.lax.top_k(teacher_row, k)
-      student_vals = student_row[top_k_inds]
-      return top_k_vals, top_k_inds, student_vals
+    chunk_size = 4096  # Tune this based on memory constraints
+    num_chunks = (vocab_size + chunk_size - 1) // chunk_size
 
-    # vmap over all leading dimensions (batch, seq, etc.) while keeping vocab as the operating axis
-    # This preserves sharding on the batch dimension
-    vmapped_top_k = top_k_single_position
+    # Pad vocab to be divisible by chunk_size
+    pad_size = num_chunks * chunk_size - vocab_size
+    if pad_size > 0:
+      pad_shape = list(teacher_logits_scaled.shape)
+      pad_shape[-1] = pad_size
+      neg_inf_pad = jnp.full(pad_shape, -jnp.inf, dtype=teacher_logits_scaled.dtype)
+      teacher_logits_padded = jnp.concatenate([teacher_logits_scaled, neg_inf_pad], axis=-1)
+      student_logits_padded = jnp.concatenate([student_logits_scaled, neg_inf_pad], axis=-1)
+    else:
+      teacher_logits_padded = teacher_logits_scaled
+      student_logits_padded = student_logits_scaled
+
+    # Reshape to [..., num_chunks, chunk_size]
+    new_shape = list(original_shape) + [num_chunks, chunk_size]
+    teacher_chunked = teacher_logits_padded.reshape(new_shape)
+    student_chunked = student_logits_padded.reshape(new_shape)
+
+    # Find top-k within each chunk: [..., num_chunks, k]
+    # k_per_chunk should be at least k to ensure we don't miss any top-k elements
+    k_per_chunk = min(k, chunk_size)
+    chunk_top_k_vals, chunk_top_k_inds = jax.lax.top_k(teacher_chunked, k_per_chunk)
+    # chunk_top_k_inds are indices within each chunk (0 to chunk_size-1)
+
+    # Convert to global vocab indices
+    chunk_offsets = jnp.arange(num_chunks) * chunk_size  # [num_chunks]
+    # Broadcast to match chunk_top_k_inds shape: [..., num_chunks, k_per_chunk]
     for _ in range(len(original_shape)):
-      vmapped_top_k = jax.vmap(vmapped_top_k, in_axes=(0, 0), out_axes=0)
+      chunk_offsets = jnp.expand_dims(chunk_offsets, axis=0)
+    chunk_offsets = jnp.expand_dims(chunk_offsets, axis=-1)  # [..., num_chunks, 1]
+    global_chunk_inds = chunk_top_k_inds + chunk_offsets  # [..., num_chunks, k_per_chunk]
 
-    top_k_teacher_logits, top_k_indices, top_k_student_logits = vmapped_top_k(
-        teacher_logits_scaled, student_logits_scaled
-    )
-    # Shapes: [..., k] same as original_shape + (k,)
+    # Gather student logits at chunk top-k positions
+    # Flatten chunks: [..., num_chunks * k_per_chunk]
+    flat_shape = list(original_shape) + [num_chunks * k_per_chunk]
+    chunk_top_k_vals_flat = chunk_top_k_vals.reshape(flat_shape)
+    global_chunk_inds_flat = global_chunk_inds.reshape(flat_shape)
+
+    # Gather student values using the global indices
+    # We need to gather from the padded student logits
+    student_chunk_vals = jnp.take_along_axis(student_logits_padded, global_chunk_inds_flat, axis=-1)
+
+    # Now find global top-k among the num_chunks * k_per_chunk candidates
+    final_top_k_vals, final_top_k_local_inds = jax.lax.top_k(chunk_top_k_vals_flat, k)
+    # final_top_k_local_inds are indices into the flattened candidates
+
+    # Gather the corresponding global indices and student values
+    top_k_indices = jnp.take_along_axis(global_chunk_inds_flat, final_top_k_local_inds, axis=-1)
+    top_k_teacher_logits = final_top_k_vals
+    top_k_student_logits = jnp.take_along_axis(student_chunk_vals, final_top_k_local_inds, axis=-1)
+    # Shapes: [..., k]
 
     if use_other_bucket:
       # OTHER BUCKET PATH: Needs full vocab softmax (will use more memory)
