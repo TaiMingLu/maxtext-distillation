@@ -841,15 +841,18 @@ def kl_divergence_between_logits_efficient(
 
     else:
       # Renormalization path: only compute softmax over top-k tokens
-      # Compute log_softmax over just the top-k logits
+      # Both teacher and student are renormalized over top-k only
+
+      # Teacher: log_softmax over just the top-k logits (sums to 1)
       teacher_log_probs_topk = jax.nn.log_softmax(top_k_teacher_logits, axis=-1)
       teacher_probs_topk = jnp.exp(teacher_log_probs_topk)
 
-      # For student, we need log_softmax over FULL vocab, then gather top-k
-      student_log_probs_full = jax.nn.log_softmax(student_logits_flat, axis=-1)
-      student_log_probs_topk = student_log_probs_full[batch_indices, top_k_indices]
+      # Student: log_softmax over just the top-k logits (sums to 1)
+      # This is memory-efficient - no full vocab softmax needed
+      student_log_probs_topk = jax.nn.log_softmax(top_k_student_logits, axis=-1)
 
       # Compute KL over renormalized top-k distribution
+      # Gradients only flow through the top-k student logits
       kl_flat = jnp.sum(
           teacher_probs_topk * (teacher_log_probs_topk - student_log_probs_topk),
           axis=-1
