@@ -797,54 +797,40 @@ def kl_divergence_between_logits_efficient(
     # ============ TOP-K PATH (iterative argmax - no sorting!) ============
     k = int(top_k)
 
-    # jax.lax.top_k uses sorting which creates huge intermediates.
-    # Instead, we find top-k iteratively using argmax (reduction, not sort).
-    # Each iteration: find max, record it, mask it out, repeat.
-    # Memory: only need one copy of logits + small accumulated results.
+    # Use stop_gradient on teacher - we don't need gradients through top-k selection
+    # This tells XLA it doesn't need to store teacher intermediates for backward pass
+    teacher_for_topk = jax.lax.stop_gradient(teacher_logits_scaled)
 
-    def find_top_k_iterative(carry, _):
-      masked_teacher, masked_student, all_vals, all_inds, all_student_vals, idx = carry
+    # Find top-k using fori_loop (simpler than scan, no intermediate state storage)
+    def find_top_k_body(i, state):
+      masked_teacher, all_vals, all_inds = state
 
-      # Find current max value and index (reduction ops, not sort!)
-      max_val = jnp.max(masked_teacher, axis=-1, keepdims=True)
+      # Find current max (reduction ops, not sort!)
+      max_val = jnp.max(masked_teacher, axis=-1)
       max_idx = jnp.argmax(masked_teacher, axis=-1)
 
-      # Gather student value at this index
-      max_idx_expanded = jnp.expand_dims(max_idx, axis=-1)
-      student_val = jnp.take_along_axis(masked_student, max_idx_expanded, axis=-1)
+      # Store results using dynamic_update_slice for efficiency
+      all_vals = all_vals.at[..., i].set(max_val)
+      all_inds = all_inds.at[..., i].set(max_idx)
 
-      # Store results
-      all_vals = all_vals.at[..., idx].set(jnp.squeeze(max_val, axis=-1))
-      all_inds = all_inds.at[..., idx].set(max_idx)
-      all_student_vals = all_student_vals.at[..., idx].set(jnp.squeeze(student_val, axis=-1))
-
-      # Mask out the found max for next iteration (set to -inf)
+      # Mask out found max for next iteration
       mask = jnp.arange(vocab_size) == max_idx[..., None]
       masked_teacher = jnp.where(mask, -jnp.inf, masked_teacher)
 
-      return (masked_teacher, masked_student, all_vals, all_inds, all_student_vals, idx + 1), None
+      return (masked_teacher, all_vals, all_inds)
 
-    # Initialize accumulators
+    # Initialize - only carry small accumulators, not student logits
     init_vals = jnp.full(original_shape + (k,), -jnp.inf, dtype=teacher_logits_scaled.dtype)
     init_inds = jnp.zeros(original_shape + (k,), dtype=jnp.int32)
-    init_student_vals = jnp.zeros(original_shape + (k,), dtype=student_logits_scaled.dtype)
 
-    init_carry = (
-        teacher_logits_scaled,  # will be progressively masked
-        student_logits_scaled,  # unchanged, just for gathering
-        init_vals,
-        init_inds,
-        init_student_vals,
-        0,  # iteration index
+    _, top_k_teacher_logits, top_k_indices = jax.lax.fori_loop(
+        0, k,
+        find_top_k_body,
+        (teacher_for_topk, init_vals, init_inds)
     )
 
-    # Run k iterations
-    (_, _, top_k_teacher_logits, top_k_indices, top_k_student_logits, _), _ = jax.lax.scan(
-        find_top_k_iterative,
-        init_carry,
-        None,
-        length=k,
-    )
+    # Gather student logits at top-k positions (this needs gradients!)
+    top_k_student_logits = jnp.take_along_axis(student_logits_scaled, top_k_indices, axis=-1)
     # Shapes: [..., k]
 
     if use_other_bucket:
