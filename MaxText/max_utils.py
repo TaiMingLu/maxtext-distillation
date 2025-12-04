@@ -794,35 +794,29 @@ def kl_divergence_between_logits_efficient(
   original_shape = teacher_logits.shape[:-1]  # [..., vocab] -> [...]
 
   if top_k is not None:
-    # ============ TOP-K PATH (memory-efficient with chunking) ============
+    # ============ TOP-K PATH (sharding-aware) ============
     k = int(top_k)
 
-    # jax.lax.top_k on TPU uses a full sort which creates 4x copies of the input.
-    # For large vocab (128K), this causes OOM. We use chunked processing with scan
-    # to reduce peak memory by processing one sequence position at a time.
+    # Use vmap to process each position independently while preserving batch sharding.
+    # This is critical for multi-device training - scan/reshape would break sharding
+    # and cause all-gather of the full tensor across devices.
 
-    # Flatten to [num_positions, vocab_size] for chunked processing
-    teacher_logits_flat = teacher_logits_scaled.reshape(-1, vocab_size)
-    student_logits_flat = student_logits_scaled.reshape(-1, vocab_size)
-
-    # Process each position with scan to avoid materializing full sort intermediates
-    def top_k_single_position(carry, inputs):
-      teacher_row, student_row = inputs
+    def top_k_single_position(teacher_row, student_row):
+      """Process a single [vocab_size] row."""
       top_k_vals, top_k_inds = jax.lax.top_k(teacher_row, k)
       student_vals = student_row[top_k_inds]
-      return carry, (top_k_vals, top_k_inds, student_vals)
+      return top_k_vals, top_k_inds, student_vals
 
-    _, (top_k_teacher_logits_flat, top_k_indices_flat, top_k_student_logits_flat) = jax.lax.scan(
-        top_k_single_position,
-        None,
-        (teacher_logits_flat, student_logits_flat),
+    # vmap over all leading dimensions (batch, seq, etc.) while keeping vocab as the operating axis
+    # This preserves sharding on the batch dimension
+    vmapped_top_k = top_k_single_position
+    for _ in range(len(original_shape)):
+      vmapped_top_k = jax.vmap(vmapped_top_k, in_axes=(0, 0), out_axes=0)
+
+    top_k_teacher_logits, top_k_indices, top_k_student_logits = vmapped_top_k(
+        teacher_logits_scaled, student_logits_scaled
     )
-    # Shapes: [num_positions, k]
-
-    # Reshape back to original batch shape
-    top_k_teacher_logits = top_k_teacher_logits_flat.reshape(*original_shape, k)
-    top_k_indices = top_k_indices_flat.reshape(*original_shape, k)
-    top_k_student_logits = top_k_student_logits_flat.reshape(*original_shape, k)
+    # Shapes: [..., k] same as original_shape + (k,)
 
     if use_other_bucket:
       # OTHER BUCKET PATH: Needs full vocab softmax (will use more memory)
