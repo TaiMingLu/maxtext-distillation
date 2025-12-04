@@ -794,24 +794,19 @@ def kl_divergence_between_logits_efficient(
   original_shape = teacher_logits.shape[:-1]  # [..., vocab] -> [...]
 
   if top_k is not None:
-    # ============ TOP-K PATH (chunked to reduce memory) ============
+    # ============ TOP-K PATH (sequential chunks via scan) ============
     k = int(top_k)
 
-    # jax.lax.top_k on TPU uses a full sort which creates huge intermediate tensors.
-    # For vocab=128K, this is 15GB+ per intermediate, causing OOM.
-    #
-    # Solution: Chunked top-k (tournament-style)
-    # 1. Split vocab into chunks (e.g., 32 chunks of 4096)
-    # 2. Find top-k within each chunk
-    # 3. Merge per-chunk results and find global top-k
-    #
-    # Memory: Sort on [batch, seq, chunk_size] instead of [batch, seq, vocab]
+    # jax.lax.top_k uses full sort creating huge intermediates.
+    # Solution: Process vocab in chunks SEQUENTIALLY via scan.
+    # This forces XLA to process one chunk at a time, not all at once.
 
-    chunk_size = 4096  # Tune this based on memory constraints
+    chunk_size = 4096
     num_chunks = (vocab_size + chunk_size - 1) // chunk_size
+    padded_vocab = num_chunks * chunk_size
 
     # Pad vocab to be divisible by chunk_size
-    pad_size = num_chunks * chunk_size - vocab_size
+    pad_size = padded_vocab - vocab_size
     if pad_size > 0:
       pad_shape = list(teacher_logits_scaled.shape)
       pad_shape[-1] = pad_size
@@ -822,44 +817,54 @@ def kl_divergence_between_logits_efficient(
       teacher_logits_padded = teacher_logits_scaled
       student_logits_padded = student_logits_scaled
 
-    # Reshape to [..., num_chunks, chunk_size]
-    new_shape = list(original_shape) + [num_chunks, chunk_size]
-    teacher_chunked = teacher_logits_padded.reshape(new_shape)
-    student_chunked = student_logits_padded.reshape(new_shape)
+    # Reshape to [num_chunks, ...batch_dims..., chunk_size] for scan
+    # Original: [..., vocab] -> [..., num_chunks, chunk_size] -> [num_chunks, ..., chunk_size]
+    batch_seq_shape = list(original_shape)  # e.g., [4, 8192]
+    teacher_chunked = teacher_logits_padded.reshape(batch_seq_shape + [num_chunks, chunk_size])
+    student_chunked = student_logits_padded.reshape(batch_seq_shape + [num_chunks, chunk_size])
 
-    # Find top-k within each chunk: [..., num_chunks, k]
-    # k_per_chunk should be at least k to ensure we don't miss any top-k elements
-    k_per_chunk = min(k, chunk_size)
-    chunk_top_k_vals, chunk_top_k_inds = jax.lax.top_k(teacher_chunked, k_per_chunk)
-    # chunk_top_k_inds are indices within each chunk (0 to chunk_size-1)
+    # Move chunk dim to front for scan: [num_chunks, batch, seq, chunk_size]
+    chunk_axis = len(batch_seq_shape)  # Position of num_chunks dim
+    perm = [chunk_axis] + list(range(chunk_axis)) + [chunk_axis + 1]
+    teacher_chunked_t = jnp.transpose(teacher_chunked, perm)
+    student_chunked_t = jnp.transpose(student_chunked, perm)
 
-    # Convert to global vocab indices
-    chunk_offsets = jnp.arange(num_chunks) * chunk_size  # [num_chunks]
-    # Broadcast to match chunk_top_k_inds shape: [..., num_chunks, k_per_chunk]
-    for _ in range(len(original_shape)):
-      chunk_offsets = jnp.expand_dims(chunk_offsets, axis=0)
-    chunk_offsets = jnp.expand_dims(chunk_offsets, axis=-1)  # [..., num_chunks, 1]
-    global_chunk_inds = chunk_top_k_inds + chunk_offsets  # [..., num_chunks, k_per_chunk]
+    # Process each chunk sequentially - this is the key to avoiding OOM
+    def process_single_chunk(carry, inputs):
+      chunk_idx, teacher_chunk, student_chunk = inputs
+      # teacher_chunk: [batch, seq, chunk_size]
+      top_k_vals, top_k_local_inds = jax.lax.top_k(teacher_chunk, k)
+      # Convert to global indices
+      global_inds = top_k_local_inds + chunk_idx * chunk_size
+      # Gather student values
+      student_vals = jnp.take_along_axis(student_chunk, top_k_local_inds, axis=-1)
+      return carry, (top_k_vals, global_inds, student_vals)
 
-    # Gather student logits at chunk top-k positions
-    # Flatten chunks: [..., num_chunks * k_per_chunk]
-    flat_shape = list(original_shape) + [num_chunks * k_per_chunk]
-    chunk_top_k_vals_flat = chunk_top_k_vals.reshape(flat_shape)
-    global_chunk_inds_flat = global_chunk_inds.reshape(flat_shape)
+    chunk_indices = jnp.arange(num_chunks)
+    _, (all_chunk_vals, all_chunk_inds, all_chunk_student) = jax.lax.scan(
+        process_single_chunk,
+        None,
+        (chunk_indices, teacher_chunked_t, student_chunked_t),
+    )
+    # Shapes: [num_chunks, batch, seq, k]
 
-    # Gather student values using the global indices
-    # We need to gather from the padded student logits
-    student_chunk_vals = jnp.take_along_axis(student_logits_padded, global_chunk_inds_flat, axis=-1)
+    # Transpose back: [batch, seq, num_chunks, k]
+    inv_perm = list(range(1, len(batch_seq_shape) + 1)) + [0, len(batch_seq_shape) + 1]
+    all_chunk_vals = jnp.transpose(all_chunk_vals, inv_perm)
+    all_chunk_inds = jnp.transpose(all_chunk_inds, inv_perm)
+    all_chunk_student = jnp.transpose(all_chunk_student, inv_perm)
 
-    # Now find global top-k among the num_chunks * k_per_chunk candidates
-    final_top_k_vals, final_top_k_local_inds = jax.lax.top_k(chunk_top_k_vals_flat, k)
-    # final_top_k_local_inds are indices into the flattened candidates
+    # Flatten chunks: [batch, seq, num_chunks * k]
+    flat_shape = batch_seq_shape + [num_chunks * k]
+    all_chunk_vals_flat = all_chunk_vals.reshape(flat_shape)
+    all_chunk_inds_flat = all_chunk_inds.reshape(flat_shape)
+    all_chunk_student_flat = all_chunk_student.reshape(flat_shape)
 
-    # Gather the corresponding global indices and student values
-    top_k_indices = jnp.take_along_axis(global_chunk_inds_flat, final_top_k_local_inds, axis=-1)
-    top_k_teacher_logits = final_top_k_vals
-    top_k_student_logits = jnp.take_along_axis(student_chunk_vals, final_top_k_local_inds, axis=-1)
-    # Shapes: [..., k]
+    # Final top-k among all chunk candidates (small: num_chunks * k values)
+    top_k_teacher_logits, final_local_inds = jax.lax.top_k(all_chunk_vals_flat, k)
+    top_k_indices = jnp.take_along_axis(all_chunk_inds_flat, final_local_inds, axis=-1)
+    top_k_student_logits = jnp.take_along_axis(all_chunk_student_flat, final_local_inds, axis=-1)
+    # Shapes: [batch, seq, k]
 
     if use_other_bucket:
       # OTHER BUCKET PATH: Needs full vocab softmax (will use more memory)
