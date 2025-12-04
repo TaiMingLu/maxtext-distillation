@@ -794,18 +794,35 @@ def kl_divergence_between_logits_efficient(
   original_shape = teacher_logits.shape[:-1]  # [..., vocab] -> [...]
 
   if top_k is not None:
-    # ============ TOP-K PATH (memory-efficient) ============
+    # ============ TOP-K PATH (memory-efficient with chunking) ============
     k = int(top_k)
 
-    # Apply top_k directly on original shape - avoids materializing full vocab reshape
-    # jax.lax.top_k operates on the last axis
-    top_k_teacher_logits, top_k_indices = jax.lax.top_k(teacher_logits_scaled, k)
-    # Shape: top_k_teacher_logits: [..., k]
-    #        top_k_indices: [..., k]
+    # jax.lax.top_k on TPU uses a full sort which creates 4x copies of the input.
+    # For large vocab (128K), this causes OOM. We use chunked processing with scan
+    # to reduce peak memory by processing one sequence position at a time.
 
-    # Gather corresponding student logits using take_along_axis (no flatten needed!)
-    top_k_student_logits = jnp.take_along_axis(student_logits_scaled, top_k_indices, axis=-1)
-    # Shape: [..., k]
+    # Flatten to [num_positions, vocab_size] for chunked processing
+    teacher_logits_flat = teacher_logits_scaled.reshape(-1, vocab_size)
+    student_logits_flat = student_logits_scaled.reshape(-1, vocab_size)
+
+    # Process each position with scan to avoid materializing full sort intermediates
+    def top_k_single_position(carry, inputs):
+      teacher_row, student_row = inputs
+      top_k_vals, top_k_inds = jax.lax.top_k(teacher_row, k)
+      student_vals = student_row[top_k_inds]
+      return carry, (top_k_vals, top_k_inds, student_vals)
+
+    _, (top_k_teacher_logits_flat, top_k_indices_flat, top_k_student_logits_flat) = jax.lax.scan(
+        top_k_single_position,
+        None,
+        (teacher_logits_flat, student_logits_flat),
+    )
+    # Shapes: [num_positions, k]
+
+    # Reshape back to original batch shape
+    top_k_teacher_logits = top_k_teacher_logits_flat.reshape(*original_shape, k)
+    top_k_indices = top_k_indices_flat.reshape(*original_shape, k)
+    top_k_student_logits = top_k_student_logits_flat.reshape(*original_shape, k)
 
     if use_other_bucket:
       # OTHER BUCKET PATH: Needs full vocab softmax (will use more memory)
