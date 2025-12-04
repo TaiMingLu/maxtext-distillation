@@ -33,20 +33,19 @@ export ASYNC_CHECKPOINTING=false
 export USE_KD=true
 export KD_ALPHA=0.5  #KD_ALPHA=0.0 -- pure cross-entropy (no KD), KD_ALPHA=1.0 -- makes purely the KD term
 export KD_TEMPERATURE=1.0
-export KD_USE_HARD_LABELS=true
-export KD_TEACHER_PARAMETERS_PATH="/home/terry/gcs-bucket/ckpts/pretrain_param_only/llama3.1-05b-finewebedu-vanilla-s42/checkpoint_24999/0/items"
-export TEACHER_MODEL_NAME="llama3.1-05b"
-export KD_TOP_K=1
+export KD_USE_HARD_LABELS=false
+export KD_TEACHER_PARAMETERS_PATH="/home/terry/gcs-bucket/ckpts/pretrain_param_only/llama3.1-1b_finewebedu_pretrain_shuffled_lr_3e-4_seed_42/checkpoint_24999/0/items"
+export KD_TOP_K=2
 export BASE_OUTPUT_DIRECTORY="gs://$BUCKET_NAME/ckpts/distill_pretrain"
 export DATA_FILES='/home/terry/gcs-bucket/datasets/fineweb-edu/*.array_record'
 
-export RUN_NAME="${MODEL_NAME}-finewebedu-distill-top1-A05BT50BS42-a05-s43_v6"
-export RUN_ID="llama1b_finewebedu_distill_top1_A05BT50BS42_a05_s43_v6"
+export RUN_NAME="${MODEL_NAME}-finewebedu-distill-top2-A1BT50BS42-a05-s43_v6"
+export RUN_ID="llama1b_finewebedu_distill_top2_A1BT50BS42_a05_s43_v6"
 
 # Distillation parameters
 
 echo "========================"
-echo "running llama1b-finewebedu-distill-top1-A05BT50BS42-a05-s43.sh"
+echo "running llama1b-finewebedu-distill-top2-A1BT50BS42-a05-s43.sh"
 echo "parameters:"
 echo "MODEL_NAME: $MODEL_NAME"
 echo "SEQ_LEN: $SEQ_LEN"
@@ -118,6 +117,5 @@ python -u multihost_runner_orig.py \
         kd_temperature=${KD_TEMPERATURE} \
         kd_teacher_parameters_path=${KD_TEACHER_PARAMETERS_PATH} \
         kd_use_hard_labels=${KD_USE_HARD_LABELS} \
-        kd_top_k=${KD_TOP_K} \
-        kd_teacher_model_name=${TEACHER_MODEL_NAME}
+        kd_top_k=${KD_TOP_K}
     "

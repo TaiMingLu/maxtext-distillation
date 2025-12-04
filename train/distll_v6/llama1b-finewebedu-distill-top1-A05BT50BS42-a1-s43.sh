@@ -6,7 +6,7 @@ echo "========================"
 echo "environment variables:"
 echo "TPU_PREFIX: $TPU_PREFIX"
 echo "BUCKET_NAME: $BUCKET_NAME"
-echo "========================" 
+echo "========================"
 
 required_vars=(
     "BUCKET_NAME"
@@ -34,7 +34,6 @@ export USE_KD=true
 export KD_ALPHA=1.0  #KD_ALPHA=0.0 -- pure cross-entropy (no KD), KD_ALPHA=1.0 -- makes purely the KD term
 export KD_TEMPERATURE=1.0
 export KD_USE_HARD_LABELS=true
-# export KD_TEACHER_PARAMETERS_PATH="/home/terry/gcs-bucket/model_ckpts/maxtext/llama3.1-1b_seqlen_8192_bs_4_grad_accum_1_lr_2.e-4_min_lr_ratio_0.1_warmup_ratio_0.05_quadratic_warmup/checkpoints/500"
 export KD_TEACHER_PARAMETERS_PATH="/home/terry/gcs-bucket/ckpts/pretrain_param_only/llama3.1-05b-finewebedu-vanilla-s42/checkpoint_24999/0/items"
 export TEACHER_MODEL_NAME="llama3.1-05b"
 export KD_TOP_K=1
@@ -47,7 +46,7 @@ export RUN_ID="llama1b_finewebedu_distill_top1_A05BT50BS42_a1_s43_v6"
 # Distillation parameters
 
 echo "========================"
-echo "running llama1b-finewebedu-distill-top1-A3BT50BS42-a1-s43.sh"
+echo "running llama1b-finewebedu-distill-top1-A05BT50BS42-a1-s43.sh"
 echo "parameters:"
 echo "MODEL_NAME: $MODEL_NAME"
 echo "SEQ_LEN: $SEQ_LEN"
