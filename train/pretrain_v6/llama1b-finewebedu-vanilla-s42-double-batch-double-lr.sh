@@ -35,11 +35,11 @@ export ASYNC_CHECKPOINTING=false
 export BASE_OUTPUT_DIRECTORY="gs://$BUCKET_NAME/ckpts/pretrain"
 export DATA_FILES='/home/terry/gcs-bucket/datasets/fineweb-edu/*.array_record'
 
-export RUN_NAME="${MODEL_NAME}-finewebedu-vanilla-s42-double-batch-double-lr"
-export RUN_ID="llama1b_finewebedu_vanilla_s42_double_batch_double_lr"
+export RUN_NAME="${MODEL_NAME}-finewebedu-vanilla-s42-double-batch-double-lr-fixed"
+export RUN_ID="llama1b_finewebedu_vanilla_s42_double_batch_double_lr_fixed"
 
 echo "========================"
-echo "running llama1b-finewebedu-vanilla-s42-double-batch-double-lr.sh"
+echo "running llama1b-finewebedu-vanilla-s42-double-batch-double-lr-fixed.sh"
 echo "parameters:"
 echo "MODEL_NAME: $MODEL_NAME"
 echo "SEQ_LEN: $SEQ_LEN"
