@@ -24,7 +24,7 @@ for var in "${required_vars[@]}"; do
 done
 
 export MODEL_NAME='llama3.1-1b'
-export NUM_STEPS=250000 # need to double the machine cores
+export NUM_STEPS=150000 
 export SEQ_LEN=8192
 export BATCH_SIZE=4
 export GRAD_ACCUM=1
