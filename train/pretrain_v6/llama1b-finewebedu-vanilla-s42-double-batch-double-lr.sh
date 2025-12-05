@@ -24,7 +24,7 @@ for var in "${required_vars[@]}"; do
 done
 
 export MODEL_NAME='llama3.1-1b'
-export NUM_STEPS=25000
+export NUM_STEPS=12500
 export SEQ_LEN=8192
 export BATCH_SIZE=2
 export GRAD_ACCUM=1
