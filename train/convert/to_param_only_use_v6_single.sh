@@ -29,17 +29,17 @@ done
 
 
 python3.10 -u -m MaxText.generate_param_only_checkpoint MaxText/configs/base.yml \
-  load_full_state_path=gs://taiming_us_central2_b/ckpts/pretrain/llama3.1-05b-finewebedu-vanilla-s42/checkpoints/24999/items \
+  load_full_state_path=gs://taiming_us_central1_b/ckpts/pretrain/llama3.1-05b-finewebedu-vanilla-s42_v4/checkpoints/24999/items \
   checkpoint_dir=gs://taiming_us_central1_b/ckpts/pretrain_param_only_v6/llama05b-vanilla-50B-s42/checkpoint_24999 \
   enable_checkpointing=True async_checkpointing=False \
   model_name=llama3.1-05b
 python3.10 -u -m MaxText.generate_param_only_checkpoint MaxText/configs/base.yml \
-  load_full_state_path=gs://taiming_us_central2_b/ckpts/pretrain/llama3.1-1b_finewebedu_pretrain_shuffled_lr_3e-4_seed_42/24999/items \
+  load_full_state_path=gs://taiming_us_central1_b/ckpts/pretrain/llama3.1-1b-finewebedu-vanilla-s42_v4/checkpoints/24999/items \
   checkpoint_dir=gs://taiming_us_central1_b/ckpts/pretrain_param_only_v6/llama1b-vanilla-50B-s42/checkpoint_24999 \
   enable_checkpointing=True async_checkpointing=False \
   model_name=llama3.1-1b
 python3.10 -u -m MaxText.generate_param_only_checkpoint MaxText/configs/base.yml \
-  load_full_state_path=gs://taiming_us_central2_b/ckpts/pretrain/llama3.1-3b-finewebedu-vanilla-s42/checkpoints/24999/items \
+  load_full_state_path=gs://taiming_us_central1_b/ckpts/pretrain/llama3.1-3b-finewebedu-vanilla-s42_v4/checkpoints/24999/items \
   checkpoint_dir=gs://taiming_us_central1_b/ckpts/pretrain_param_only_v6/llama3b-vanilla-50B-s42/checkpoint_24999 \
   enable_checkpointing=True async_checkpointing=False \
   model_name=llama3.1-3b
