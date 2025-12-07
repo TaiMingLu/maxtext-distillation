@@ -33,7 +33,7 @@ export USE_KD=true
 export KD_ALPHA=0.5  #KD_ALPHA=0.0 -- pure cross-entropy (no KD), KD_ALPHA=1.0 -- makes purely the KD term
 export KD_TEMPERATURE=1.0
 export KD_TEACHER_PARAMETERS_PATH="/home/terry/gcs-bucket/ckpts/pretrain_param_only_v6/llama05b-vanilla-100B-s42/checkpoint_49999/0/items"
-export TEACHER_MODEL_NAME="llama3.1-0.5b"
+export TEACHER_MODEL_NAME="llama3.1-05b"
 export BASE_OUTPUT_DIRECTORY="gs://$BUCKET_NAME/ckpts/distill_pretrain"
 export DATA_FILES='/home/terry/gcs-bucket/datasets/fineweb-edu/*.array_record'
 

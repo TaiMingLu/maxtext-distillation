@@ -20,7 +20,7 @@ DEFAULT_STUDENT_SEED = 43
 
 # Mapping from arch shorthand to model name
 ARCH_TO_MODEL = {
-    "05b": "llama3.1-0.5b",
+    "05b": "llama3.1-05b",
     "1b": "llama3.1-1b",
     "3b": "llama3.1-3b",
     "8b": "llama3.1-8b",
