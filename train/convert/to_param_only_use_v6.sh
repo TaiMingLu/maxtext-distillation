@@ -7,7 +7,7 @@ source ~/maxtext_env/bin/activate
 export BUCKET_NAME=taiming_us_central1_b
 export TPU_PREFIX=taiming-v6e-64_020006
 gcloud config set project vision-mix
-gcloud config set compute/zone us-central2-b
+gcloud config set compute/zone us-central1-b
 
 echo "========================"
 echo "environment variables:"
