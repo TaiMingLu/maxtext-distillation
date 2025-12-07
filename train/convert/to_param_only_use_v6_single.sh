@@ -88,6 +88,11 @@ python3.10 -u -m MaxText.generate_param_only_checkpoint MaxText/configs/base.yml
   checkpoint_dir=gs://taiming_us_central1/ckpts/pretrain_param_only_v6/llama05b-vanilla-30B-s42/checkpoint_14999 \
   enable_checkpointing=True async_checkpointing=False \
   model_name=llama3.1-05b
+python3.10 -u -m MaxText.generate_param_only_checkpoint MaxText/configs/base.yml \
+  load_full_state_path=gs://taiming_us_central1/ckpts/pretrain/llama3.1-05b-finewebedu-vanilla-300B-s42_v6/checkpoints/14999/items \
+  checkpoint_dir=gs://taiming_us_central1/ckpts/pretrain_param_only_v6/llama05b-vanilla-300B-s42/checkpoint_14999 \
+  enable_checkpointing=True async_checkpointing=False \
+  model_name=llama3.1-05b
 
 
 echo "All checkpoints converted successfully!"
