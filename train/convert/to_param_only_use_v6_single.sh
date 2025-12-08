@@ -89,15 +89,16 @@ done
 #   enable_checkpointing=True async_checkpointing=False \
 #   model_name=llama3.1-05b
 python3.10 -u -m MaxText.generate_param_only_checkpoint MaxText/configs/base.yml \
-  load_full_state_path=gs://taiming_us_central1/ckpts/pretrain/llama3.1-05b-finewebedu-vanilla-300B-s42_v6/checkpoints/149999/items \
-  checkpoint_dir=gs://taiming_us_central1/ckpts/pretrain_param_only_v6/llama05b-vanilla-300B-s42/checkpoint_14999 \
+  load_full_state_path=gs://taiming_us_central1/ckpts/pretrain/llama3.1-05b-finewebedu-vanilla-s42-300b/checkpoints/149999/items \
+  checkpoint_dir=gs://taiming_us_central1/ckpts/pretrain_param_only_v6/llama05b-vanilla-300B-s42/checkpoint_149999 \
   enable_checkpointing=True async_checkpointing=False \
   model_name=llama3.1-05b
 python3.10 -u -m MaxText.generate_param_only_checkpoint MaxText/configs/base.yml \
-  load_full_state_path=gs://taiming_us_central1/ckpts/pretrain/llama3.1-8b-finewebedu-vanilla-100B-s42_v6/checkpoints/49999/items \
+  load_full_state_path=gs://taiming_us_central1/ckpts/pretrain/llama3.1-8b-finewebedu-vanilla-s42-100b/checkpoints/49999/items \
   checkpoint_dir=gs://taiming_us_central1/ckpts/pretrain_param_only_v6/llama8b-vanilla-100B-s42/checkpoint_49999 \
   enable_checkpointing=True async_checkpointing=False \
   model_name=llama3.1-8b
+
 
 
 echo "All checkpoints converted successfully!"
