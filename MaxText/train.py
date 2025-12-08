@@ -337,6 +337,8 @@ def kd_loss_fn(model, config, data, dropout_rng, params, teacher_params, is_trai
   kd_top_p = getattr(config, "kd_top_p", 0.0)
   kd_use_other_bucket = getattr(config, "kd_use_other_bucket", False)
   kd_use_hard_labels = getattr(config, "kd_use_hard_labels", False)
+  kd_keep_full_ce = getattr(config, "kd_keep_full_ce", False)
+  kd_keep_full_kd = getattr(config, "kd_keep_full_kd", False)
 
   if kd_use_hard_labels:
     teacher_argmax = jnp.argmax(teacher_logits, axis=-1)
@@ -362,7 +364,16 @@ def kd_loss_fn(model, config, data, dropout_rng, params, teacher_params, is_trai
     total_kd = jnp.sum(kd_kl)
     kd_loss = (total_kd / (total_weights + EPS)) * (kd_temperature * kd_temperature)
 
-  loss = (1.0 - kd_alpha) * hard_loss + kd_alpha * kd_loss
+  # Combine CE and KD losses based on weighting mode
+  if kd_keep_full_ce:
+    # CE at full weight: loss = 1.0 * ce_loss + alpha * kd_loss
+    loss = hard_loss + kd_alpha * kd_loss
+  elif kd_keep_full_kd:
+    # KD at full weight: loss = alpha * ce_loss + 1.0 * kd_loss
+    loss = kd_alpha * hard_loss + kd_loss
+  else:
+    # Default: standard alpha weighting
+    loss = (1.0 - kd_alpha) * hard_loss + kd_alpha * kd_loss
 
   mtp_loss = 0.0
   if config.mtp_num_layers > 0 and is_train:

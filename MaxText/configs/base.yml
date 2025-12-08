@@ -455,6 +455,8 @@ kd_top_k: 0
 kd_top_p: 0.0
 kd_use_other_bucket: False
 kd_use_hard_labels: False
+kd_keep_full_ce: False  # If True: loss = 1.0 * ce_loss + alpha * kd_loss (CE at full weight)
+kd_keep_full_kd: False  # If True: loss = alpha * ce_loss + 1.0 * kd_loss (KD at full weight)
 
 # Supervised Fine-Tuning (SFT)
 use_sft: False
