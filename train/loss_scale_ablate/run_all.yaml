@@ -1,0 +1,13 @@
+tasks:
+  - id: keep_full_ce_llama1b_finewebedu_distill_soft_A1BT50BS42_a02_s43
+    run: bash train/loss_scale_ablate/keep_full_ce_llama1b-A1BT50BS42-a02-s43.sh
+  - id: keep_full_kd_llama1b_finewebedu_distill_soft_A1BT50BS42_a02_s43
+    run: bash train/loss_scale_ablate/keep_full_kd_llama1b-A1BT50BS42-a02-s43.sh
+  - id: keep_full_ce_llama1b_finewebedu_distill_soft_A1BT50BS42_a08_s43
+    run: bash train/loss_scale_ablate/keep_full_ce_llama1b-A1BT50BS42-a08-s43.sh
+  - id: keep_full_kd_llama1b_finewebedu_distill_soft_A1BT50BS42_a08_s43
+    run: bash train/loss_scale_ablate/keep_full_kd_llama1b-A1BT50BS42-a08-s43.sh
+  - id: keep_full_ce_llama1b_finewebedu_distill_soft_A1BT50BS42_a1_s43
+    run: bash train/loss_scale_ablate/keep_full_ce_llama1b-A1BT50BS42-a1-s43.sh
+  - id: keep_full_kd_llama1b_finewebedu_distill_soft_A1BT50BS42_a1_s43
+    run: bash train/loss_scale_ablate/keep_full_kd_llama1b-A1BT50BS42-a1-s43.sh
