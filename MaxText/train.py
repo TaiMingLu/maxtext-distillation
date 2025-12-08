@@ -810,13 +810,21 @@ def setup_train_loop(config, recorder, devices=None):
             # CRITICAL: Compute derived values that models actually use!
             # Models use emb_dim (not base_emb_dim) and num_decoder_layers (not base_num_decoder_layers)
             base_config_keys = base_config.get_keys()
+            emb_scale = base_config_keys.get('emb_scale', 0)
+            layer_scale = base_config_keys.get('layer_scale', 0)
+            # mlp_dim_scale defaults to num_head_scale which defaults to emb_scale
+            num_head_scale = base_config_keys.get('num_head_scale', emb_scale)
+            mlp_dim_scale = base_config_keys.get('mlp_dim_scale', num_head_scale)
+
             if 'base_emb_dim' in overrides:
-              emb_scale = base_config_keys.get('emb_scale', 0)
               overrides['emb_dim'] = (2 ** emb_scale) * overrides['base_emb_dim']
 
             if 'base_num_decoder_layers' in overrides:
-              layer_scale = base_config_keys.get('layer_scale', 0)
               overrides['num_decoder_layers'] = (2 ** layer_scale) * overrides['base_num_decoder_layers']
+
+            # Required for 8b teacher (mlp_dim differs from smaller models)
+            if 'base_mlp_dim' in overrides:
+              overrides['mlp_dim'] = (2 ** mlp_dim_scale) * overrides['base_mlp_dim']
 
             object.__setattr__(self, '_overrides', overrides)
 
