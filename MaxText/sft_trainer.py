@@ -14,6 +14,10 @@
 
 "Training loop for Supervised Fine-Tuning (SFT)."
 
+# Must be set before any other imports to avoid JAX fork deadlock
+import multiprocessing
+multiprocessing.set_start_method('spawn', force=True)
+
 import datetime
 import os
 from typing import Sequence
