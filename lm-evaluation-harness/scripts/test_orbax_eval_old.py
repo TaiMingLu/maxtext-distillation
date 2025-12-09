@@ -183,119 +183,130 @@ PPL_TASKS = [
     "c4",
     "wikitext",
     # "wikitext2",
-    "cnn_dailymail",
+    # "cnn_dailymail",
     "finewebedu-test-100M",
-    # "dclm",
-    "dm_mathematics",
-    "gsm8k",
-    "arxiv",
-    # "arxiv_full",  # nick007x/arxiv-papers - huge dataset, use streaming
-    "humaneval",
-    "pg19",
+    # "dclm"
 ]
 
 ACC_TASKS = [
-    # Commonsense reasoning
-    {
-        "name": "hellaswag",  # uses validation split by default
-        "num_fewshot": 0,
-        "acc_key": "acc_norm,none",
-    },
-    {
+    { 
         "name": "winogrande",
-        "num_fewshot": 0,
+        "num_fewshot": 5,
         "acc_key": "acc,none",
     },
     {
         "name": "arc_easy",
-        "num_fewshot": 0,
+        "num_fewshot": 5,
         "acc_key": "acc_norm,none",
     },
+    # {
+    #     "name": "mmlu",
+    #     "num_fewshot": 5,
+    #     "acc_key": None,
+    #     "acc_seq_length": 4096,
+    #     "acc_batch_size": 4,
+    # },
     {
         "name": "piqa",
-        "num_fewshot": 0,
+        "num_fewshot": 5,
         "acc_key": "acc_norm,none",
-    },
-    {
-        "name": "boolq",
-        "num_fewshot": 0,
-        "acc_key": "acc,none",
+        "acc_seq_length": 4096,
+        "acc_batch_size": 4,
     },
     {
         "name": "sciq",
-        "num_fewshot": 0,
-        "acc_key": "acc,none",
-    },
-    # Knowledge & QA
-    {
-        "name": "mmlu",
-        "num_fewshot": 0,
+        "num_fewshot": 5,
         "acc_key": "acc,none",
         "acc_seq_length": 4096,
         "acc_batch_size": 4,
     },
     {
-        "name": "naturalqs_open",  # lm-eval uses naturalqs_open for open-domain QA
-        "num_fewshot": 0,
-        "acc_key": "exact_match,none",
-    },
-    # Math
-    {
-        "name": "gsm8k",
-        "num_fewshot": 0,
-        "acc_key": "exact_match,strict-match",
+        "name": "boolq",
+        "num_fewshot": 5,
+        "acc_key": "acc,none",
         "acc_seq_length": 4096,
         "acc_batch_size": 4,
     },
-    {
-        "name": "minerva_math",
-        "num_fewshot": 0,
-        "acc_key": "exact_match,none",
-        "acc_seq_length": 4096,
-        "acc_batch_size": 4,
-    },
-    # Truthfulness
-    {
-        "name": "truthfulqa_mc1",
-        "num_fewshot": 0,
-        "acc_key": "acc,none",
-    },
-    # NLI
-    {
-        "name": "rte",
-        "num_fewshot": 0,
-        "acc_key": "acc,none",
-    },
-    {
-        "name": "anli_r1",
-        "num_fewshot": 0,
-        "acc_key": "acc,none",
-    },
-    {
-        "name": "anli_r2",
-        "num_fewshot": 0,
-        "acc_key": "acc,none",
-    },
-    {
-        "name": "anli_r3",
-        "num_fewshot": 0,
-        "acc_key": "acc,none",
-    },
-    # Code
-    {
-        "name": "humaneval",
-        "num_fewshot": 0,
-        "acc_key": "pass@1,none",
-        "acc_seq_length": 4096,
-        "acc_batch_size": 4,
-    },
-    {
-        "name": "mbpp",
-        "num_fewshot": 0,
-        "acc_key": "pass@1,none",
-        "acc_seq_length": 4096,
-        "acc_batch_size": 4,
-    },
+    # {
+    #     "name": "hellaswag",        
+    #     "num_fewshot": 5,
+    #     "acc_key": "acc_norm,none",
+    # },
+    # {
+    #     "name": "winogrande",
+    #     "num_fewshot": 0,
+    #     "acc_key": "acc,none",
+    # },
+    # {
+    #     "name": "winogrande",
+    #     "num_fewshot": 5,
+    #     "acc_key": "acc,none",
+    # },
+    # {
+    #     "name": "arc_challenge",
+    #     "num_fewshot": 0,
+    #     "acc_key": "acc_norm,none",
+    # },
+    # {
+    #     "name": "arc_challenge",
+    #     "num_fewshot": 25,
+    #     "acc_key": "acc_norm,none",
+    # },
+    # {
+    #     "name": "hellaswag",
+    #     "num_fewshot": 0,
+    #     "acc_key": "acc_norm,none",
+    # },
+    # {
+    #     "name": "mmlu",
+    #     "num_fewshot": 0,
+    #     "acc_key": None,
+    # },
+    # {
+    #     "name": "truthfulqa_mc1",
+    #     "num_fewshot": 0,
+    #     "acc_key": "acc,none",
+    # },
+    # {
+    #     "name": "truthfulqa_mc2",
+    #     "num_fewshot": 0,
+    #     "acc_key": "acc,none",
+    # },
+    # {
+    #     "name": "piqa",
+    #     "num_fewshot": 0,
+    #     "acc_key": "acc_norm,none",
+    # },
+    # {
+    #     "name": "anli_r1",
+    #     "num_fewshot": 0,
+    #     "acc_key": None,
+    # },
+    # {
+    #     "name": "anli_r2",
+    #     "num_fewshot": 0,
+    #     "acc_key": None,
+    # },
+    # {
+    #     "name": "anli_r3",
+    #     "num_fewshot": 0,
+    #     "acc_key": None,
+    # },
+    # {
+    #     "name": "openbookqa",
+    #     "num_fewshot": 0,
+    #     "acc_key": None,
+    # },
+    # {
+    #     "name": "rte",
+    #     "num_fewshot": 0,
+    #     "acc_key": None,
+    # },
+    # {
+    #     "name": "record",
+    #     "num_fewshot": 0,
+    #     "acc_key": None,
+    # },
 ]
 
 load_dataset = hf_datasets.load_dataset
@@ -373,75 +384,6 @@ def get_ppl_enc(task, tokenizer, add_special_tokens: bool = True):
         )
         text_column = "text"
         testenc = tokenizer.encode(" ".join(dataset[:32768][text_column]), return_tensors='pt', add_special_tokens=add_special_tokens)
-    elif task == 'dm_mathematics':
-        # DM-Mathematics from The Pile
-        dataset = load_dataset(
-            "timaeus/pile-dm_mathematics",
-            split="train",
-            trust_remote_code=True
-        )
-        text_column = "text"
-        testenc = tokenizer.encode(" ".join(dataset[:16384][text_column]), return_tensors='pt', add_special_tokens=add_special_tokens)
-    elif task == 'gsm8k':
-        # GSM8K math word problems
-        dataset = load_dataset(
-            "openai/gsm8k",
-            "main",
-            split="train",
-            trust_remote_code=True
-        )
-        # Combine question and answer with newlines
-        texts = [f"{row['question']}\n\n{row['answer']}" for row in dataset[:8192]]
-        testenc = tokenizer.encode("\n\n".join(texts), return_tensors='pt', add_special_tokens=add_special_tokens)
-    elif task == 'arxiv':
-        # arXiv summarization dataset
-        dataset = load_dataset(
-            "ccdv/arxiv-summarization",
-            "section",
-            split="train",
-            trust_remote_code=True
-        )
-        text_column = "abstract"
-        testenc = tokenizer.encode("\n\n".join(dataset[:16384][text_column]), return_tensors='pt', add_special_tokens=add_special_tokens)
-    elif task == 'arxiv_full':
-        # arXiv papers (full) - use streaming to handle large dataset efficiently
-        dataset = load_dataset(
-            "nick007x/arxiv-papers",
-            "section",
-            split="train",
-            streaming=True,
-            trust_remote_code=True
-        )
-        # Shuffle with a buffer and take limited samples
-        dataset = dataset.shuffle(seed=42, buffer_size=10000)
-        texts = []
-        for i, row in enumerate(dataset):
-            if i >= 4096:
-                break
-            title = row.get('title', '') or ''
-            abstract = row.get('abstract', '') or ''
-            texts.append(f"{title}\n{abstract}")
-        testenc = tokenizer.encode("\n\n".join(texts), return_tensors='pt', add_special_tokens=add_special_tokens)
-    elif task == 'humaneval':
-        # HumanEval coding problems
-        dataset = load_dataset(
-            "openai/openai_humaneval",
-            split="test",
-            trust_remote_code=True
-        )
-        # Combine prompt and canonical_solution with newlines
-        texts = [f"{row['prompt']}\n\n{row['canonical_solution']}" for row in dataset]
-        testenc = tokenizer.encode("\n\n".join(texts), return_tensors='pt', add_special_tokens=add_special_tokens)
-    elif task == 'pg19':
-        # PG19 books - each row is very long, so use fewer rows
-        dataset = load_dataset(
-            "emozilla/pg19",
-            split="train",
-            trust_remote_code=True
-        )
-        # Only take first 256 rows since each is very long
-        texts = dataset[:1024]["text"]
-        testenc = tokenizer.encode("\n\n".join(texts), return_tensors='pt', add_special_tokens=add_special_tokens)
     else:
         raise NotImplementedError(f"Unsupported task: {task}")
     return testenc
@@ -591,7 +533,6 @@ def get_acc(
             # task_kwargs={"limit": 256},
             confirm_run_unsafe_code=True,
             limit=eval_limit,
-            apply_chat_template=True,
         )
         
         task_metrics = res['results'][task]
@@ -670,43 +611,35 @@ def main(config, test_args):
         max_loglikelihood_seq_length=acc_seq_len,
     )
     
-    # Initialize results
-    ppl_res, ppl_times = {}, {}
-    acc_res, acc_full, acc_times = {}, {}, {}
+    print_device_memory("before PPL eval")
+    ppl_res, ppl_times = get_ppl(
+        model,
+        tokenizer,
+        batch_size=test_args.ppl_batch_size,
+        calib_size=min(256, test_args.limit),
+        max_length=config.max_target_length,
+        tasks=PPL_TASKS,
+        add_special_tokens=test_args.add_special_tokens,
+        task_range=test_args.tasks,
+    )
+    print(ppl_res)
+    print({"ppl_times_s": ppl_times})
 
-    # Run PPL evaluation if mode is 'ppl' or 'all'
-    if test_args.eval_mode in ["ppl", "all"]:
-        print_device_memory("before PPL eval")
-        ppl_res, ppl_times = get_ppl(
-            model,
-            tokenizer,
-            batch_size=test_args.ppl_batch_size,
-            calib_size=min(256, test_args.limit),
-            max_length=config.max_target_length,
-            tasks=PPL_TASKS,
-            add_special_tokens=test_args.add_special_tokens,
-            task_range=test_args.tasks,
-        )
-        print(ppl_res)
-        print({"ppl_times_s": ppl_times})
-
-    # Run ACC evaluation if mode is 'acc' or 'all'
-    if test_args.eval_mode in ["acc", "all"]:
-        print_device_memory("before ACC eval")
-        acc_res, acc_full, acc_times = get_acc(
-            model,
-            tokenizer,
-            tasks=ACC_TASKS,
-            task_range=test_args.tasks,
-            limit=test_args.limit,
-            batch_size=test_args.acc_batch_size,
-            per_task_limit=test_args.acc_limit,
-            task_limit_overrides=task_limit_overrides,
-            task_seq_overrides=task_seq_overrides,
-            task_batch_overrides=task_batch_overrides,
-        )
-        print(acc_res)
-        print({"acc_times_s": acc_times})
+    print_device_memory("before ACC eval")
+    acc_res, acc_full, acc_times = get_acc(
+        model,
+        tokenizer,
+        tasks=ACC_TASKS,
+        task_range=test_args.tasks,
+        limit=test_args.limit,
+        batch_size=test_args.acc_batch_size,
+        per_task_limit=test_args.acc_limit,
+        task_limit_overrides=task_limit_overrides,
+        task_seq_overrides=task_seq_overrides,
+        task_batch_overrides=task_batch_overrides,
+    )
+    print(acc_res)
+    print({"acc_times_s": acc_times})
 
     # Optionally save results to disk
     if getattr(test_args, "eval_save_dir", ""):
@@ -729,7 +662,6 @@ def main(config, test_args):
         results_payload = {
             "run_name": getattr(config, "run_name", ""),
             "model_name": getattr(config, "model_name", ""),
-            "eval_mode": test_args.eval_mode,
             "limit": test_args.limit,
             "tasks_requested": test_args.tasks,
             "add_special_tokens": test_args.add_special_tokens,
@@ -799,7 +731,7 @@ if __name__ == "__main__":
     parser.add_argument("--golden_logits_path", type=str, required=False, default="")
     parser.add_argument("--hf_model_path", type=str, required=False, default="")
     parser.add_argument("--run_hf_model", type=bool, required=False, default=False)
-    parser.add_argument('--add_special_tokens', type=str2bool, default=False)
+    parser.add_argument('--add_special_tokens', type=str2bool, default=True)
     parser.add_argument("--limit", type=int, default=1000000)
     parser.add_argument("--tasks", type=lambda x: [] if not x else x.split(","), default=[])
     parser.add_argument("--eval_save_dir", type=str, required=False, default="")
@@ -811,7 +743,6 @@ if __name__ == "__main__":
     parser.add_argument("--acc_task_limits", type=str, default="", help="Comma separated overrides like 'mmlu:10,arc_easy:50'")
     parser.add_argument("--acc_task_seq_lens", type=str, default="", help="Per-task accuracy sequence lengths, e.g. 'piqa:2304,arc_easy:3000'")
     parser.add_argument("--acc_task_batch_sizes", type=str, default="", help="Per-task accuracy batch sizes, e.g. 'piqa:4,arc_easy:8'")
-    parser.add_argument("--eval_mode", type=str, choices=["ppl", "acc", "all"], default="all", help="Evaluation mode: 'ppl' (perplexity only), 'acc' (accuracy only), or 'all' (both)")
     test_args, _ = parser.parse_known_args()
 
     # Remove args defined in this test file to avoid error from pyconfig
@@ -837,7 +768,6 @@ if __name__ == "__main__":
         "--acc_task_limits",
         "--acc_task_seq_lens",
         "--acc_task_batch_sizes",
-        "--eval_mode",
     ]
     for arg in to_remove_args:
         model_args = [s for s in model_args if not s.startswith(arg)]

@@ -1,0 +1,368 @@
+tasks:
+  - id: eval_ppl_exp1_llama3.1_1b_A05BT50BS42_a02_s43
+    hide: true
+    run: bash train/eval/eval_pretrain_ppl.sh exp1_llama3.1-1b-A05BT50BS42-a02-s43 24999 distill
+  - id: eval_acc_sft_exp1_llama3.1_1b_A05BT50BS42_a02_s43
+    hide: true
+    run: bash train/eval/eval_sft_acc.sh sft_exp1_llama3.1-1b-A05BT50BS42-a02-s43 999
+    depends_on: sft_exp1_llama3.1_1b_A05BT50BS42_a02_s43
+  - id: eval_ppl_exp1_llama3.1_1b_A05BT50BS42_a04_s43
+    hide: true
+    run: bash train/eval/eval_pretrain_ppl.sh exp1_llama3.1-1b-A05BT50BS42-a04-s43 24999 distill
+  - id: eval_acc_sft_exp1_llama3.1_1b_A05BT50BS42_a04_s43
+    hide: true
+    run: bash train/eval/eval_sft_acc.sh sft_exp1_llama3.1-1b-A05BT50BS42-a04-s43 999
+    depends_on: sft_exp1_llama3.1_1b_A05BT50BS42_a04_s43
+  - id: eval_ppl_exp1_llama3.1_1b_A05BT50BS42_a05_s43
+    hide: true
+    run: bash train/eval/eval_pretrain_ppl.sh exp1_llama3.1-1b-A05BT50BS42-a05-s43 24999 distill
+  - id: eval_acc_sft_exp1_llama3.1_1b_A05BT50BS42_a05_s43
+    hide: true
+    run: bash train/eval/eval_sft_acc.sh sft_exp1_llama3.1-1b-A05BT50BS42-a05-s43 999
+    depends_on: sft_exp1_llama3.1_1b_A05BT50BS42_a05_s43
+  - id: eval_ppl_exp1_llama3.1_1b_A05BT50BS42_a06_s43
+    hide: true
+    run: bash train/eval/eval_pretrain_ppl.sh exp1_llama3.1-1b-A05BT50BS42-a06-s43 24999 distill
+  - id: eval_acc_sft_exp1_llama3.1_1b_A05BT50BS42_a06_s43
+    hide: true
+    run: bash train/eval/eval_sft_acc.sh sft_exp1_llama3.1-1b-A05BT50BS42-a06-s43 999
+    depends_on: sft_exp1_llama3.1_1b_A05BT50BS42_a06_s43
+  - id: eval_ppl_exp1_llama3.1_1b_A05BT50BS42_a08_s43
+    hide: true
+    run: bash train/eval/eval_pretrain_ppl.sh exp1_llama3.1-1b-A05BT50BS42-a08-s43 24999 distill
+  - id: eval_acc_sft_exp1_llama3.1_1b_A05BT50BS42_a08_s43
+    hide: true
+    run: bash train/eval/eval_sft_acc.sh sft_exp1_llama3.1-1b-A05BT50BS42-a08-s43 999
+    depends_on: sft_exp1_llama3.1_1b_A05BT50BS42_a08_s43
+  - id: eval_ppl_exp1_llama3.1_1b_A05BT50BS42_a1_s43
+    hide: true
+    run: bash train/eval/eval_pretrain_ppl.sh exp1_llama3.1-1b-A05BT50BS42-a1-s43 24999 distill
+  - id: eval_acc_sft_exp1_llama3.1_1b_A05BT50BS42_a1_s43
+    hide: true
+    run: bash train/eval/eval_sft_acc.sh sft_exp1_llama3.1-1b-A05BT50BS42-a1-s43 999
+    depends_on: sft_exp1_llama3.1_1b_A05BT50BS42_a1_s43
+  - id: eval_ppl_exp1_llama3.1_1b_A1BT50BS42_a02_s43
+    hide: true
+    run: bash train/eval/eval_pretrain_ppl.sh exp1_llama3.1-1b-A1BT50BS42-a02-s43 24999 distill
+  - id: eval_acc_sft_exp1_llama3.1_1b_A1BT50BS42_a02_s43
+    hide: true
+    run: bash train/eval/eval_sft_acc.sh sft_exp1_llama3.1-1b-A1BT50BS42-a02-s43 999
+    depends_on: sft_exp1_llama3.1_1b_A1BT50BS42_a02_s43
+  - id: eval_ppl_exp1_llama3.1_1b_A1BT50BS42_a04_s43
+    hide: true
+    run: bash train/eval/eval_pretrain_ppl.sh exp1_llama3.1-1b-A1BT50BS42-a04-s43 24999 distill
+  - id: eval_acc_sft_exp1_llama3.1_1b_A1BT50BS42_a04_s43
+    hide: true
+    run: bash train/eval/eval_sft_acc.sh sft_exp1_llama3.1-1b-A1BT50BS42-a04-s43 999
+    depends_on: sft_exp1_llama3.1_1b_A1BT50BS42_a04_s43
+  - id: eval_ppl_exp1_llama3.1_1b_A1BT50BS42_a05_s43
+    hide: true
+    run: bash train/eval/eval_pretrain_ppl.sh exp1_llama3.1-1b-A1BT50BS42-a05-s43 24999 distill
+  - id: eval_acc_sft_exp1_llama3.1_1b_A1BT50BS42_a05_s43
+    hide: true
+    run: bash train/eval/eval_sft_acc.sh sft_exp1_llama3.1-1b-A1BT50BS42-a05-s43 999
+    depends_on: sft_exp1_llama3.1_1b_A1BT50BS42_a05_s43
+  - id: eval_ppl_exp1_llama3.1_1b_A1BT50BS42_a06_s43
+    hide: true
+    run: bash train/eval/eval_pretrain_ppl.sh exp1_llama3.1-1b-A1BT50BS42-a06-s43 24999 distill
+  - id: eval_acc_sft_exp1_llama3.1_1b_A1BT50BS42_a06_s43
+    hide: true
+    run: bash train/eval/eval_sft_acc.sh sft_exp1_llama3.1-1b-A1BT50BS42-a06-s43 999
+    depends_on: sft_exp1_llama3.1_1b_A1BT50BS42_a06_s43
+  - id: eval_ppl_exp1_llama3.1_1b_A1BT50BS42_a08_s43
+    hide: true
+    run: bash train/eval/eval_pretrain_ppl.sh exp1_llama3.1-1b-A1BT50BS42-a08-s43 24999 distill
+  - id: eval_acc_sft_exp1_llama3.1_1b_A1BT50BS42_a08_s43
+    hide: true
+    run: bash train/eval/eval_sft_acc.sh sft_exp1_llama3.1-1b-A1BT50BS42-a08-s43 999
+    depends_on: sft_exp1_llama3.1_1b_A1BT50BS42_a08_s43
+  - id: eval_ppl_exp1_llama3.1_1b_A1BT50BS42_a1_s43
+    hide: true
+    run: bash train/eval/eval_pretrain_ppl.sh exp1_llama3.1-1b-A1BT50BS42-a1-s43 24999 distill
+  - id: eval_acc_sft_exp1_llama3.1_1b_A1BT50BS42_a1_s43
+    hide: true
+    run: bash train/eval/eval_sft_acc.sh sft_exp1_llama3.1-1b-A1BT50BS42-a1-s43 999
+    depends_on: sft_exp1_llama3.1_1b_A1BT50BS42_a1_s43
+  - id: eval_ppl_exp1_llama3.1_1b_A3BT50BS42_a02_s43
+    hide: true
+    run: bash train/eval/eval_pretrain_ppl.sh exp1_llama3.1-1b-A3BT50BS42-a02-s43 24999 distill
+    depends_on: exp1_llama1b_finewebedu_distill_soft_A3BT50BS42_a02_s43
+  - id: eval_acc_sft_exp1_llama3.1_1b_A3BT50BS42_a02_s43
+    hide: true
+    run: bash train/eval/eval_sft_acc.sh sft_exp1_llama3.1-1b-A3BT50BS42-a02-s43 999
+    depends_on: sft_exp1_llama3.1_1b_A3BT50BS42_a02_s43
+  - id: eval_ppl_exp1_llama3.1_1b_A3BT50BS42_a04_s43
+    hide: true
+    run: bash train/eval/eval_pretrain_ppl.sh exp1_llama3.1-1b-A3BT50BS42-a04-s43 24999 distill
+    depends_on: exp1_llama1b_finewebedu_distill_soft_A3BT50BS42_a04_s43
+  - id: eval_acc_sft_exp1_llama3.1_1b_A3BT50BS42_a04_s43
+    hide: true
+    run: bash train/eval/eval_sft_acc.sh sft_exp1_llama3.1-1b-A3BT50BS42-a04-s43 999
+    depends_on: sft_exp1_llama3.1_1b_A3BT50BS42_a04_s43
+  - id: eval_ppl_exp1_llama3.1_1b_A3BT50BS42_a05_s43
+    hide: true
+    run: bash train/eval/eval_pretrain_ppl.sh exp1_llama3.1-1b-A3BT50BS42-a05-s43 24999 distill
+    depends_on: exp1_llama1b_finewebedu_distill_soft_A3BT50BS42_a05_s43
+  - id: eval_acc_sft_exp1_llama3.1_1b_A3BT50BS42_a05_s43
+    hide: true
+    run: bash train/eval/eval_sft_acc.sh sft_exp1_llama3.1-1b-A3BT50BS42-a05-s43 999
+    depends_on: sft_exp1_llama3.1_1b_A3BT50BS42_a05_s43
+  - id: eval_ppl_exp1_llama3.1_1b_A3BT50BS42_a06_s43
+    hide: true
+    run: bash train/eval/eval_pretrain_ppl.sh exp1_llama3.1-1b-A3BT50BS42-a06-s43 24999 distill
+    depends_on: exp1_llama1b_finewebedu_distill_soft_A3BT50BS42_a06_s43
+  - id: eval_acc_sft_exp1_llama3.1_1b_A3BT50BS42_a06_s43
+    hide: true
+    run: bash train/eval/eval_sft_acc.sh sft_exp1_llama3.1-1b-A3BT50BS42-a06-s43 999
+    depends_on: sft_exp1_llama3.1_1b_A3BT50BS42_a06_s43
+  - id: eval_ppl_exp1_llama3.1_1b_A3BT50BS42_a08_s43
+    hide: true
+    run: bash train/eval/eval_pretrain_ppl.sh exp1_llama3.1-1b-A3BT50BS42-a08-s43 24999 distill
+    depends_on: exp1_llama1b_finewebedu_distill_soft_A3BT50BS42_a08_s43
+  - id: eval_acc_sft_exp1_llama3.1_1b_A3BT50BS42_a08_s43
+    hide: true
+    run: bash train/eval/eval_sft_acc.sh sft_exp1_llama3.1-1b-A3BT50BS42-a08-s43 999
+    depends_on: sft_exp1_llama3.1_1b_A3BT50BS42_a08_s43
+  - id: eval_ppl_exp1_llama3.1_1b_A3BT50BS42_a1_s43
+    hide: true
+    run: bash train/eval/eval_pretrain_ppl.sh exp1_llama3.1-1b-A3BT50BS42-a1-s43 24999 distill
+    depends_on: exp1_llama1b_finewebedu_distill_soft_A3BT50BS42_a1_s43
+  - id: eval_acc_sft_exp1_llama3.1_1b_A3BT50BS42_a1_s43
+    hide: true
+    run: bash train/eval/eval_sft_acc.sh sft_exp1_llama3.1-1b-A3BT50BS42-a1-s43 999
+    depends_on: sft_exp1_llama3.1_1b_A3BT50BS42_a1_s43
+  - id: eval_ppl_exp1_llama3.1_1b_A8BT50BS42_a02_s43
+    hide: true
+    run: bash train/eval/eval_pretrain_ppl.sh exp1_llama3.1-1b-A8BT50BS42-a02-s43 24999 distill
+    depends_on: exp1_llama1b_finewebedu_distill_soft_A8BT50BS42_a02_s43
+  - id: eval_acc_sft_exp1_llama3.1_1b_A8BT50BS42_a02_s43
+    hide: true
+    run: bash train/eval/eval_sft_acc.sh sft_exp1_llama3.1-1b-A8BT50BS42-a02-s43 999
+    depends_on: sft_exp1_llama3.1_1b_A8BT50BS42_a02_s43
+  - id: eval_ppl_exp1_llama3.1_1b_A8BT50BS42_a04_s43
+    hide: true
+    run: bash train/eval/eval_pretrain_ppl.sh exp1_llama3.1-1b-A8BT50BS42-a04-s43 24999 distill
+    depends_on: exp1_llama1b_finewebedu_distill_soft_A8BT50BS42_a04_s43
+  - id: eval_acc_sft_exp1_llama3.1_1b_A8BT50BS42_a04_s43
+    hide: true
+    run: bash train/eval/eval_sft_acc.sh sft_exp1_llama3.1-1b-A8BT50BS42-a04-s43 999
+    depends_on: sft_exp1_llama3.1_1b_A8BT50BS42_a04_s43
+  - id: eval_ppl_exp1_llama3.1_1b_A8BT50BS42_a05_s43
+    hide: true
+    run: bash train/eval/eval_pretrain_ppl.sh exp1_llama3.1-1b-A8BT50BS42-a05-s43 24999 distill
+    depends_on: exp1_llama1b_finewebedu_distill_soft_A8BT50BS42_a05_s43
+  - id: eval_acc_sft_exp1_llama3.1_1b_A8BT50BS42_a05_s43
+    hide: true
+    run: bash train/eval/eval_sft_acc.sh sft_exp1_llama3.1-1b-A8BT50BS42-a05-s43 999
+    depends_on: sft_exp1_llama3.1_1b_A8BT50BS42_a05_s43
+  - id: eval_ppl_exp1_llama3.1_1b_A8BT50BS42_a06_s43
+    hide: true
+    run: bash train/eval/eval_pretrain_ppl.sh exp1_llama3.1-1b-A8BT50BS42-a06-s43 24999 distill
+    depends_on: exp1_llama1b_finewebedu_distill_soft_A8BT50BS42_a06_s43
+  - id: eval_acc_sft_exp1_llama3.1_1b_A8BT50BS42_a06_s43
+    hide: true
+    run: bash train/eval/eval_sft_acc.sh sft_exp1_llama3.1-1b-A8BT50BS42-a06-s43 999
+    depends_on: sft_exp1_llama3.1_1b_A8BT50BS42_a06_s43
+  - id: eval_ppl_exp1_llama3.1_1b_A8BT50BS42_a08_s43
+    hide: true
+    run: bash train/eval/eval_pretrain_ppl.sh exp1_llama3.1-1b-A8BT50BS42-a08-s43 24999 distill
+    depends_on: exp1_llama1b_finewebedu_distill_soft_A8BT50BS42_a08_s43
+  - id: eval_acc_sft_exp1_llama3.1_1b_A8BT50BS42_a08_s43
+    hide: true
+    run: bash train/eval/eval_sft_acc.sh sft_exp1_llama3.1-1b-A8BT50BS42-a08-s43 999
+    depends_on: sft_exp1_llama3.1_1b_A8BT50BS42_a08_s43
+  - id: eval_ppl_exp1_llama3.1_1b_A8BT50BS42_a1_s43
+    hide: true
+    run: bash train/eval/eval_pretrain_ppl.sh exp1_llama3.1-1b-A8BT50BS42-a1-s43 24999 distill
+    depends_on: exp1_llama1b_finewebedu_distill_soft_A8BT50BS42_a1_s43
+  - id: eval_acc_sft_exp1_llama3.1_1b_A8BT50BS42_a1_s43
+    hide: true
+    run: bash train/eval/eval_sft_acc.sh sft_exp1_llama3.1-1b-A8BT50BS42-a1-s43 999
+    depends_on: sft_exp1_llama3.1_1b_A8BT50BS42_a1_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A05BT30BS42_a05_s43
+    hide: true
+    run: bash train/eval/eval_pretrain_ppl.sh exp2_llama3.1-1b-A05BT30BS42-a05-s43 24999 distill
+  - id: eval_acc_sft_exp2_llama3.1_1b_A05BT30BS42_a05_s43
+    hide: true
+    run: bash train/eval/eval_sft_acc.sh sft_exp2_llama3.1-1b-A05BT30BS42-a05-s43 999
+    depends_on: sft_exp2_llama3.1_1b_A05BT30BS42_a05_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A05BT30BS42_a1_s43
+    hide: true
+    run: bash train/eval/eval_pretrain_ppl.sh exp2_llama3.1-1b-A05BT30BS42-a1-s43 24999 distill
+  - id: eval_acc_sft_exp2_llama3.1_1b_A05BT30BS42_a1_s43
+    hide: true
+    run: bash train/eval/eval_sft_acc.sh sft_exp2_llama3.1-1b-A05BT30BS42-a1-s43 999
+    depends_on: sft_exp2_llama3.1_1b_A05BT30BS42_a1_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A05BT50BS42_a05_s43
+    hide: true
+    run: bash train/eval/eval_pretrain_ppl.sh exp2_llama3.1-1b-A05BT50BS42-a05-s43 24999 distill
+  - id: eval_acc_sft_exp2_llama3.1_1b_A05BT50BS42_a05_s43
+    hide: true
+    run: bash train/eval/eval_sft_acc.sh sft_exp2_llama3.1-1b-A05BT50BS42-a05-s43 999
+    depends_on: sft_exp2_llama3.1_1b_A05BT50BS42_a05_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A05BT50BS42_a1_s43
+    hide: true
+    run: bash train/eval/eval_pretrain_ppl.sh exp2_llama3.1-1b-A05BT50BS42-a1-s43 24999 distill
+  - id: eval_acc_sft_exp2_llama3.1_1b_A05BT50BS42_a1_s43
+    hide: true
+    run: bash train/eval/eval_sft_acc.sh sft_exp2_llama3.1-1b-A05BT50BS42-a1-s43 999
+    depends_on: sft_exp2_llama3.1_1b_A05BT50BS42_a1_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A05BT100BS42_a05_s43
+    hide: true
+    run: bash train/eval/eval_pretrain_ppl.sh exp2_llama3.1-1b-A05BT100BS42-a05-s43 24999 distill
+  - id: eval_acc_sft_exp2_llama3.1_1b_A05BT100BS42_a05_s43
+    hide: true
+    run: bash train/eval/eval_sft_acc.sh sft_exp2_llama3.1-1b-A05BT100BS42-a05-s43 999
+    depends_on: sft_exp2_llama3.1_1b_A05BT100BS42_a05_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A05BT100BS42_a1_s43
+    hide: true
+    run: bash train/eval/eval_pretrain_ppl.sh exp2_llama3.1-1b-A05BT100BS42-a1-s43 24999 distill
+  - id: eval_acc_sft_exp2_llama3.1_1b_A05BT100BS42_a1_s43
+    hide: true
+    run: bash train/eval/eval_sft_acc.sh sft_exp2_llama3.1-1b-A05BT100BS42-a1-s43 999
+    depends_on: sft_exp2_llama3.1_1b_A05BT100BS42_a1_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A1BT30BS42_a05_s43
+    hide: true
+    run: bash train/eval/eval_pretrain_ppl.sh exp2_llama3.1-1b-A1BT30BS42-a05-s43 24999 distill
+  - id: eval_acc_sft_exp2_llama3.1_1b_A1BT30BS42_a05_s43
+    hide: true
+    run: bash train/eval/eval_sft_acc.sh sft_exp2_llama3.1-1b-A1BT30BS42-a05-s43 999
+    depends_on: sft_exp2_llama3.1_1b_A1BT30BS42_a05_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A1BT30BS42_a1_s43
+    hide: true
+    run: bash train/eval/eval_pretrain_ppl.sh exp2_llama3.1-1b-A1BT30BS42-a1-s43 24999 distill
+  - id: eval_acc_sft_exp2_llama3.1_1b_A1BT30BS42_a1_s43
+    hide: true
+    run: bash train/eval/eval_sft_acc.sh sft_exp2_llama3.1-1b-A1BT30BS42-a1-s43 999
+    depends_on: sft_exp2_llama3.1_1b_A1BT30BS42_a1_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A1BT50BS42_a05_s43
+    hide: true
+    run: bash train/eval/eval_pretrain_ppl.sh exp2_llama3.1-1b-A1BT50BS42-a05-s43 24999 distill
+  - id: eval_acc_sft_exp2_llama3.1_1b_A1BT50BS42_a05_s43
+    hide: true
+    run: bash train/eval/eval_sft_acc.sh sft_exp2_llama3.1-1b-A1BT50BS42-a05-s43 999
+    depends_on: sft_exp2_llama3.1_1b_A1BT50BS42_a05_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A1BT50BS42_a1_s43
+    hide: true
+    run: bash train/eval/eval_pretrain_ppl.sh exp2_llama3.1-1b-A1BT50BS42-a1-s43 24999 distill
+  - id: eval_acc_sft_exp2_llama3.1_1b_A1BT50BS42_a1_s43
+    hide: true
+    run: bash train/eval/eval_sft_acc.sh sft_exp2_llama3.1-1b-A1BT50BS42-a1-s43 999
+    depends_on: sft_exp2_llama3.1_1b_A1BT50BS42_a1_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A1BT100BS42_a05_s43
+    hide: true
+    run: bash train/eval/eval_pretrain_ppl.sh exp2_llama3.1-1b-A1BT100BS42-a05-s43 24999 distill
+  - id: eval_acc_sft_exp2_llama3.1_1b_A1BT100BS42_a05_s43
+    hide: true
+    run: bash train/eval/eval_sft_acc.sh sft_exp2_llama3.1-1b-A1BT100BS42-a05-s43 999
+    depends_on: sft_exp2_llama3.1_1b_A1BT100BS42_a05_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A1BT100BS42_a1_s43
+    hide: true
+    run: bash train/eval/eval_pretrain_ppl.sh exp2_llama3.1-1b-A1BT100BS42-a1-s43 24999 distill
+  - id: eval_acc_sft_exp2_llama3.1_1b_A1BT100BS42_a1_s43
+    hide: true
+    run: bash train/eval/eval_sft_acc.sh sft_exp2_llama3.1-1b-A1BT100BS42-a1-s43 999
+    depends_on: sft_exp2_llama3.1_1b_A1BT100BS42_a1_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A3BT30BS42_a05_s43
+    hide: true
+    run: bash train/eval/eval_pretrain_ppl.sh exp2_llama3.1-1b-A3BT30BS42-a05-s43 24999 distill
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A3BT30BS42_a05_s43
+  - id: eval_acc_sft_exp2_llama3.1_1b_A3BT30BS42_a05_s43
+    hide: true
+    run: bash train/eval/eval_sft_acc.sh sft_exp2_llama3.1-1b-A3BT30BS42-a05-s43 999
+    depends_on: sft_exp2_llama3.1_1b_A3BT30BS42_a05_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A3BT30BS42_a1_s43
+    hide: true
+    run: bash train/eval/eval_pretrain_ppl.sh exp2_llama3.1-1b-A3BT30BS42-a1-s43 24999 distill
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A3BT30BS42_a1_s43
+  - id: eval_acc_sft_exp2_llama3.1_1b_A3BT30BS42_a1_s43
+    hide: true
+    run: bash train/eval/eval_sft_acc.sh sft_exp2_llama3.1-1b-A3BT30BS42-a1-s43 999
+    depends_on: sft_exp2_llama3.1_1b_A3BT30BS42_a1_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A3BT50BS42_a05_s43
+    hide: true
+    run: bash train/eval/eval_pretrain_ppl.sh exp2_llama3.1-1b-A3BT50BS42-a05-s43 24999 distill
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A3BT50BS42_a05_s43
+  - id: eval_acc_sft_exp2_llama3.1_1b_A3BT50BS42_a05_s43
+    hide: true
+    run: bash train/eval/eval_sft_acc.sh sft_exp2_llama3.1-1b-A3BT50BS42-a05-s43 999
+    depends_on: sft_exp2_llama3.1_1b_A3BT50BS42_a05_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A3BT50BS42_a1_s43
+    hide: true
+    run: bash train/eval/eval_pretrain_ppl.sh exp2_llama3.1-1b-A3BT50BS42-a1-s43 24999 distill
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A3BT50BS42_a1_s43
+  - id: eval_acc_sft_exp2_llama3.1_1b_A3BT50BS42_a1_s43
+    hide: true
+    run: bash train/eval/eval_sft_acc.sh sft_exp2_llama3.1-1b-A3BT50BS42-a1-s43 999
+    depends_on: sft_exp2_llama3.1_1b_A3BT50BS42_a1_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A3BT100BS42_a05_s43
+    hide: true
+    run: bash train/eval/eval_pretrain_ppl.sh exp2_llama3.1-1b-A3BT100BS42-a05-s43 24999 distill
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A3BT100BS42_a05_s43
+  - id: eval_acc_sft_exp2_llama3.1_1b_A3BT100BS42_a05_s43
+    hide: true
+    run: bash train/eval/eval_sft_acc.sh sft_exp2_llama3.1-1b-A3BT100BS42-a05-s43 999
+    depends_on: sft_exp2_llama3.1_1b_A3BT100BS42_a05_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A3BT100BS42_a1_s43
+    hide: true
+    run: bash train/eval/eval_pretrain_ppl.sh exp2_llama3.1-1b-A3BT100BS42-a1-s43 24999 distill
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A3BT100BS42_a1_s43
+  - id: eval_acc_sft_exp2_llama3.1_1b_A3BT100BS42_a1_s43
+    hide: true
+    run: bash train/eval/eval_sft_acc.sh sft_exp2_llama3.1-1b-A3BT100BS42-a1-s43 999
+    depends_on: sft_exp2_llama3.1_1b_A3BT100BS42_a1_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A8BT30BS42_a05_s43
+    hide: true
+    run: bash train/eval/eval_pretrain_ppl.sh exp2_llama3.1-1b-A8BT30BS42-a05-s43 24999 distill
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A8BT30BS42_a05_s43
+  - id: eval_acc_sft_exp2_llama3.1_1b_A8BT30BS42_a05_s43
+    hide: true
+    run: bash train/eval/eval_sft_acc.sh sft_exp2_llama3.1-1b-A8BT30BS42-a05-s43 999
+    depends_on: sft_exp2_llama3.1_1b_A8BT30BS42_a05_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A8BT30BS42_a1_s43
+    hide: true
+    run: bash train/eval/eval_pretrain_ppl.sh exp2_llama3.1-1b-A8BT30BS42-a1-s43 24999 distill
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A8BT30BS42_a1_s43
+  - id: eval_acc_sft_exp2_llama3.1_1b_A8BT30BS42_a1_s43
+    hide: true
+    run: bash train/eval/eval_sft_acc.sh sft_exp2_llama3.1-1b-A8BT30BS42-a1-s43 999
+    depends_on: sft_exp2_llama3.1_1b_A8BT30BS42_a1_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A8BT50BS42_a05_s43
+    hide: true
+    run: bash train/eval/eval_pretrain_ppl.sh exp2_llama3.1-1b-A8BT50BS42-a05-s43 24999 distill
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A8BT50BS42_a05_s43
+  - id: eval_acc_sft_exp2_llama3.1_1b_A8BT50BS42_a05_s43
+    hide: true
+    run: bash train/eval/eval_sft_acc.sh sft_exp2_llama3.1-1b-A8BT50BS42-a05-s43 999
+    depends_on: sft_exp2_llama3.1_1b_A8BT50BS42_a05_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A8BT50BS42_a1_s43
+    hide: true
+    run: bash train/eval/eval_pretrain_ppl.sh exp2_llama3.1-1b-A8BT50BS42-a1-s43 24999 distill
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A8BT50BS42_a1_s43
+  - id: eval_acc_sft_exp2_llama3.1_1b_A8BT50BS42_a1_s43
+    hide: true
+    run: bash train/eval/eval_sft_acc.sh sft_exp2_llama3.1-1b-A8BT50BS42-a1-s43 999
+    depends_on: sft_exp2_llama3.1_1b_A8BT50BS42_a1_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A8BT100BS42_a05_s43
+    hide: true
+    run: bash train/eval/eval_pretrain_ppl.sh exp2_llama3.1-1b-A8BT100BS42-a05-s43 24999 distill
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A8BT100BS42_a05_s43
+  - id: eval_acc_sft_exp2_llama3.1_1b_A8BT100BS42_a05_s43
+    hide: true
+    run: bash train/eval/eval_sft_acc.sh sft_exp2_llama3.1-1b-A8BT100BS42-a05-s43 999
+    depends_on: sft_exp2_llama3.1_1b_A8BT100BS42_a05_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A8BT100BS42_a1_s43
+    hide: true
+    run: bash train/eval/eval_pretrain_ppl.sh exp2_llama3.1-1b-A8BT100BS42-a1-s43 24999 distill
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A8BT100BS42_a1_s43
+  - id: eval_acc_sft_exp2_llama3.1_1b_A8BT100BS42_a1_s43
+    hide: true
+    run: bash train/eval/eval_sft_acc.sh sft_exp2_llama3.1-1b-A8BT100BS42-a1-s43 999
+    depends_on: sft_exp2_llama3.1_1b_A8BT100BS42_a1_s43
+  - id: eval_ppl_vanilla_llama3.1_1b_finewebedu_vanilla_s42_50b
+    hide: true
+    run: bash train/eval/eval_pretrain_ppl.sh llama3.1-1b-finewebedu-vanilla-s42-50b 24999 pretrain
+  - id: eval_acc_sft_vanilla_llama3.1_1b_finewebedu_vanilla_s42_50b
+    hide: true
+    run: bash train/eval/eval_sft_acc.sh sft_vanilla_llama3.1-1b-finewebedu-vanilla-s42-50b 999
+    depends_on: sft_vanilla_llama3.1_1b_finewebedu_vanilla_s42_50b
