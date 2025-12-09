@@ -628,10 +628,14 @@ def get_acc(
     return acc_res, full_res_by_task, acc_times
 
 def cast_orbax_state_to_bf16(orbax_state):
-    casted_params = jax.tree_util.tree_map(
-        lambda x: x.astype(jnp.bfloat16) if hasattr(x, "dtype") and x.dtype == jnp.float32 else x,
-        orbax_state.params
-    )
+    def cast_fn(x):
+        # Skip ShapeDtypeStruct and other non-array objects
+        if not hasattr(x, "astype"):
+            return x
+        if hasattr(x, "dtype") and x.dtype == jnp.float32:
+            return x.astype(jnp.bfloat16)
+        return x
+    casted_params = jax.tree_util.tree_map(cast_fn, orbax_state.params)
     orbax_state = orbax_state.replace(params=casted_params)
     return orbax_state
 
