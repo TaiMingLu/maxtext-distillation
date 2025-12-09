@@ -19,6 +19,8 @@ from dataclasses import dataclass
 from typing import Optional
 import time
 
+from tqdm import tqdm
+
 # Add MaxText to path
 maxtext_path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.insert(0, maxtext_path)
@@ -246,8 +248,10 @@ def record_training_data(
     recorded_sequences = 0
     start_time = time.time()
 
+    pbar = tqdm(range(num_steps), desc="Recording", unit="step")
+
     try:
-        for step in range(num_steps):
+        for step in pbar:
             batch = next(data_iter)
             batch_size = batch["inputs"].shape[0]
 
@@ -272,16 +276,11 @@ def record_training_data(
                     samples["samples"].append(sample_data)
                     recorded_sequences += 1
 
-            # Progress logging
-            if (step + 1) % 100 == 0:
-                elapsed = time.time() - start_time
-                rate = (step + 1) / elapsed
-                eta = (num_steps - step - 1) / rate if rate > 0 else 0
-                print(f"Step {step + 1}/{num_steps} | "
-                      f"Sequences: {total_sequences} | "
-                      f"Recorded: {recorded_sequences} | "
-                      f"Rate: {rate:.1f} steps/s | "
-                      f"ETA: {eta:.0f}s")
+            # Update progress bar
+            pbar.set_postfix({
+                "seqs": total_sequences,
+                "recorded": recorded_sequences,
+            })
 
             # Periodic save
             if (step + 1) % save_interval == 0:
@@ -289,10 +288,12 @@ def record_training_data(
                 with open(temp_file, 'wb') as f:
                     pickle.dump(samples, f)
                 os.rename(temp_file, output_file)
-                print(f"  -> Saved checkpoint at step {step + 1}")
+                tqdm.write(f"  -> Saved checkpoint at step {step + 1}")
 
     except StopIteration:
         print(f"Data exhausted at step {step}")
+
+    pbar.close()
 
     # Final save
     samples["metadata"] = {

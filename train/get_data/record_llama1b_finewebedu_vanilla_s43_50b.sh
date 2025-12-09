@@ -52,8 +52,8 @@ HOST_COUNT=${3:-1}
 
 # Sampling configuration
 SAMPLE_PROB=${SAMPLE_PROB:-0.001}  # 0.1% by default
-OUTPUT_DIR="${OUTPUT_DIR:-$SCRIPT_DIR/output}"
-OUTPUT_FILE="$OUTPUT_DIR/train_data_samples_host${HOST_INDEX}.pkl"
+OUTPUT_DIR="${OUTPUT_DIR:-/home/terry/gcs-bucket/datasets/train_tokens}"
+OUTPUT_FILE="$OUTPUT_DIR/llama1b_finewebedu_vanilla_s43_50b_host${HOST_INDEX}.pkl"
 
 # Create output directory
 mkdir -p "$OUTPUT_DIR"
