@@ -120,12 +120,17 @@ echo "TOKENIZER_PATH: $TOKENIZER_PATH"
 echo "start time: $(date)"
 echo "========================"
 
+wandb login --relogin 01126ae90da25bae0d86704140ac978cb9fd9c73
+
 python -u multihost_runner_orig.py \\
     --TPU_PREFIX=$TPU_PREFIX \\
     --INTERNAL_IP=true \\
     --COMMAND="
     export TPU_LOG_DIR=/home/terry/tpu_logs
     source ~/maxtext_env/bin/activate
+    export WANDB_API_KEY='01126ae90da25bae0d86704140ac978cb9fd9c73'
+    export WANDB_PROJECT=maxtext_sft
+    export WANDB_NAME=${{RUN_NAME}}
     python3.10 -u -m MaxText.sft_trainer MaxText/configs/sft.yml \\
         run_name=${{RUN_NAME}} \\
         base_output_directory=${{BASE_OUTPUT_DIRECTORY}} \\
@@ -147,6 +152,7 @@ python -u multihost_runner_orig.py \\
         sft_train_on_completion_only=true \\
         packing=true \\
         dataset_type=hf \\
+        hf_streaming=False \\
         hf_path=${{HF_PATH}} \\
         train_split=${{TRAIN_SPLIT}} \\
         hf_eval_split=${{EVAL_SPLIT}} \\
@@ -155,7 +161,10 @@ python -u multihost_runner_orig.py \\
         eval_interval=-1 \\
         enable_data_shuffling=true \\
         data_shuffle_seed=43 \\
-        gcs_metrics=True
+        gcs_metrics=True \\
+        use_wandb=True \\
+        wandb_project=maxtext_sft \\
+        wandb_run_name=${{RUN_NAME}}
     "
 '''
 
@@ -238,12 +247,17 @@ echo "TOKENIZER_PATH: $TOKENIZER_PATH"
 echo "start time: $(date)"
 echo "========================"
 
+wandb login --relogin 01126ae90da25bae0d86704140ac978cb9fd9c73
+
 python -u multihost_runner_orig.py \\
     --TPU_PREFIX=$TPU_PREFIX \\
     --INTERNAL_IP=true \\
     --COMMAND="
     export TPU_LOG_DIR=/home/terry/tpu_logs
     source ~/maxtext_env/bin/activate
+    export WANDB_API_KEY='01126ae90da25bae0d86704140ac978cb9fd9c73'
+    export WANDB_PROJECT=maxtext_sft
+    export WANDB_NAME=${{RUN_NAME}}
     python3.10 -u -m MaxText.sft_trainer MaxText/configs/sft.yml \\
         run_name=${{RUN_NAME}} \\
         base_output_directory=${{BASE_OUTPUT_DIRECTORY}} \\
@@ -265,6 +279,7 @@ python -u multihost_runner_orig.py \\
         sft_train_on_completion_only=true \\
         packing=true \\
         dataset_type=hf \\
+        hf_streaming=False \\
         hf_path=${{HF_PATH}} \\
         train_split=${{TRAIN_SPLIT}} \\
         hf_eval_split=${{EVAL_SPLIT}} \\
@@ -273,7 +288,10 @@ python -u multihost_runner_orig.py \\
         eval_interval=-1 \\
         enable_data_shuffling=true \\
         data_shuffle_seed=43 \\
-        gcs_metrics=True
+        gcs_metrics=True \\
+        use_wandb=True \\
+        wandb_project=maxtext_sft \\
+        wandb_run_name=${{RUN_NAME}}
     "
 '''
 
