@@ -184,7 +184,8 @@ PPL_TASKS = [
     "wikitext",
     # "wikitext2",
     "cnn_dailymail",
-    "finewebedu-test-100M",
+    # "finewebedu-test-100M",
+    "finewebedu-train-0.001",
     # "dclm",
     "dm_mathematics",
     "gsm8k",
@@ -369,6 +370,14 @@ def get_ppl_enc(task, tokenizer, add_special_tokens: bool = True):
         dataset = load_dataset(
             "TaiMingLu/finewebedu-test-100M",
             split="test",
+            trust_remote_code=True
+        )
+        text_column = "text"
+        testenc = tokenizer.encode(" ".join(dataset[:32768][text_column]), return_tensors='pt', add_special_tokens=add_special_tokens)
+    elif task == 'finewebedu-train-0.001':
+        dataset = load_dataset(
+            "TaiMingLu/finewebedu-train-0.001",
+            split="train",
             trust_remote_code=True
         )
         text_column = "text"

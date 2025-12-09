@@ -35,7 +35,7 @@ export KD_TEMPERATURE=1.0
 export KD_TEACHER_PARAMETERS_PATH="/home/terry/gcs-bucket/ckpts/pretrain_param_only_v6/llama05b-vanilla-50B-s42/checkpoint_24999/0/items"
 export TEACHER_MODEL_NAME="llama3.1-05b"
 export BASE_OUTPUT_DIRECTORY="gs://$BUCKET_NAME/ckpts/distill_pretrain"
-export DATA_FILES='/home/terry/gcs-bucket/datasets/fineweb-edu/*.array_record'
+export DATA_FILES='/mnt/ramdisk/datasets/fineweb-edu/*.array_record'
 
 export RUN_NAME="exp1_llama3.1-1b-A05BT50BS42-a02-s43"
 export RUN_ID="exp1_llama1b_finewebedu_distill_soft_A05BT50BS42_a02_s43"
