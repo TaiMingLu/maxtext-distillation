@@ -204,11 +204,15 @@ def apply_chat_template(example, tokenizer_model, data_column_name):
         completion_in_chat_template = tokenizer_model.decode(completion_tokens, skip_special_tokens=False)
         messages.append(completion_in_chat_template)
         is_prompt.append(False)
-  except ValueError as e:
-    max_logging.log(f"Unable to apply chat template: {e}")
-    raise e
+  except Exception as e:
+    # Mark as invalid - will be filtered out later
+    example["is_prompt"] = []
+    example[data_column_name] = []
+    example["_invalid"] = True
+    return example
   example["is_prompt"] = is_prompt
   example[data_column_name] = messages
+  example["_invalid"] = False
   return example
 
 

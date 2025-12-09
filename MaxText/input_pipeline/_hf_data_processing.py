@@ -219,6 +219,9 @@ def preprocessing_pipeline(
         fn_kwargs={"tokenizer_model": tokenizer, "data_column_name": data_column_names[0]},
         num_proc=num_proc,
     )
+    # Filter out examples that failed chat template processing
+    dataset = dataset.filter(lambda x: not x.get("_invalid", False), num_proc=num_proc)
+    dataset = dataset.remove_columns(["_invalid"])
   else:
     dataset = dataset.select_columns(data_column_names)
 
