@@ -134,13 +134,34 @@ def is_conversational(features, data_columns):
 
 
 def has_valid_messages(example, data_column_name):
-  """Check if all messages have non-None content."""
+  """Check if messages are valid for SFT chat template processing.
+
+  Requirements:
+  - Non-empty messages list
+  - All messages have non-None, non-empty content and role
+  - Proper user->assistant alternation (assistant must follow user)
+  """
   messages = example.get(data_column_name, [])
   if not messages:
     return False
+
+  last_role = None
   for msg in messages:
-    if msg.get("content") is None or msg.get("role") is None:
+    content = msg.get("content")
+    role = msg.get("role")
+
+    # Check for None or empty content/role
+    if content is None or role is None:
       return False
+    if not isinstance(content, str) or not content.strip():
+      return False
+
+    # Assistant message must follow a user message
+    if role == "assistant" and last_role != "user":
+      return False
+
+    last_role = role
+
   return True
 
 
