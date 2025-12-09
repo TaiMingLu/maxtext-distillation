@@ -232,7 +232,7 @@ ACC_TASKS = [
         "name": "mmlu",
         "num_fewshot": 0,
         "acc_key": "acc,none",
-        "acc_seq_length": 4096,
+        "acc_seq_length": 1024,
         "acc_batch_size": 4,
     },
     {
@@ -245,14 +245,14 @@ ACC_TASKS = [
         "name": "gsm8k",
         "num_fewshot": 0,
         "acc_key": "exact_match,strict-match",
-        "acc_seq_length": 4096,
+        "acc_seq_length": 1024,
         "acc_batch_size": 4,
     },
     {
         "name": "minerva_math",
         "num_fewshot": 0,
         "acc_key": "exact_match,none",
-        "acc_seq_length": 4096,
+        "acc_seq_length": 1024,
         "acc_batch_size": 4,
     },
     # Truthfulness
@@ -287,14 +287,14 @@ ACC_TASKS = [
         "name": "humaneval",
         "num_fewshot": 0,
         "acc_key": "pass@1,none",
-        "acc_seq_length": 4096,
+        "acc_seq_length": 1024,
         "acc_batch_size": 4,
     },
     {
         "name": "mbpp",
         "num_fewshot": 0,
         "acc_key": "pass@1,none",
-        "acc_seq_length": 4096,
+        "acc_seq_length": 1024,
         "acc_batch_size": 4,
     },
 ]
@@ -664,7 +664,27 @@ def main(config, test_args):
     quant = quantizations.configure_quantization(config)
     orbax_model = models.Transformer(config, mesh, quant=quant)
     orbax_state, _ = maxtext_utils.setup_decode_state(orbax_model, config, rng1, mesh, None)
-    
+
+    # Debug: Check if params are actual arrays or abstract shapes
+    def check_params_type(params, prefix=""):
+        sample_leaf = jax.tree_util.tree_leaves(params)[0] if jax.tree_util.tree_leaves(params) else None
+        if sample_leaf is not None:
+            print(f"[DEBUG] {prefix}First param leaf type: {type(sample_leaf)}, shape: {getattr(sample_leaf, 'shape', 'N/A')}")
+            if hasattr(sample_leaf, 'sharding'):
+                print(f"[DEBUG] {prefix}Has sharding (likely ShapeDtypeStruct or abstract): {sample_leaf.sharding}")
+            if not hasattr(sample_leaf, 'astype'):
+                print(f"[DEBUG] {prefix}WARNING: Params appear to be abstract (ShapeDtypeStruct), not actual arrays!")
+                return False
+        return True
+
+    params_ok = check_params_type(orbax_state.params, "orbax_state.params: ")
+    if not params_ok:
+        raise RuntimeError(
+            "Checkpoint loading failed: params are ShapeDtypeStruct instead of actual arrays. "
+            "This usually means the checkpoint path is incorrect or the checkpoint structure doesn't match. "
+            f"Checkpoint path: {config.load_parameters_path}"
+        )
+
     orbax_state = cast_orbax_state_to_bf16(orbax_state)
     print_device_memory("after model init")
     

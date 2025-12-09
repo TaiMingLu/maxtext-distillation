@@ -147,7 +147,15 @@ class OrbaxLM(LM):
             raise ValueError("A max sequence length is required for OrbaxLM loglikelihood evaluation")
         self.eval_seq_len = int(max_seq)
 
+        # Store tokenizer name for chat template support
+        self._tokenizer_name = getattr(tokenizer, "name_or_path", None) or "unknown"
+
         self._compiled_forward = self._create_fast_forward()
+
+    @property
+    def tokenizer_name(self) -> str:
+        """Return tokenizer name for chat template support."""
+        return self._tokenizer_name
 
     def _create_fast_forward(self):
         @partial(pjit,
