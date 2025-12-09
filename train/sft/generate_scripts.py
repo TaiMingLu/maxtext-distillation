@@ -153,6 +153,7 @@ python -u multihost_runner_orig.py \\
         packing=true \\
         dataset_type=hf \\
         hf_streaming=False \\
+        hf_num_proc=64 \\
         hf_path=${{HF_PATH}} \\
         train_split=${{TRAIN_SPLIT}} \\
         hf_eval_split=${{EVAL_SPLIT}} \\
@@ -164,7 +165,8 @@ python -u multihost_runner_orig.py \\
         gcs_metrics=True \\
         use_wandb=True \\
         wandb_project=maxtext_sft \\
-        wandb_run_name=${{RUN_NAME}}
+        wandb_run_name=${{RUN_NAME}} \\
+        wandb_run_id=${{RUN_ID}}
     "
 '''
 
@@ -280,6 +282,7 @@ python -u multihost_runner_orig.py \\
         packing=true \\
         dataset_type=hf \\
         hf_streaming=False \\
+        hf_num_proc=64 \\
         hf_path=${{HF_PATH}} \\
         train_split=${{TRAIN_SPLIT}} \\
         hf_eval_split=${{EVAL_SPLIT}} \\
@@ -291,7 +294,8 @@ python -u multihost_runner_orig.py \\
         gcs_metrics=True \\
         use_wandb=True \\
         wandb_project=maxtext_sft \\
-        wandb_run_name=${{RUN_NAME}}
+        wandb_run_name=${{RUN_NAME}} \\
+        wandb_run_id=${{RUN_ID}}
     "
 '''
 

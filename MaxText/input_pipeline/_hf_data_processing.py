@@ -166,6 +166,7 @@ def preprocessing_pipeline(
     use_sft=None,
     sft_train_on_completion_only=True,
     grain_worker_count=1,  # only support 0 or 1
+    num_proc=1,  # Number of processes for map operations (non-streaming only)
 ):
   """pipeline for preprocessing HF dataset"""
 
@@ -203,12 +204,14 @@ def preprocessing_pipeline(
           fn_kwargs={"columns": data_column_names, "data_column": combined_column_name},
           remove_columns=data_column_names,
           features=dataset_features,
+          num_proc=num_proc,
       )
 
     data_column_names = list(dataset.features.keys())
     dataset = dataset.map(
         _input_pipeline_utils.apply_chat_template,
         fn_kwargs={"tokenizer_model": tokenizer, "data_column_name": data_column_names[0]},
+        num_proc=num_proc,
     )
   else:
     dataset = dataset.select_columns(data_column_names)
@@ -230,6 +233,7 @@ def preprocessing_pipeline(
             "max_length": max_target_length,
             "column_names": data_column_names,
         },
+        num_proc=num_proc,
     )
 
   dataset = _input_pipeline_utils.HFDataSource(
@@ -354,6 +358,7 @@ def make_hf_train_iterator(
         use_dpo=config.use_dpo,
         use_sft=config.use_sft,
         sft_train_on_completion_only=config.sft_train_on_completion_only,
+        num_proc=config.hf_num_proc,
     )
   return train_iter
 
@@ -406,5 +411,6 @@ def make_hf_eval_iterator(
         use_dpo=config.use_dpo,
         use_sft=config.use_sft,
         sft_train_on_completion_only=config.sft_train_on_completion_only,
+        num_proc=config.hf_num_proc,
     )
   return eval_iter
