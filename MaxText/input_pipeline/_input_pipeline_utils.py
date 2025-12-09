@@ -133,6 +133,17 @@ def is_conversational(features, data_columns):
   return False
 
 
+def has_valid_messages(example, data_column_name):
+  """Check if all messages have non-None content."""
+  messages = example.get(data_column_name, [])
+  if not messages:
+    return False
+  for msg in messages:
+    if msg.get("content") is None or msg.get("role") is None:
+      return False
+  return True
+
+
 def apply_chat_template(example, tokenizer_model, data_column_name):
   """Formats conversational data by applying the tokenizer's chat template
   and identifying prompt/completion segments.

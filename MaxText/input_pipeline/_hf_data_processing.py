@@ -208,6 +208,12 @@ def preprocessing_pipeline(
       )
 
     data_column_names = list(dataset.features.keys())
+    # Filter out examples with None content in messages
+    dataset = dataset.filter(
+        _input_pipeline_utils.has_valid_messages,
+        fn_kwargs={"data_column_name": data_column_names[0]},
+        num_proc=num_proc,
+    )
     dataset = dataset.map(
         _input_pipeline_utils.apply_chat_template,
         fn_kwargs={"tokenizer_model": tokenizer, "data_column_name": data_column_names[0]},
