@@ -479,6 +479,7 @@ hf_train_files: ''
 hf_eval_split: ''
 hf_eval_files: ''
 hf_access_token: ''
+hf_streaming: True  # Set to False to load full dataset into memory (enables true shuffle)
 # for Grain input pipeline (dataset_type=grain)
 # Path to grain data files. Can be a single pattern or multiple patterns with weights.
 # For multiple patterns, use semicolon (;) to separate and colon (:) to specify weights.

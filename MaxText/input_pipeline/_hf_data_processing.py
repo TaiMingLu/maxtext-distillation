@@ -319,7 +319,7 @@ def make_hf_train_iterator(
       data_dir=config.hf_data_dir,
       data_files=config.hf_train_files,
       split=config.train_split,
-      streaming=True,
+      streaming=config.hf_streaming,
       token=config.hf_access_token,
   )
   if config.use_sft and config.use_multimodal:
@@ -369,7 +369,7 @@ def make_hf_eval_iterator(
       data_dir=config.hf_data_dir,
       data_files=config.hf_eval_files,
       split=config.hf_eval_split,
-      streaming=True,
+      streaming=config.hf_streaming,
       token=config.hf_access_token,
   )
 
