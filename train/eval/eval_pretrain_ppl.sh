@@ -115,6 +115,7 @@ if [[ "${TPU_SIZE}" -le 8 ]]; then
       load_parameters_path=${CHECKPOINT_PATH} \
       run_name=${RUN_NAME}_step${CHECKPOINT_STEP} \
       model_name=${MODEL_NAME} \
+      max_target_length=4096 \
       dtype=bfloat16 \
       scan_layers=false \
       attention=dot_product \
@@ -140,6 +141,7 @@ python3.10 -u scripts/test_orbax_eval.py ../MaxText/configs/base.yml \
     load_parameters_path=${CHECKPOINT_PATH} \
     run_name=${RUN_NAME}_step${CHECKPOINT_STEP} \
     model_name=${MODEL_NAME} \
+    max_target_length=4096 \
     dtype=bfloat16 \
     scan_layers=false \
     attention=dot_product \
