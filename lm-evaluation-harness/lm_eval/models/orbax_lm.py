@@ -172,10 +172,13 @@ class OrbaxLM(LM):
 
     def apply_chat_template(self, chat_history: list[dict[str, str]], add_generation_prompt=True) -> str:
         """Delegate to tokenizer's chat template."""
+        # Remove system messages - SFT training didn't include them
+        chat_history = [msg for msg in chat_history if msg["role"] != "system"]
         return self.tokenizer.apply_chat_template(
             chat_history,
             tokenize=False,
             add_generation_prompt=add_generation_prompt,
+            continue_final_message=not add_generation_prompt,
         )
 
     def _create_fast_forward(self):
@@ -277,10 +280,13 @@ class OrbaxLM(LM):
         # Debug: print first few requests to understand the format
         debug_count = 0
         for context, continuation in [req.args for req in requests]:
-            if debug_count < 3:
+            if debug_count < 2:
                 print(f"\n[DEBUG loglikelihood] Request {debug_count}:")
-                print(f"  Context (len={len(context)}): {context[:200]}...")
-                print(f"  Continuation: {continuation}")
+                print(f"  Context (len={len(context)}):")
+                print(f"  ---BEGIN CONTEXT---")
+                print(context)
+                print(f"  ---END CONTEXT---")
+                print(f"  Continuation: '{continuation}'")
                 debug_count += 1
             if context == "":
                 # BOS or EOS as context

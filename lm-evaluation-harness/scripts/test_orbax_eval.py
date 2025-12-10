@@ -204,13 +204,13 @@ PPL_TASKS = [
 
 ACC_TASKS = [
     # Commonsense reasoning
-    {
-        "name": "hellaswag",  # uses validation split by default
-        "num_fewshot": 0,
-        "acc_key": "acc_norm,none",
-        "acc_seq_length": 256,
-        "acc_batch_size": 64,
-    },
+    # {
+    #     "name": "hellaswag",  # uses validation split by default
+    #     "num_fewshot": 0,
+    #     "acc_key": "acc_norm,none",
+    #     "acc_seq_length": 256,
+    #     "acc_batch_size": 64,
+    # },
     {
         "name": "winogrande",
         "num_fewshot": 0,
