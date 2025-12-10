@@ -213,10 +213,10 @@ ACC_TASKS = [
     },
     {
         "name": "winogrande",
-        "num_fewshot": 0,
+        "num_fewshot": 5,
         "acc_key": "acc,none",
-        "acc_seq_length": 256,
-        "acc_batch_size": 64,
+        "acc_seq_length": 1024,
+        "acc_batch_size": 16,
     },
     {
         "name": "arc_easy",
@@ -234,10 +234,10 @@ ACC_TASKS = [
     },
     {
         "name": "boolq",
-        "num_fewshot": 0,
+        "num_fewshot": 5,
         "acc_key": "acc,none",
-        "acc_seq_length": 2048,
-        "acc_batch_size": 8,
+        "acc_seq_length": 8192,
+        "acc_batch_size": 2,
     },
     {
         "name": "sciq",
@@ -249,34 +249,34 @@ ACC_TASKS = [
     # Knowledge & QA
     {
         "name": "mmlu",
-        "num_fewshot": 0,
+        "num_fewshot": 5,
         "acc_key": "acc,none",
-        "acc_seq_length": 2048,
-        "acc_batch_size": 8,
+        "acc_seq_length": 8192,
+        "acc_batch_size": 2,
     },
     # Math - multiple choice (uses loglikelihood)
     {
         "name": "mathqa",
-        "num_fewshot": 0,
+        "num_fewshot": 5,
         "acc_key": "acc,none",
-        "acc_seq_length": 512,
-        "acc_batch_size": 32,
+        "acc_seq_length": 2048,
+        "acc_batch_size": 8,
     },
     # Truthfulness - uses loglikelihood (multiple choice)
     {
         "name": "truthfulqa_mc1",
-        "num_fewshot": 0,
+        "num_fewshot": 5,
         "acc_key": "acc,none",
-        "acc_seq_length": 256,
-        "acc_batch_size": 64,
+        "acc_seq_length": 1024,
+        "acc_batch_size": 16,
     },
     # NLI - uses loglikelihood
     {
         "name": "rte",
-        "num_fewshot": 0,
+        "num_fewshot": 5,
         "acc_key": "acc,none",
-        "acc_seq_length": 1024,
-        "acc_batch_size": 16,
+        "acc_seq_length": 4096,
+        "acc_batch_size": 4,
     },
 ]
     # NOTE: Tasks below require generate_until (text generation), which is not implemented
