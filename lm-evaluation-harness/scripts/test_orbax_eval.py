@@ -1,7 +1,10 @@
 # import hydra
-# requirements: 
-# pip install sacrebleu accelerate peft 
+# requirements:
+# pip install sacrebleu accelerate peft
 import os
+
+# Set trust_remote_code for HuggingFace datasets (required by some tasks like mathqa)
+os.environ["HF_DATASETS_TRUST_REMOTE_CODE"] = "true"
 import json
 import shutil
 import tempfile
@@ -694,7 +697,6 @@ def get_acc(
             confirm_run_unsafe_code=True,
             limit=eval_limit,
             apply_chat_template=True,
-            trust_remote_code=True,
         )
         
         task_metrics = res['results'][task]
