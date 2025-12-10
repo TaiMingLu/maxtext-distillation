@@ -202,42 +202,42 @@ ACC_TASKS = [
         "num_fewshot": 0,
         "acc_key": "acc_norm,none",
         "acc_seq_length": 256,
-        "acc_batch_size": 128,
+        "acc_batch_size": 64,
     },
     {
         "name": "winogrande",
         "num_fewshot": 0,
         "acc_key": "acc,none",
         "acc_seq_length": 256,
-        "acc_batch_size": 128,
+        "acc_batch_size": 64,
     },
     {
         "name": "arc_easy",
         "num_fewshot": 0,
         "acc_key": "acc_norm,none",
         "acc_seq_length": 256,
-        "acc_batch_size": 128,
+        "acc_batch_size": 64,
     },
     {
         "name": "piqa",
         "num_fewshot": 0,
         "acc_key": "acc_norm,none",
         "acc_seq_length": 256,
-        "acc_batch_size": 128,
+        "acc_batch_size": 64,
     },
     {
         "name": "boolq",
         "num_fewshot": 0,
         "acc_key": "acc,none",
         "acc_seq_length": 256,
-        "acc_batch_size": 128,
+        "acc_batch_size": 64,
     },
     {
         "name": "sciq",
         "num_fewshot": 0,
         "acc_key": "acc,none",
         "acc_seq_length": 256,
-        "acc_batch_size": 128,
+        "acc_batch_size": 64,
     },
     # Knowledge & QA
     {
@@ -245,14 +245,14 @@ ACC_TASKS = [
         "num_fewshot": 0,
         "acc_key": "acc,none",
         "acc_seq_length": 512,
-        "acc_batch_size": 64,
+        "acc_batch_size": 32,
     },
     {
         "name": "naturalqs_open",  # lm-eval uses naturalqs_open for open-domain QA
         "num_fewshot": 0,
         "acc_key": "exact_match,none",
         "acc_seq_length": 256,
-        "acc_batch_size": 128,
+        "acc_batch_size": 64,
     },
     # Math
     {
@@ -260,14 +260,14 @@ ACC_TASKS = [
         "num_fewshot": 0,
         "acc_key": "exact_match,strict-match",
         "acc_seq_length": 512,
-        "acc_batch_size": 64,
+        "acc_batch_size": 32,
     },
     {
         "name": "minerva_math",
         "num_fewshot": 0,
         "acc_key": "exact_match,none",
         "acc_seq_length": 256,
-        "acc_batch_size": 128,
+        "acc_batch_size": 64,
     },
     # Truthfulness
     {
@@ -275,7 +275,7 @@ ACC_TASKS = [
         "num_fewshot": 0,
         "acc_key": "acc,none",
         "acc_seq_length": 256,
-        "acc_batch_size": 128,
+        "acc_batch_size": 64,
     },
     # NLI
     {
@@ -283,28 +283,28 @@ ACC_TASKS = [
         "num_fewshot": 0,
         "acc_key": "acc,none",
         "acc_seq_length": 256,
-        "acc_batch_size": 128,
+        "acc_batch_size": 64,
     },
     {
         "name": "anli_r1",
         "num_fewshot": 0,
         "acc_key": "acc,none",     
         "acc_seq_length": 256,
-        "acc_batch_size": 128,
+        "acc_batch_size": 64,
     },
     {
         "name": "anli_r2",
         "num_fewshot": 0,
         "acc_key": "acc,none",
         "acc_seq_length": 256,
-        "acc_batch_size": 128,
+        "acc_batch_size": 64,
     },
     {
         "name": "anli_r3",
         "num_fewshot": 0,
         "acc_key": "acc,none",
         "acc_seq_length": 256,
-        "acc_batch_size": 128,
+        "acc_batch_size": 64,
     },
     # Code
     {
@@ -312,14 +312,14 @@ ACC_TASKS = [
         "num_fewshot": 0,
         "acc_key": "pass@1,none",
         "acc_seq_length": 512,
-        "acc_batch_size": 64,
+        "acc_batch_size": 32,
     },
     {
         "name": "mbpp",
         "num_fewshot": 0,
         "acc_key": "pass@1,none",
         "acc_seq_length": 512,
-        "acc_batch_size": 64,
+        "acc_batch_size": 32,
     },
 ]
 
