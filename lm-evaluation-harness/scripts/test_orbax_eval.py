@@ -180,24 +180,24 @@ def copy_file_with_retries(src: Path, dst: Path, retries: int = 3, delay_s: floa
         raise last_err
 
 PPL_TASKS = [
-    "c4",
-    "wikitext",
-    # "wikitext2",
-    "cnn_dailymail",
-    # "finewebedu-test-100M",
-    "finewebedu-train-0.001",
-    # "dclm",
-    "dm_mathematics",
-    "gsm8k",
-    "arxiv",
-    # "arxiv_full",  # nick007x/arxiv-papers - huge dataset, use streaming
-    "humaneval",
-    "pg19",
+    # "c4",
+    # "wikitext",
+    # "cnn_dailymail",
+    # "finewebedu-train-0.001",
+    # "dm_mathematics",
+    # "gsm8k",
+    # "arxiv",
+    # "humaneval",
+    # "pg19",
     "codesearchnet",
     "pubmed_qa",
     "echr",
     "xquad",
 ]
+    # "wikitext2",
+    # "finewebedu-test-100M",
+    # "dclm",
+    # "arxiv_full",  # nick007x/arxiv-papers - huge dataset, use streaming
 
 ACC_TASKS = [
     # Commonsense reasoning
