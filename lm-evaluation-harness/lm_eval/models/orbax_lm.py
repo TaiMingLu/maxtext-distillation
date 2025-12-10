@@ -157,9 +157,24 @@ class OrbaxLM(LM):
         """Return tokenizer name for chat template support."""
         return self._tokenizer_name
 
+    def apply_chat_template(self, chat_history: list[dict[str, str]], add_generation_prompt=True) -> str:
+        """Delegate to tokenizer's chat template."""
+        return self.tokenizer.apply_chat_template(
+            chat_history,
+            tokenize=False,
+            add_generation_prompt=add_generation_prompt,
+        )
+
     def _create_fast_forward(self):
+        # Extract shardings from abstract state (ShapeDtypeStruct has .sharding attribute)
+        def extract_sharding(x):
+            if hasattr(x, 'sharding'):
+                return x.sharding
+            return None
+        params_shardings = jax.tree_util.tree_map(extract_sharding, self.state_mesh_shardings.params)
+
         @partial(pjit,
-                 in_shardings=(self.state_mesh_shardings.params, None, None, None),
+                 in_shardings=(params_shardings, None, None, None),
                  out_shardings=None)
         def fast_forward(params, input_ids, positions, segment_ids):
             return self.model.apply(
