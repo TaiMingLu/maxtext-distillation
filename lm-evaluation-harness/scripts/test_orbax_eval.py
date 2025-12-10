@@ -193,37 +193,41 @@ PPL_TASKS = [
     # "arxiv_full",  # nick007x/arxiv-papers - huge dataset, use streaming
     "humaneval",
     "pg19",
+    "codesearchnet",
+    "pubmed_qa",
+    "echr",
+    "xquad",
 ]
 
 ACC_TASKS = [
     # Commonsense reasoning
-    {
-        "name": "hellaswag",  # uses validation split by default
-        "num_fewshot": 0,
-        "acc_key": "acc_norm,none",
-        "acc_seq_length": 256,
-        "acc_batch_size": 64,
-    },
-    {
-        "name": "winogrande",
-        "num_fewshot": 0,
-        "acc_key": "acc,none",
-        "acc_seq_length": 256,
-        "acc_batch_size": 64,
-    },
-    {
-        "name": "arc_easy",
-        "num_fewshot": 0,
-        "acc_key": "acc_norm,none",
-        "acc_seq_length": 256,
-        "acc_batch_size": 64,
-    },
+    # {
+    #     "name": "hellaswag",  # uses validation split by default
+    #     "num_fewshot": 0,
+    #     "acc_key": "acc_norm,none",
+    #     "acc_seq_length": 256,
+    #     "acc_batch_size": 64,
+    # },
+    # {
+    #     "name": "winogrande",
+    #     "num_fewshot": 0,
+    #     "acc_key": "acc,none",
+    #     "acc_seq_length": 256,
+    #     "acc_batch_size": 64,
+    # },
+    # {
+    #     "name": "arc_easy",
+    #     "num_fewshot": 0,
+    #     "acc_key": "acc_norm,none",
+    #     "acc_seq_length": 256,
+    #     "acc_batch_size": 64,
+    # },
     {
         "name": "piqa",
         "num_fewshot": 0,
         "acc_key": "acc_norm,none",
-        "acc_seq_length": 256,
-        "acc_batch_size": 64,
+        "acc_seq_length": 512,
+        "acc_batch_size": 32,
     },
     {
         "name": "boolq",
@@ -414,7 +418,7 @@ def get_ppl_enc(task, tokenizer, add_special_tokens: bool = True):
             trust_remote_code=True
         )
         text_column = "text"
-        testenc = tokenizer.encode(" ".join(dataset[:16384][text_column]), return_tensors='pt', add_special_tokens=add_special_tokens)
+        testenc = tokenizer.encode(" ".join(dataset[:100000][text_column]), return_tensors='pt', add_special_tokens=add_special_tokens)
     elif task == 'gsm8k':
         # GSM8K math word problems
         dataset = load_dataset(
@@ -425,7 +429,7 @@ def get_ppl_enc(task, tokenizer, add_special_tokens: bool = True):
         )
         # Combine question and answer with newlines
         # dataset[:N] returns dict of lists, so we need to zip them
-        subset = dataset[:8192]
+        subset = dataset[:100000]
         texts = [f"{q}\n\n{a}" for q, a in zip(subset['question'], subset['answer'])]
         testenc = tokenizer.encode("\n\n".join(texts), return_tensors='pt', add_special_tokens=add_special_tokens)
     elif task == 'arxiv':
@@ -437,7 +441,7 @@ def get_ppl_enc(task, tokenizer, add_special_tokens: bool = True):
             trust_remote_code=True
         )
         text_column = "abstract"
-        testenc = tokenizer.encode("\n\n".join(dataset[:16384][text_column]), return_tensors='pt', add_special_tokens=add_special_tokens)
+        testenc = tokenizer.encode("\n\n".join(dataset[:100000][text_column]), return_tensors='pt', add_special_tokens=add_special_tokens)
     elif task == 'arxiv_full':
         # arXiv papers (full) - use streaming to handle large dataset efficiently
         dataset = load_dataset(
@@ -475,8 +479,60 @@ def get_ppl_enc(task, tokenizer, add_special_tokens: bool = True):
             trust_remote_code=True
         )
         # Only take first 256 rows since each is very long
-        texts = dataset[:1024]["text"]
+        texts = dataset[:8192]["text"]
         testenc = tokenizer.encode("\n\n".join(texts), return_tensors='pt', add_special_tokens=add_special_tokens)
+    elif task == 'codesearchnet':
+        # CodeSearchNet - code documentation
+        dataset = load_dataset(
+            "claudios/code_search_net",
+            "all",
+            split="train",
+            trust_remote_code=True
+        )
+        subset = dataset[:8192]
+        texts = [f"{doc}\n\n{code}" for doc, code in zip(subset['func_documentation_string'], subset['whole_func_string'])]
+        testenc = tokenizer.encode("\n\n".join(texts), return_tensors='pt', add_special_tokens=add_special_tokens)
+    elif task == 'pubmed_qa':
+        # PubMedQA - biomedical QA
+        dataset = load_dataset(
+            "qiaojin/PubMedQA",
+            "pqa_labeled",
+            split="train",
+            trust_remote_code=True
+        )
+        subset = dataset[:1000]
+        texts = [f"{q}\n\n{a}" for q, a in zip(subset['question'], subset['long_answer'])]
+        testenc = tokenizer.encode("\n\n".join(texts), return_tensors='pt', add_special_tokens=add_special_tokens)
+    elif task == 'echr':
+        # ECHR - European Court of Human Rights cases
+        dataset = load_dataset(
+            "glnmario/ECHR",
+            split="train",
+            trust_remote_code=True
+        )
+        subset = dataset[:4096]
+        texts = [f"{docname}\n\n{text}\n\n{conclusion}"
+                 for docname, text, conclusion in zip(subset['docname'], subset['text'], subset['conclusion'])]
+        testenc = tokenizer.encode("\n\n".join(texts), return_tensors='pt', add_special_tokens=add_special_tokens)
+    elif task == 'xquad':
+        # XQuAD - multilingual QA (all 12 subsets)
+        xquad_subsets = [
+            "xquad.ar", "xquad.de", "xquad.el", "xquad.en", "xquad.es", "xquad.hi",
+            "xquad.ro", "xquad.ru", "xquad.th", "xquad.tr", "xquad.vi", "xquad.zh"
+        ]
+        all_texts = []
+        for subset_name in xquad_subsets:
+            dataset = load_dataset(
+                "google/xquad",
+                subset_name,
+                split="validation",
+                trust_remote_code=True
+            )
+            for ctx, q, ans in zip(dataset['context'], dataset['question'], dataset['answers']):
+                # Extract first answer text from the answers dict
+                answer_text = ans['text'][0] if ans['text'] else ""
+                all_texts.append(f"{ctx}\n\n{q}\n\n{answer_text}")
+        testenc = tokenizer.encode("\n\n".join(all_texts), return_tensors='pt', add_special_tokens=add_special_tokens)
     else:
         raise NotImplementedError(f"Unsupported task: {task}")
     return testenc
