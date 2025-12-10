@@ -122,7 +122,7 @@ if [[ "${TPU_SIZE}" -le 8 ]]; then
       --hf_model_path=${HF_MODEL_PATH} \
       --eval_mode=ppl \
       --eval_save_dir=${EVAL_RESULTS_DIR} \
-      --ppl_batch_size=4 \
+      --ppl_batch_size=16 \
       --ppl_seq_length=4096
 else
   echo "Multi-host TPU detected (size=${TPU_SIZE}), using multihost_runner..."
@@ -148,7 +148,7 @@ python3.10 -u scripts/test_orbax_eval.py ../MaxText/configs/base.yml \
     --hf_model_path=${HF_MODEL_PATH} \
     --eval_mode=ppl \
     --eval_save_dir=${EVAL_RESULTS_DIR} \
-    --ppl_batch_size=4 \
+    --ppl_batch_size=16 \
     --ppl_seq_length=4096
 "
 fi
