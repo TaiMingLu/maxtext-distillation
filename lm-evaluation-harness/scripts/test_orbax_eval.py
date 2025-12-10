@@ -1002,6 +1002,7 @@ if __name__ == "__main__":
         "--acc_task_seq_lens",
         "--acc_task_batch_sizes",
         "--eval_mode",
+        "--apply_chat_template",
     ]
     for arg in to_remove_args:
         model_args = [s for s in model_args if not s.startswith(arg)]
