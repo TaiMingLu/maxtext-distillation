@@ -4,11 +4,12 @@
 # Runs lm-evaluation-harness accuracy tasks WITHOUT chat template
 #
 # Usage:
-#   ./eval_base_acc.sh <pretrain_run_name> [checkpoint_step] [checkpoint_type]
+#   ./eval_base_acc.sh <pretrain_run_name> [checkpoint_step] [checkpoint_type] [--force]
 #
 # Examples:
 #   ./eval_base_acc.sh exp1_llama3.1-1b-A1BT50BS42-a1-s43 24999 distill
 #   ./eval_base_acc.sh llama3.1-1b-finewebedu-vanilla-s42-50b 24999 pretrain
+#   ./eval_base_acc.sh llama3.1-1b-finewebedu-vanilla-s42-50b 24999 pretrain --force
 #
 # checkpoint_type: "distill" or "pretrain" (determines GCS path)
 #
@@ -27,6 +28,10 @@ fi
 RUN_NAME="$1"
 CHECKPOINT_STEP="${2:-24999}"
 CHECKPOINT_TYPE="${3:-distill}"
+FORCE_EVAL=false
+if [[ "${4:-}" == "--force" ]]; then
+  FORCE_EVAL=true
+fi
 
 echo "========================"
 echo "environment variables:"
@@ -85,10 +90,11 @@ echo "  CHECKPOINT_TYPE: ${CHECKPOINT_TYPE}"
 echo "  CHECKPOINT_PATH: ${CHECKPOINT_PATH}"
 echo "  HF_MODEL_PATH: ${HF_MODEL_PATH} (base model, no chat template)"
 echo "  EVAL_RESULTS_DIR: ${EVAL_RESULTS_DIR}"
+echo "  FORCE_EVAL: ${FORCE_EVAL}"
 echo "========================"
 
-if [[ -f "${RESULT_JSON_PATH}" ]]; then
-  echo "Results already exist at ${RESULT_JSON_PATH}; skipping."
+if [[ -f "${RESULT_JSON_PATH}" ]] && [[ "${FORCE_EVAL}" == "false" ]]; then
+  echo "Results already exist at ${RESULT_JSON_PATH}; skipping. (use --force to re-run)"
   exit 0
 fi
 
