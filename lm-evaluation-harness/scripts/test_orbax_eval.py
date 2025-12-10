@@ -376,15 +376,26 @@ def set_seed(seed: int):
     torch.backends.cudnn.benchmark = False
 
 def clean_text_for_tokenizer(text: str) -> str:
-    """Clean text to avoid tokenizer crashes on unusual Unicode characters."""
-    import unicodedata
-    # Normalize unicode to NFC form
-    text = unicodedata.normalize("NFC", text)
-    # Replace problematic characters (null bytes, surrogates, etc.)
+    """Clean text to avoid tokenizer crashes on unusual Unicode characters.
+
+    The Rust tokenizer can crash with 'NormalizedString bad split' on:
+    - Surrogate pairs (U+D800 to U+DFFF)
+    - Null bytes
+    - Other malformed Unicode sequences
+    """
+    import re
+    # Remove surrogate pairs (cause of most 'NormalizedString bad split' errors)
+    text = re.sub(r'[\ud800-\udfff]', '', text)
+    # Remove null bytes
     text = text.replace("\x00", "")
-    # Remove other control characters except newlines and tabs
-    text = "".join(c if c in "\n\t" or not unicodedata.category(c).startswith("C") else " " for c in text)
+    # Encode to UTF-8 and decode back, replacing any invalid sequences
+    text = text.encode('utf-8', errors='replace').decode('utf-8', errors='replace')
     return text
+
+def safe_tokenize(tokenizer, text: str, add_special_tokens: bool = True):
+    """Tokenize text with automatic cleaning to prevent tokenizer crashes."""
+    cleaned_text = clean_text_for_tokenizer(text)
+    return tokenizer.encode(cleaned_text, return_tensors='pt', add_special_tokens=add_special_tokens)
 
 def get_ppl_enc(task, tokenizer, add_special_tokens: bool = True):
     if task == 'wikitext':
