@@ -183,15 +183,15 @@ def copy_file_with_retries(src: Path, dst: Path, retries: int = 3, delay_s: floa
         raise last_err
 
 PPL_TASKS = [
-    # "c4",
-    # "wikitext",
-    # "cnn_dailymail",
-    # "finewebedu-train-0.001",
-    # "dm_mathematics",
-    # "gsm8k",
-    # "arxiv",
-    # "humaneval",
-    # "pg19",
+    "c4",
+    "wikitext",
+    "cnn_dailymail",
+    "finewebedu-train-0.001",
+    "dm_mathematics",
+    "gsm8k",
+    "arxiv",
+    "humaneval",
+    "pg19",
     "codesearchnet",
     "pubmed_qa",
     "echr",
@@ -204,72 +204,72 @@ PPL_TASKS = [
 
 ACC_TASKS = [
     # Commonsense reasoning
-    # {
-    #     "name": "hellaswag",  # uses validation split by default
-    #     "num_fewshot": 0,
-    #     "acc_key": "acc_norm,none",
-    #     "acc_seq_length": 256,
-    #     "acc_batch_size": 64,
-    # },
-    # {
-    #     "name": "winogrande",
-    #     "num_fewshot": 0,
-    #     "acc_key": "acc,none",
-    #     "acc_seq_length": 256,
-    #     "acc_batch_size": 64,
-    # },
-    # {
-    #     "name": "arc_easy",
-    #     "num_fewshot": 0,
-    #     "acc_key": "acc_norm,none",
-    #     "acc_seq_length": 256,
-    #     "acc_batch_size": 64,
-    # },
-    # {
-    #     "name": "piqa",
-    #     "num_fewshot": 0,
-    #     "acc_key": "acc_norm,none",
-    #     "acc_seq_length": 512,
-    #     "acc_batch_size": 32,
-    # },
-    # {
-    #     "name": "boolq",
-    #     "num_fewshot": 0,
-    #     "acc_key": "acc,none",
-    #     "acc_seq_length": 2048,
-    #     "acc_batch_size": 8,
-    # },
-    # {
-    #     "name": "sciq",
-    #     "num_fewshot": 0,
-    #     "acc_key": "acc,none",
-    #     "acc_seq_length": 1024,
-    #     "acc_batch_size": 16,
-    # },
+    {
+        "name": "hellaswag",  # uses validation split by default
+        "num_fewshot": 0,
+        "acc_key": "acc_norm,none",
+        "acc_seq_length": 256,
+        "acc_batch_size": 64,
+    },
+    {
+        "name": "winogrande",
+        "num_fewshot": 0,
+        "acc_key": "acc,none",
+        "acc_seq_length": 256,
+        "acc_batch_size": 64,
+    },
+    {
+        "name": "arc_easy",
+        "num_fewshot": 0,
+        "acc_key": "acc_norm,none",
+        "acc_seq_length": 256,
+        "acc_batch_size": 64,
+    },
+    {
+        "name": "piqa",
+        "num_fewshot": 0,
+        "acc_key": "acc_norm,none",
+        "acc_seq_length": 512,
+        "acc_batch_size": 32,
+    },
+    {
+        "name": "boolq",
+        "num_fewshot": 0,
+        "acc_key": "acc,none",
+        "acc_seq_length": 2048,
+        "acc_batch_size": 8,
+    },
+    {
+        "name": "sciq",
+        "num_fewshot": 0,
+        "acc_key": "acc,none",
+        "acc_seq_length": 1024,
+        "acc_batch_size": 16,
+    },
     # Knowledge & QA
-    # {
-    #     "name": "mmlu",
-    #     "num_fewshot": 0,
-    #     "acc_key": "acc,none",
-    #     "acc_seq_length": 2048,
-    #     "acc_batch_size": 8,
-    # },
-    # # Math - multiple choice (uses loglikelihood)
-    # {
-    #     "name": "mathqa",
-    #     "num_fewshot": 0,
-    #     "acc_key": "acc,none",
-    #     "acc_seq_length": 512,
-    #     "acc_batch_size": 32,
-    # },
-    # # Truthfulness - uses loglikelihood (multiple choice)
-    # {
-    #     "name": "truthfulqa_mc1",
-    #     "num_fewshot": 0,
-    #     "acc_key": "acc,none",
-    #     "acc_seq_length": 256,
-    #     "acc_batch_size": 64,
-    # },
+    {
+        "name": "mmlu",
+        "num_fewshot": 0,
+        "acc_key": "acc,none",
+        "acc_seq_length": 2048,
+        "acc_batch_size": 8,
+    },
+    # Math - multiple choice (uses loglikelihood)
+    {
+        "name": "mathqa",
+        "num_fewshot": 0,
+        "acc_key": "acc,none",
+        "acc_seq_length": 512,
+        "acc_batch_size": 32,
+    },
+    # Truthfulness - uses loglikelihood (multiple choice)
+    {
+        "name": "truthfulqa_mc1",
+        "num_fewshot": 0,
+        "acc_key": "acc,none",
+        "acc_seq_length": 256,
+        "acc_batch_size": 64,
+    },
     # NLI - uses loglikelihood
     {
         "name": "rte",
@@ -696,7 +696,7 @@ def get_acc(
             # task_kwargs={"limit": 256},
             confirm_run_unsafe_code=True,
             limit=eval_limit,
-            apply_chat_template=True,
+            apply_chat_template=test_args.apply_chat_template,
         )
         
         task_metrics = res['results'][task]
@@ -975,6 +975,7 @@ if __name__ == "__main__":
     parser.add_argument("--acc_task_seq_lens", type=str, default="", help="Per-task accuracy sequence lengths, e.g. 'piqa:2304,arc_easy:3000'")
     parser.add_argument("--acc_task_batch_sizes", type=str, default="", help="Per-task accuracy batch sizes, e.g. 'piqa:4,arc_easy:8'")
     parser.add_argument("--eval_mode", type=str, choices=["ppl", "acc", "all"], default="all", help="Evaluation mode: 'ppl' (perplexity only), 'acc' (accuracy only), or 'all' (both)")
+    parser.add_argument("--apply_chat_template", type=str2bool, default=False, help="Apply chat template for ACC evaluation (use True for SFT models, False for pretrained)")
     test_args, _ = parser.parse_known_args()
 
     # Remove args defined in this test file to avoid error from pyconfig

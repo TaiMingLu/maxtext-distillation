@@ -157,6 +157,19 @@ class OrbaxLM(LM):
         """Return tokenizer name for chat template support."""
         return self._tokenizer_name
 
+    @property
+    def eot_token_id(self) -> int:
+        """Return end-of-text token ID (used as prefix for loglikelihood)."""
+        return self.tokenizer.eos_token_id
+
+    @property
+    def prefix_token_id(self) -> int:
+        """Return prefix token ID for loglikelihood calculations."""
+        # Use BOS token if available, otherwise fall back to EOS
+        if self.tokenizer.bos_token_id is not None:
+            return self.tokenizer.bos_token_id
+        return self.eot_token_id
+
     def apply_chat_template(self, chat_history: list[dict[str, str]], add_generation_prompt=True) -> str:
         """Delegate to tokenizer's chat template."""
         return self.tokenizer.apply_chat_template(
@@ -261,7 +274,14 @@ class OrbaxLM(LM):
         self, requests: list["Instance"], disable_tqdm: bool = False
     ) -> list[tuple[float, bool]]:
         new_reqs = []
+        # Debug: print first few requests to understand the format
+        debug_count = 0
         for context, continuation in [req.args for req in requests]:
+            if debug_count < 3:
+                print(f"\n[DEBUG loglikelihood] Request {debug_count}:")
+                print(f"  Context (len={len(context)}): {context[:200]}...")
+                print(f"  Continuation: {continuation}")
+                debug_count += 1
             if context == "":
                 # BOS or EOS as context
                 context_enc, continuation_enc = (

@@ -100,7 +100,8 @@ if [[ "${TPU_SIZE}" -le 8 ]]; then
       --eval_mode=acc \
       --eval_save_dir=${EVAL_RESULTS_DIR} \
       --acc_batch_size=16 \
-      --acc_seq_length=512
+      --acc_seq_length=512 \
+      --apply_chat_template=true
 else
   echo "Multi-host TPU detected (size=${TPU_SIZE}), using multihost_runner..."
   python -u multihost_runner_orig.py \
@@ -125,7 +126,8 @@ python3.10 -u scripts/test_orbax_eval.py ../MaxText/configs/base.yml \
     --eval_mode=acc \
     --eval_save_dir=${EVAL_RESULTS_DIR} \
     --acc_batch_size=16 \
-    --acc_seq_length=512
+    --acc_seq_length=512 \
+    --apply_chat_template=true
 "
 fi
 
