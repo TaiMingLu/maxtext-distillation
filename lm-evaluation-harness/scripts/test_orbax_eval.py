@@ -201,31 +201,43 @@ ACC_TASKS = [
         "name": "hellaswag",  # uses validation split by default
         "num_fewshot": 0,
         "acc_key": "acc_norm,none",
+        "acc_seq_length": 512,
+        "acc_batch_size": 8,
     },
     {
         "name": "winogrande",
         "num_fewshot": 0,
         "acc_key": "acc,none",
+        "acc_seq_length": 512,
+        "acc_batch_size": 8,
     },
     {
         "name": "arc_easy",
         "num_fewshot": 0,
         "acc_key": "acc_norm,none",
+        "acc_seq_length": 512,
+        "acc_batch_size": 8,
     },
     {
         "name": "piqa",
         "num_fewshot": 0,
         "acc_key": "acc_norm,none",
+        "acc_seq_length": 512,
+        "acc_batch_size": 8,
     },
     {
         "name": "boolq",
         "num_fewshot": 0,
         "acc_key": "acc,none",
+        "acc_seq_length": 512,
+        "acc_batch_size": 8,
     },
     {
         "name": "sciq",
         "num_fewshot": 0,
         "acc_key": "acc,none",
+        "acc_seq_length": 512,
+        "acc_batch_size": 8,
     },
     # Knowledge & QA
     {
@@ -239,6 +251,8 @@ ACC_TASKS = [
         "name": "naturalqs_open",  # lm-eval uses naturalqs_open for open-domain QA
         "num_fewshot": 0,
         "acc_key": "exact_match,none",
+        "acc_seq_length": 512,
+        "acc_batch_size": 8,
     },
     # Math
     {
@@ -260,27 +274,37 @@ ACC_TASKS = [
         "name": "truthfulqa_mc1",
         "num_fewshot": 0,
         "acc_key": "acc,none",
+        "acc_seq_length": 512,
+        "acc_batch_size": 8,
     },
     # NLI
     {
         "name": "rte",
         "num_fewshot": 0,
         "acc_key": "acc,none",
+        "acc_seq_length": 512,
+        "acc_batch_size": 8,
     },
     {
         "name": "anli_r1",
         "num_fewshot": 0,
-        "acc_key": "acc,none",
+        "acc_key": "acc,none",     
+        "acc_seq_length": 512,
+        "acc_batch_size": 8,
     },
     {
         "name": "anli_r2",
         "num_fewshot": 0,
         "acc_key": "acc,none",
+        "acc_seq_length": 512,
+        "acc_batch_size": 8,
     },
     {
         "name": "anli_r3",
         "num_fewshot": 0,
         "acc_key": "acc,none",
+        "acc_seq_length": 512,
+        "acc_batch_size": 8,
     },
     # Code
     {
