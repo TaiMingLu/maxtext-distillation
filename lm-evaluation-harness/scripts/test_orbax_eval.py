@@ -667,18 +667,52 @@ def main(config, test_args):
 
     # Debug: Check if params are actual arrays or abstract shapes
     def check_params_type(params, prefix=""):
-        sample_leaf = jax.tree_util.tree_leaves(params)[0] if jax.tree_util.tree_leaves(params) else None
-        if sample_leaf is not None:
+        leaves = jax.tree_util.tree_leaves(params)
+        print(f"[DEBUG] {prefix}Number of leaves: {len(leaves)}")
+        if leaves:
+            sample_leaf = leaves[0]
             print(f"[DEBUG] {prefix}First param leaf type: {type(sample_leaf)}, shape: {getattr(sample_leaf, 'shape', 'N/A')}")
             if hasattr(sample_leaf, 'sharding'):
-                print(f"[DEBUG] {prefix}Has sharding (likely ShapeDtypeStruct or abstract): {sample_leaf.sharding}")
+                print(f"[DEBUG] {prefix}Sharding: {sample_leaf.sharding}")
+            # Check if it's a ShapeDtypeStruct (abstract) - it won't have .astype method
             if not hasattr(sample_leaf, 'astype'):
                 print(f"[DEBUG] {prefix}WARNING: Params appear to be abstract (ShapeDtypeStruct), not actual arrays!")
                 return False
+            # Also check a few more leaves to be sure
+            for i, leaf in enumerate(leaves[:5]):
+                if not hasattr(leaf, 'astype'):
+                    print(f"[DEBUG] {prefix}Leaf {i} is abstract: {type(leaf)}")
+                    return False
         return True
+
+    # Check params structure
+    print(f"[DEBUG] orbax_state.params type: {type(orbax_state.params)}")
+    if hasattr(orbax_state.params, 'keys'):
+        print(f"[DEBUG] orbax_state.params keys: {list(orbax_state.params.keys())[:10]}")
+        # Check if params has nested 'params' key (common in Flax)
+        if 'params' in orbax_state.params:
+            print(f"[DEBUG] Found nested 'params' key, checking inner structure...")
+            inner_params = orbax_state.params['params']
+            if hasattr(inner_params, 'keys'):
+                print(f"[DEBUG] inner params keys: {list(inner_params.keys())[:10]}")
 
     params_ok = check_params_type(orbax_state.params, "orbax_state.params: ")
     if not params_ok:
+        # Try to provide more diagnostic info
+        print(f"[DEBUG] Checkpoint path: {config.load_parameters_path}")
+        print(f"[DEBUG] Attempting to list checkpoint contents...")
+        import subprocess
+        try:
+            result = subprocess.run(
+                ["gsutil", "ls", config.load_parameters_path],
+                capture_output=True, text=True, timeout=30
+            )
+            print(f"[DEBUG] gsutil ls output: {result.stdout[:500] if result.stdout else 'empty'}")
+            if result.stderr:
+                print(f"[DEBUG] gsutil ls stderr: {result.stderr[:500]}")
+        except Exception as e:
+            print(f"[DEBUG] Failed to list checkpoint: {e}")
+
         raise RuntimeError(
             "Checkpoint loading failed: params are ShapeDtypeStruct instead of actual arrays. "
             "This usually means the checkpoint path is incorrect or the checkpoint structure doesn't match. "
