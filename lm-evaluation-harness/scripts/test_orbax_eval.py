@@ -375,6 +375,17 @@ def set_seed(seed: int):
     torch.backends.cudnn.deterministic = True
     torch.backends.cudnn.benchmark = False
 
+def clean_text_for_tokenizer(text: str) -> str:
+    """Clean text to avoid tokenizer crashes on unusual Unicode characters."""
+    import unicodedata
+    # Normalize unicode to NFC form
+    text = unicodedata.normalize("NFC", text)
+    # Replace problematic characters (null bytes, surrogates, etc.)
+    text = text.replace("\x00", "")
+    # Remove other control characters except newlines and tabs
+    text = "".join(c if c in "\n\t" or not unicodedata.category(c).startswith("C") else " " for c in text)
+    return text
+
 def get_ppl_enc(task, tokenizer, add_special_tokens: bool = True):
     if task == 'wikitext':
         dataset = load_dataset("wikitext", "wikitext-103-v1", split="train", trust_remote_code=True)
@@ -494,7 +505,9 @@ def get_ppl_enc(task, tokenizer, add_special_tokens: bool = True):
         )
         # Only take first 256 rows since each is very long
         texts = dataset[:8192]["text"]
-        testenc = tokenizer.encode("\n\n".join(texts), return_tensors='pt', add_special_tokens=add_special_tokens)
+        # Clean text to avoid tokenizer crashes on unusual Unicode in old books
+        combined_text = clean_text_for_tokenizer("\n\n".join(texts))
+        testenc = tokenizer.encode(combined_text, return_tensors='pt', add_special_tokens=add_special_tokens)
     elif task == 'codesearchnet':
         # CodeSearchNet - code documentation
         dataset = load_dataset(
