@@ -251,29 +251,15 @@ ACC_TASKS = [
     #     "acc_seq_length": 2048,
     #     "acc_batch_size": 8,
     # },
+    # Math - multiple choice (uses loglikelihood)
     {
-        "name": "nq_open",  # Natural Questions open-domain QA
+        "name": "mathqa",
         "num_fewshot": 0,
-        "acc_key": "exact_match,none",
+        "acc_key": "acc,none",
         "acc_seq_length": 512,
         "acc_batch_size": 32,
     },
-    # Math
-    {
-        "name": "gsm8k",
-        "num_fewshot": 0,
-        "acc_key": "exact_match,strict-match",
-        "acc_seq_length": 512,
-        "acc_batch_size": 32,
-    },
-    {
-        "name": "minerva_math",
-        "num_fewshot": 0,
-        "acc_key": "exact_match,none",
-        "acc_seq_length": 256,
-        "acc_batch_size": 64,
-    },
-    # Truthfulness
+    # Truthfulness - uses loglikelihood (multiple choice)
     {
         "name": "truthfulqa_mc1",
         "num_fewshot": 0,
@@ -281,7 +267,7 @@ ACC_TASKS = [
         "acc_seq_length": 256,
         "acc_batch_size": 64,
     },
-    # NLI
+    # NLI - uses loglikelihood
     {
         "name": "rte",
         "num_fewshot": 0,
@@ -289,21 +275,47 @@ ACC_TASKS = [
         "acc_seq_length": 256,
         "acc_batch_size": 64,
     },
-    # Code
-    {
-        "name": "humaneval",
-        "num_fewshot": 0,
-        "acc_key": "pass@1,none",
-        "acc_seq_length": 512,
-        "acc_batch_size": 32,
-    },
-    {
-        "name": "mbpp",
-        "num_fewshot": 0,
-        "acc_key": "pass@1,none",
-        "acc_seq_length": 512,
-        "acc_batch_size": 32,
-    },
+]
+    # NOTE: Tasks below require generate_until (text generation), which is not implemented
+    # {
+    #     "name": "nq_open",  # Natural Questions open-domain QA - requires generation
+    #     "num_fewshot": 0,
+    #     "acc_key": "exact_match,none",
+    #     "acc_seq_length": 512,
+    #     "acc_batch_size": 32,
+    # },
+    # Math - requires generation
+    # {
+    #     "name": "gsm8k",
+    #     "num_fewshot": 0,
+    #     "acc_key": "exact_match,strict-match",
+    #     "acc_seq_length": 512,
+    #     "acc_batch_size": 32,
+    # },
+    # {
+    #     "name": "minerva_math",
+    #     "num_fewshot": 0,
+    #     "acc_key": "exact_match,none",
+    #     "acc_seq_length": 256,
+    #     "acc_batch_size": 64,
+    # },
+    
+    # Code - requires generation (not implemented)
+    # {
+    #     "name": "humaneval",
+    #     "num_fewshot": 0,
+    #     "acc_key": "pass@1,none",
+    #     "acc_seq_length": 512,
+    #     "acc_batch_size": 32,
+    # },
+    # {
+    #     "name": "mbpp",
+    #     "num_fewshot": 0,
+    #     "acc_key": "pass@1,none",
+    #     "acc_seq_length": 512,
+    #     "acc_batch_size": 32,
+    # },
+
     # {
     #     "name": "anli_r1",
     #     "num_fewshot": 0,
@@ -325,7 +337,6 @@ ACC_TASKS = [
     #     "acc_seq_length": 256,
     #     "acc_batch_size": 64,
     # },
-]
 
 load_dataset = hf_datasets.load_dataset
 
