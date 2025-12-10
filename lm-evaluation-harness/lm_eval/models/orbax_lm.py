@@ -166,12 +166,12 @@ class OrbaxLM(LM):
         )
 
     def _create_fast_forward(self):
-        # Extract shardings from abstract state (ShapeDtypeStruct has .sharding attribute)
+        # Extract shardings from actual loaded params (jax arrays have .sharding attribute)
         def extract_sharding(x):
             if hasattr(x, 'sharding'):
                 return x.sharding
             return None
-        params_shardings = jax.tree_util.tree_map(extract_sharding, self.state_mesh_shardings.params)
+        params_shardings = jax.tree_util.tree_map(extract_sharding, self.state.params)
 
         @partial(pjit,
                  in_shardings=(params_shardings, None, None, None),
