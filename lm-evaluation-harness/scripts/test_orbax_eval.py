@@ -400,7 +400,9 @@ def get_ppl_enc(task, tokenizer, add_special_tokens: bool = True):
             trust_remote_code=True
         )
         # Combine question and answer with newlines
-        texts = [f"{row['question']}\n\n{row['answer']}" for row in dataset[:8192]]
+        # dataset[:N] returns dict of lists, so we need to zip them
+        subset = dataset[:8192]
+        texts = [f"{q}\n\n{a}" for q, a in zip(subset['question'], subset['answer'])]
         testenc = tokenizer.encode("\n\n".join(texts), return_tensors='pt', add_special_tokens=add_special_tokens)
     elif task == 'arxiv':
         # arXiv summarization dataset
@@ -439,7 +441,7 @@ def get_ppl_enc(task, tokenizer, add_special_tokens: bool = True):
             trust_remote_code=True
         )
         # Combine prompt and canonical_solution with newlines
-        texts = [f"{row['prompt']}\n\n{row['canonical_solution']}" for row in dataset]
+        texts = [f"{p}\n\n{s}" for p, s in zip(dataset['prompt'], dataset['canonical_solution'])]
         testenc = tokenizer.encode("\n\n".join(texts), return_tensors='pt', add_special_tokens=add_special_tokens)
     elif task == 'pg19':
         # PG19 books - each row is very long, so use fewer rows
