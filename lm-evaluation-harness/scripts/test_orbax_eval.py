@@ -204,48 +204,48 @@ PPL_TASKS = [
 
 ACC_TASKS = [
     # Commonsense reasoning
-    {
-        "name": "hellaswag",  # uses validation split by default
-        "num_fewshot": 0,
-        "acc_key": "acc_norm,none",
-        "acc_seq_length": 256,
-        "acc_batch_size": 64,
-    },
-    {
-        "name": "winogrande",
-        "num_fewshot": 5,
-        "acc_key": "acc,none",
-        "acc_seq_length": 1024,
-        "acc_batch_size": 16,
-    },
-    {
-        "name": "arc_easy",
-        "num_fewshot": 0,
-        "acc_key": "acc_norm,none",
-        "acc_seq_length": 256,
-        "acc_batch_size": 64,
-    },
-    {
-        "name": "piqa",
-        "num_fewshot": 0,
-        "acc_key": "acc_norm,none",
-        "acc_seq_length": 512,
-        "acc_batch_size": 32,
-    },
-    {
-        "name": "boolq",
-        "num_fewshot": 5,
-        "acc_key": "acc,none",
-        "acc_seq_length": 8192,
-        "acc_batch_size": 2,
-    },
-    {
-        "name": "sciq",
-        "num_fewshot": 0,
-        "acc_key": "acc,none",
-        "acc_seq_length": 1024,
-        "acc_batch_size": 16,
-    },
+    # {
+    #     "name": "hellaswag",  # uses validation split by default
+    #     "num_fewshot": 0,
+    #     "acc_key": "acc_norm,none",
+    #     "acc_seq_length": 256,
+    #     "acc_batch_size": 64,
+    # },
+    # {
+    #     "name": "winogrande",
+    #     "num_fewshot": 5,
+    #     "acc_key": "acc,none",
+    #     "acc_seq_length": 1024,
+    #     "acc_batch_size": 16,
+    # },
+    # {
+    #     "name": "arc_easy",
+    #     "num_fewshot": 0,
+    #     "acc_key": "acc_norm,none",
+    #     "acc_seq_length": 256,
+    #     "acc_batch_size": 64,
+    # },
+    # {
+    #     "name": "piqa",
+    #     "num_fewshot": 0,
+    #     "acc_key": "acc_norm,none",
+    #     "acc_seq_length": 512,
+    #     "acc_batch_size": 32,
+    # },
+    # {
+    #     "name": "boolq",
+    #     "num_fewshot": 5,
+    #     "acc_key": "acc,none",
+    #     "acc_seq_length": 8192,
+    #     "acc_batch_size": 2,
+    # },
+    # {
+    #     "name": "sciq",
+    #     "num_fewshot": 0,
+    #     "acc_key": "acc,none",
+    #     "acc_seq_length": 1024,
+    #     "acc_batch_size": 16,
+    # },
     # Knowledge & QA
     {
         "name": "mmlu",
@@ -254,30 +254,30 @@ ACC_TASKS = [
         "acc_seq_length": 8192,
         "acc_batch_size": 2,
     },
-    # Math - multiple choice (uses loglikelihood)
-    {
-        "name": "mathqa",
-        "num_fewshot": 5,
-        "acc_key": "acc,none",
-        "acc_seq_length": 2048,
-        "acc_batch_size": 8,
-    },
-    # Truthfulness - uses loglikelihood (multiple choice)
-    {
-        "name": "truthfulqa_mc1",
-        "num_fewshot": 5,
-        "acc_key": "acc,none",
-        "acc_seq_length": 1024,
-        "acc_batch_size": 16,
-    },
-    # NLI - uses loglikelihood
-    {
-        "name": "rte",
-        "num_fewshot": 5,
-        "acc_key": "acc,none",
-        "acc_seq_length": 4096,
-        "acc_batch_size": 4,
-    },
+    # # Math - multiple choice (uses loglikelihood)
+    # {
+    #     "name": "mathqa",
+    #     "num_fewshot": 5,
+    #     "acc_key": "acc,none",
+    #     "acc_seq_length": 2048,
+    #     "acc_batch_size": 8,
+    # },
+    # # Truthfulness - uses loglikelihood (multiple choice)
+    # {
+    #     "name": "truthfulqa_mc1",
+    #     "num_fewshot": 5,
+    #     "acc_key": "acc,none",
+    #     "acc_seq_length": 1024,
+    #     "acc_batch_size": 16,
+    # },
+    # # NLI - uses loglikelihood
+    # {
+    #     "name": "rte",
+    #     "num_fewshot": 5,
+    #     "acc_key": "acc,none",
+    #     "acc_seq_length": 4096,
+    #     "acc_batch_size": 4,
+    # },
 ]
     # NOTE: Tasks below require generate_until (text generation), which is not implemented
     # {
@@ -401,25 +401,25 @@ def get_ppl_enc(task, tokenizer, add_special_tokens: bool = True):
     if task == 'wikitext':
         dataset = load_dataset("wikitext", "wikitext-103-v1", split="train", trust_remote_code=True)
         text_column = "text"
-        testenc = tokenizer.encode("\n\n".join(dataset[:32768][text_column]), return_tensors='pt', add_special_tokens=add_special_tokens)
+        testenc = safe_tokenize(tokenizer, "\n\n".join(dataset[:32768][text_column]), add_special_tokens=add_special_tokens)
     elif task == 'wikitext2':
         dataset = load_dataset("wikitext", "wikitext-2-raw-v1", split="train", trust_remote_code=True)
         text_column = "text"
-        testenc = tokenizer.encode("\n\n".join(dataset[:32768][text_column]), return_tensors='pt', add_special_tokens=add_special_tokens)
+        testenc = safe_tokenize(tokenizer, "\n\n".join(dataset[:32768][text_column]), add_special_tokens=add_special_tokens)
     elif task == 'cnn_dailymail':
         dataset = load_dataset("cnn_dailymail", "3.0.0", split="train", trust_remote_code=True)
         text_column = "article"
-        testenc = tokenizer.encode(" ".join(dataset[:16384][text_column]), return_tensors='pt', add_special_tokens=add_special_tokens)
+        testenc = safe_tokenize(tokenizer, " ".join(dataset[:16384][text_column]), add_special_tokens=add_special_tokens)
     elif task == 'c4':
         dataset = load_dataset(
-            "allenai/c4", 
-            data_files={'train': 'en/c4-train.00000-of-01024.json.gz'}, 
-            split="train", 
+            "allenai/c4",
+            data_files={'train': 'en/c4-train.00000-of-01024.json.gz'},
+            split="train",
             verification_mode="no_checks",
             trust_remote_code=True
         )
         text_column = "text"
-        testenc = tokenizer.encode(" ".join(dataset[:8192][text_column]), return_tensors='pt', add_special_tokens=add_special_tokens)
+        testenc = safe_tokenize(tokenizer, " ".join(dataset[:8192][text_column]), add_special_tokens=add_special_tokens)
     elif task == 'dclm':
         data_path = "/home/zephyr/gcs-bucket/datasets/dclm/dclm_baseline_1.0.val.jsonl"
         dataset = load_dataset(
@@ -429,7 +429,7 @@ def get_ppl_enc(task, tokenizer, add_special_tokens: bool = True):
             verification_mode="no_checks"
         )
         text_column = "text"
-        testenc = tokenizer.encode(" ".join(dataset[:8192][text_column]), return_tensors='pt', add_special_tokens=add_special_tokens)
+        testenc = safe_tokenize(tokenizer, " ".join(dataset[:8192][text_column]), add_special_tokens=add_special_tokens)
     elif task == 'finewebedu-test-100M':
         dataset = load_dataset(
             "TaiMingLu/finewebedu-test-100M",
@@ -437,7 +437,7 @@ def get_ppl_enc(task, tokenizer, add_special_tokens: bool = True):
             trust_remote_code=True
         )
         text_column = "text"
-        testenc = tokenizer.encode(" ".join(dataset[:32768][text_column]), return_tensors='pt', add_special_tokens=add_special_tokens)
+        testenc = safe_tokenize(tokenizer, " ".join(dataset[:32768][text_column]), add_special_tokens=add_special_tokens)
     elif task == 'finewebedu-train-0.001':
         dataset = load_dataset(
             "TaiMingLu/finewebedu-train-0.001",
@@ -445,7 +445,7 @@ def get_ppl_enc(task, tokenizer, add_special_tokens: bool = True):
             trust_remote_code=True
         )
         text_column = "text"
-        testenc = tokenizer.encode(" ".join(dataset[:32768][text_column]), return_tensors='pt', add_special_tokens=add_special_tokens)
+        testenc = safe_tokenize(tokenizer, " ".join(dataset[:32768][text_column]), add_special_tokens=add_special_tokens)
     elif task == 'dm_mathematics':
         # DM-Mathematics from The Pile
         dataset = load_dataset(
@@ -454,7 +454,7 @@ def get_ppl_enc(task, tokenizer, add_special_tokens: bool = True):
             trust_remote_code=True
         )
         text_column = "text"
-        testenc = tokenizer.encode(" ".join(dataset[:100000][text_column]), return_tensors='pt', add_special_tokens=add_special_tokens)
+        testenc = safe_tokenize(tokenizer, " ".join(dataset[:100000][text_column]), add_special_tokens=add_special_tokens)
     elif task == 'gsm8k':
         # GSM8K math word problems
         dataset = load_dataset(
@@ -467,7 +467,7 @@ def get_ppl_enc(task, tokenizer, add_special_tokens: bool = True):
         # dataset[:N] returns dict of lists, so we need to zip them
         subset = dataset[:100000]
         texts = [f"{q}\n\n{a}" for q, a in zip(subset['question'], subset['answer'])]
-        testenc = tokenizer.encode("\n\n".join(texts), return_tensors='pt', add_special_tokens=add_special_tokens)
+        testenc = safe_tokenize(tokenizer, "\n\n".join(texts), add_special_tokens=add_special_tokens)
     elif task == 'arxiv':
         # arXiv summarization dataset
         dataset = load_dataset(
@@ -477,7 +477,7 @@ def get_ppl_enc(task, tokenizer, add_special_tokens: bool = True):
             trust_remote_code=True
         )
         text_column = "abstract"
-        testenc = tokenizer.encode("\n\n".join(dataset[:100000][text_column]), return_tensors='pt', add_special_tokens=add_special_tokens)
+        testenc = safe_tokenize(tokenizer, "\n\n".join(dataset[:100000][text_column]), add_special_tokens=add_special_tokens)
     elif task == 'arxiv_full':
         # arXiv papers (full) - use streaming to handle large dataset efficiently
         dataset = load_dataset(
@@ -496,7 +496,7 @@ def get_ppl_enc(task, tokenizer, add_special_tokens: bool = True):
             title = row.get('title', '') or ''
             abstract = row.get('abstract', '') or ''
             texts.append(f"{title}\n{abstract}")
-        testenc = tokenizer.encode("\n\n".join(texts), return_tensors='pt', add_special_tokens=add_special_tokens)
+        testenc = safe_tokenize(tokenizer, "\n\n".join(texts), add_special_tokens=add_special_tokens)
     elif task == 'humaneval':
         # HumanEval coding problems
         dataset = load_dataset(
@@ -506,7 +506,7 @@ def get_ppl_enc(task, tokenizer, add_special_tokens: bool = True):
         )
         # Combine prompt and canonical_solution with newlines
         texts = [f"{p}\n\n{s}" for p, s in zip(dataset['prompt'], dataset['canonical_solution'])]
-        testenc = tokenizer.encode("\n\n".join(texts), return_tensors='pt', add_special_tokens=add_special_tokens)
+        testenc = safe_tokenize(tokenizer, "\n\n".join(texts), add_special_tokens=add_special_tokens)
     elif task == 'pg19':
         # PG19 books - each row is very long, so use fewer rows
         dataset = load_dataset(
@@ -516,9 +516,7 @@ def get_ppl_enc(task, tokenizer, add_special_tokens: bool = True):
         )
         # Only take first 256 rows since each is very long
         texts = dataset[:8192]["text"]
-        # Clean text to avoid tokenizer crashes on unusual Unicode in old books
-        combined_text = clean_text_for_tokenizer("\n\n".join(texts))
-        testenc = tokenizer.encode(combined_text, return_tensors='pt', add_special_tokens=add_special_tokens)
+        testenc = safe_tokenize(tokenizer, "\n\n".join(texts), add_special_tokens=add_special_tokens)
     elif task == 'codesearchnet':
         # CodeSearchNet - code documentation
         dataset = load_dataset(
@@ -529,7 +527,7 @@ def get_ppl_enc(task, tokenizer, add_special_tokens: bool = True):
         )
         subset = dataset[:8192]
         texts = [f"{doc}\n\n{code}" for doc, code in zip(subset['func_documentation_string'], subset['whole_func_string'])]
-        testenc = tokenizer.encode("\n\n".join(texts), return_tensors='pt', add_special_tokens=add_special_tokens)
+        testenc = safe_tokenize(tokenizer, "\n\n".join(texts), add_special_tokens=add_special_tokens)
     elif task == 'pubmed_qa':
         # PubMedQA - biomedical QA
         dataset = load_dataset(
@@ -540,7 +538,7 @@ def get_ppl_enc(task, tokenizer, add_special_tokens: bool = True):
         )
         subset = dataset[:1000]
         texts = [f"{q}\n\n{a}" for q, a in zip(subset['question'], subset['long_answer'])]
-        testenc = tokenizer.encode("\n\n".join(texts), return_tensors='pt', add_special_tokens=add_special_tokens)
+        testenc = safe_tokenize(tokenizer, "\n\n".join(texts), add_special_tokens=add_special_tokens)
     elif task == 'echr':
         # ECHR - European Court of Human Rights cases
         dataset = load_dataset(
@@ -551,7 +549,7 @@ def get_ppl_enc(task, tokenizer, add_special_tokens: bool = True):
         subset = dataset[:4096]
         texts = [f"{docname}\n\n{text}\n\n{conclusion}"
                  for docname, text, conclusion in zip(subset['docname'], subset['text'], subset['conclusion'])]
-        testenc = tokenizer.encode("\n\n".join(texts), return_tensors='pt', add_special_tokens=add_special_tokens)
+        testenc = safe_tokenize(tokenizer, "\n\n".join(texts), add_special_tokens=add_special_tokens)
     elif task == 'xquad':
         # XQuAD - multilingual QA (all 12 subsets)
         xquad_subsets = [
@@ -570,7 +568,7 @@ def get_ppl_enc(task, tokenizer, add_special_tokens: bool = True):
                 # Extract first answer text from the answers dict
                 answer_text = ans['text'][0] if ans['text'] else ""
                 all_texts.append(f"{ctx}\n\n{q}\n\n{answer_text}")
-        testenc = tokenizer.encode("\n\n".join(all_texts), return_tensors='pt', add_special_tokens=add_special_tokens)
+        testenc = safe_tokenize(tokenizer, "\n\n".join(all_texts), add_special_tokens=add_special_tokens)
     else:
         raise NotImplementedError(f"Unsupported task: {task}")
     return testenc
