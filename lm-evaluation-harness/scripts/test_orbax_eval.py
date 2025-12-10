@@ -236,27 +236,27 @@ ACC_TASKS = [
     #     "acc_seq_length": 2048,
     #     "acc_batch_size": 8,
     # },
-    {
-        "name": "sciq",
-        "num_fewshot": 0,
-        "acc_key": "acc,none",
-        "acc_seq_length": 1024,
-        "acc_batch_size": 16,
-    },
+    # {
+    #     "name": "sciq",
+    #     "num_fewshot": 0,
+    #     "acc_key": "acc,none",
+    #     "acc_seq_length": 1024,
+    #     "acc_batch_size": 16,
+    # },
     # Knowledge & QA
     {
         "name": "mmlu",
         "num_fewshot": 0,
         "acc_key": "acc,none",
-        "acc_seq_length": 512,
-        "acc_batch_size": 32,
+        "acc_seq_length": 2048,
+        "acc_batch_size": 8,
     },
     {
         "name": "naturalqs_open",  # lm-eval uses naturalqs_open for open-domain QA
         "num_fewshot": 0,
         "acc_key": "exact_match,none",
-        "acc_seq_length": 256,
-        "acc_batch_size": 64,
+        "acc_seq_length": 512,
+        "acc_batch_size": 32,
     },
     # Math
     {
