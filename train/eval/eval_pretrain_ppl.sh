@@ -117,7 +117,7 @@ if [[ "${TPU_SIZE}" -le 8 ]]; then
       model_name=${MODEL_NAME} \
       max_target_length=4096 \
       dtype=bfloat16 \
-      scan_layers=false \
+      scan_layers=true \
       attention=dot_product \
       --hf_model_path=${HF_MODEL_PATH} \
       --eval_mode=ppl \
@@ -143,7 +143,7 @@ python3.10 -u scripts/test_orbax_eval.py ../MaxText/configs/base.yml \
     model_name=${MODEL_NAME} \
     max_target_length=4096 \
     dtype=bfloat16 \
-    scan_layers=false \
+    scan_layers=true \
     attention=dot_product \
     --hf_model_path=${HF_MODEL_PATH} \
     --eval_mode=ppl \

@@ -94,7 +94,7 @@ if [[ "${TPU_SIZE}" -le 8 ]]; then
       run_name=${RUN_NAME}_step${CHECKPOINT_STEP} \
       model_name=${MODEL_NAME} \
       dtype=bfloat16 \
-      scan_layers=false \
+      scan_layers=true \
       attention=dot_product \
       --hf_model_path=${HF_MODEL_PATH} \
       --eval_mode=acc \
@@ -119,7 +119,7 @@ python3.10 -u scripts/test_orbax_eval.py ../MaxText/configs/base.yml \
     run_name=${RUN_NAME}_step${CHECKPOINT_STEP} \
     model_name=${MODEL_NAME} \
     dtype=bfloat16 \
-    scan_layers=false \
+    scan_layers=true \
     attention=dot_product \
     --hf_model_path=${HF_MODEL_PATH} \
     --eval_mode=acc \
