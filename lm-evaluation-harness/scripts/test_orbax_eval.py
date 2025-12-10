@@ -694,6 +694,7 @@ def get_acc(
             confirm_run_unsafe_code=True,
             limit=eval_limit,
             apply_chat_template=True,
+            trust_remote_code=True,
         )
         
         task_metrics = res['results'][task]
