@@ -33,7 +33,7 @@ export MIN_LR_RATIO=0.1
 export WARMUP_RATIO=0.05
 export ASYNC_CHECKPOINTING=false
 export BASE_OUTPUT_DIRECTORY="gs://$BUCKET_NAME/ckpts/pretrain"
-export DATA_FILES='/home/terry/gcs-bucket/datasets/fineweb-edu/*.array_record'
+export DATA_FILES='/home/terry/gcs-data/datasets/fineweb-edu/*.array_record'
 
 export RUN_NAME="${MODEL_NAME}-finewebedu-vanilla-s42-1000b"
 export RUN_ID="llama05b_finewebedu_vanilla_s42_1000b"
