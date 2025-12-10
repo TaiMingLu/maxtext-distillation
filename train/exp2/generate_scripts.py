@@ -70,7 +70,7 @@ export KD_TEMPERATURE=1.0
 export KD_TEACHER_PARAMETERS_PATH="/home/terry/gcs-bucket/ckpts/pretrain_param_only_v6/{teacher_ckpt_name}/checkpoint_{checkpoint_step}/0/items"
 export TEACHER_MODEL_NAME="{teacher_model_name}"
 export BASE_OUTPUT_DIRECTORY="gs://$BUCKET_NAME/ckpts/distill_pretrain"
-export DATA_FILES='/mnt/ramdisk/datasets/fineweb-edu/*.array_record'
+export DATA_FILES='/home/terry/gcs-bucket/datasets/fineweb-edu/*.array_record'
 
 export RUN_NAME="{run_name}"
 export RUN_ID="{run_id}"
