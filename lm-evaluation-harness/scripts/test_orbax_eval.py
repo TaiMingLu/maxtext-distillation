@@ -254,29 +254,29 @@ ACC_TASKS = [
     #     "acc_seq_length": 2048,
     #     "acc_batch_size": 8,
     # },
-    # Math - multiple choice (uses loglikelihood)
-    {
-        "name": "mathqa",
-        "num_fewshot": 0,
-        "acc_key": "acc,none",
-        "acc_seq_length": 512,
-        "acc_batch_size": 32,
-    },
-    # Truthfulness - uses loglikelihood (multiple choice)
-    {
-        "name": "truthfulqa_mc1",
-        "num_fewshot": 0,
-        "acc_key": "acc,none",
-        "acc_seq_length": 256,
-        "acc_batch_size": 64,
-    },
+    # # Math - multiple choice (uses loglikelihood)
+    # {
+    #     "name": "mathqa",
+    #     "num_fewshot": 0,
+    #     "acc_key": "acc,none",
+    #     "acc_seq_length": 512,
+    #     "acc_batch_size": 32,
+    # },
+    # # Truthfulness - uses loglikelihood (multiple choice)
+    # {
+    #     "name": "truthfulqa_mc1",
+    #     "num_fewshot": 0,
+    #     "acc_key": "acc,none",
+    #     "acc_seq_length": 256,
+    #     "acc_batch_size": 64,
+    # },
     # NLI - uses loglikelihood
     {
         "name": "rte",
         "num_fewshot": 0,
         "acc_key": "acc,none",
-        "acc_seq_length": 256,
-        "acc_batch_size": 64,
+        "acc_seq_length": 1024,
+        "acc_batch_size": 16,
     },
 ]
     # NOTE: Tasks below require generate_until (text generation), which is not implemented
