@@ -247,21 +247,21 @@ ACC_TASKS = [
     #     "acc_batch_size": 16,
     # },
     # Knowledge & QA
-    {
-        "name": "mmlu",
-        "num_fewshot": 5,
-        "acc_key": "acc,none",
-        "acc_seq_length": 8192,
-        "acc_batch_size": 2,
-    },
-    # # Math - multiple choice (uses loglikelihood)
     # {
-    #     "name": "mathqa",
+    #     "name": "mmlu",
     #     "num_fewshot": 5,
     #     "acc_key": "acc,none",
-    #     "acc_seq_length": 2048,
-    #     "acc_batch_size": 8,
+    #     "acc_seq_length": 8192,
+    #     "acc_batch_size": 2,
     # },
+    # # Math - multiple choice (uses loglikelihood)
+    {
+        "name": "mathqa",
+        "num_fewshot": 5,
+        "acc_key": "acc,none",
+        "acc_seq_length": 2048,
+        "acc_batch_size": 8,
+    },
     # # Truthfulness - uses loglikelihood (multiple choice)
     # {
     #     "name": "truthfulqa_mc1",
