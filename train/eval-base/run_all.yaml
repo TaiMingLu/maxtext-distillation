@@ -528,12 +528,9 @@ tasks:
     run: bash train/eval-base/eval_sft_acc.sh sft_exp2_llama3.1-1b-A8BT100BS42-a1-s43 999
     depends_on: sft_exp2_llama3.1_1b_A8BT100BS42_a1_s43
   - id: eval_ppl_vanilla_llama3.1_1b_finewebedu_vanilla_s42_50b
-    hide: true
     run: bash train/eval-base/eval_pretrain_ppl.sh llama3.1-1b-finewebedu-vanilla-s42-50b 24999 pretrain
   - id: eval_base_acc_vanilla_llama3.1_1b_finewebedu_vanilla_s42_50b
-    hide: true
     run: bash train/eval-base/eval_base_acc.sh llama3.1-1b-finewebedu-vanilla-s42-50b 24999 pretrain
   - id: eval_acc_sft_vanilla_llama3.1_1b_finewebedu_vanilla_s42_50b
-    hide: true
     run: bash train/eval-base/eval_sft_acc.sh sft_vanilla_llama3.1-1b-finewebedu-vanilla-s42-50b 999
     depends_on: sft_vanilla_llama3.1_1b_finewebedu_vanilla_s42_50b
