@@ -229,19 +229,19 @@ ACC_TASKS = [
     #     "acc_seq_length": 512,
     #     "acc_batch_size": 32,
     # },
-    {
-        "name": "boolq",
-        "num_fewshot": 0,
-        "acc_key": "acc,none",
-        "acc_seq_length": 2048,
-        "acc_batch_size": 8,
-    },
+    # {
+    #     "name": "boolq",
+    #     "num_fewshot": 0,
+    #     "acc_key": "acc,none",
+    #     "acc_seq_length": 2048,
+    #     "acc_batch_size": 8,
+    # },
     {
         "name": "sciq",
         "num_fewshot": 0,
         "acc_key": "acc,none",
-        "acc_seq_length": 256,
-        "acc_batch_size": 64,
+        "acc_seq_length": 512,
+        "acc_batch_size": 32,
     },
     # Knowledge & QA
     {
