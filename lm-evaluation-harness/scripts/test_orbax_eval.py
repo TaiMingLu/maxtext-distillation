@@ -739,7 +739,7 @@ def get_ppl(
 
             # Save intermediate results after each task
             if save_callback:
-                save_callback()
+                save_callback(current_ppl_res=ppl_res, current_ppl_times=ppl_times)
                 print(f"  -> Saved intermediate results after {task}")
 
     return ppl_res, ppl_times
@@ -872,7 +872,7 @@ def get_acc(
 
         # Save intermediate results after each task
         if save_callback:
-            save_callback()
+            save_callback(current_acc_res=acc_res, current_acc_full=full_res_by_task, current_acc_times=acc_times)
             print(f"  -> Saved intermediate results after {task}")
 
     if default_seq_len is not None and hasattr(model, "set_eval_seq_length"):
@@ -1041,9 +1041,18 @@ def main(config, test_args):
         raise TypeError(f"Object of type {type(obj).__name__} is not JSON serializable")
 
     # Create save callback for incremental saves
-    def save_intermediate_results():
+    # NOTE: The callback receives current results as parameters because get_ppl/get_acc
+    # create local dicts that would not be captured by closure
+    def save_intermediate_results(current_ppl_res=None, current_ppl_times=None,
+                                   current_acc_res=None, current_acc_full=None, current_acc_times=None):
         if not save_path:
             return
+        # Use provided values if given, otherwise fall back to outer scope (for final save)
+        _ppl_res = current_ppl_res if current_ppl_res is not None else ppl_res
+        _ppl_times = current_ppl_times if current_ppl_times is not None else ppl_times
+        _acc_res = current_acc_res if current_acc_res is not None else acc_res
+        _acc_full = current_acc_full if current_acc_full is not None else acc_full
+        _acc_times = current_acc_times if current_acc_times is not None else acc_times
         results_payload = {
             "run_name": getattr(config, "run_name", ""),
             "model_name": getattr(config, "model_name", ""),
@@ -1051,14 +1060,14 @@ def main(config, test_args):
             "limit": test_args.limit,
             "tasks_requested": test_args.tasks,
             "add_special_tokens": test_args.add_special_tokens,
-            "ppl": ppl_res,
+            "ppl": _ppl_res,
             "lm_eval": {
-                "acc_summary": acc_res,
-                "per_task": acc_full,
+                "acc_summary": _acc_res,
+                "per_task": _acc_full,
             },
             "timing": {
-                "ppl": ppl_times,
-                "lm_eval": acc_times,
+                "ppl": _ppl_times,
+                "lm_eval": _acc_times,
             },
             "_incomplete": True,  # Mark as incomplete until final save
         }
