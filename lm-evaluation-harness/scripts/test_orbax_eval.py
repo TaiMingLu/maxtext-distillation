@@ -466,16 +466,23 @@ def safe_tokenize(tokenizer, text: str, add_special_tokens: bool = True):
     """Tokenize text with automatic cleaning to prevent tokenizer crashes.
 
     If tokenization still fails after cleaning, falls back to ASCII-only.
+    Uses BaseException to catch Rust panics (pyo3_runtime.PanicException).
     """
     cleaned_text = clean_text_for_tokenizer(text)
 
     try:
         return tokenizer.encode(cleaned_text, return_tensors='pt', add_special_tokens=add_special_tokens)
-    except Exception as e:
-        # If cleaning didn't help, try ASCII-only as last resort
-        print(f"Warning: Tokenization failed after cleaning, falling back to ASCII-only. Error: {e}")
+    except BaseException as e:
+        # BaseException catches Rust panics (pyo3_runtime.PanicException) that Exception doesn't
+        print(f"Warning: Tokenization failed after cleaning, falling back to ASCII-only. Error: {type(e).__name__}: {e}")
         ascii_text = cleaned_text.encode('ascii', errors='ignore').decode('ascii')
-        return tokenizer.encode(ascii_text, return_tensors='pt', add_special_tokens=add_special_tokens)
+        try:
+            return tokenizer.encode(ascii_text, return_tensors='pt', add_special_tokens=add_special_tokens)
+        except BaseException as e2:
+            # If even ASCII fails, return empty tensor
+            print(f"Warning: Even ASCII tokenization failed. Error: {type(e2).__name__}: {e2}")
+            import torch
+            return torch.tensor([[tokenizer.bos_token_id or 0]], dtype=torch.long)
 
 def get_ppl_enc(task, tokenizer, add_special_tokens: bool = True):
     if task == 'wikitext':
