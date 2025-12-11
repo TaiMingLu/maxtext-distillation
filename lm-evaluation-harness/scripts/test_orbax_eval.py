@@ -1004,22 +1004,26 @@ def main(config, test_args):
         save_path = save_dir / f"{getattr(config, 'run_name', 'results')}.json"
 
     # Load existing results if resuming
-    if test_args.resume and save_path and save_path.exists():
-        print(f"Resuming from existing results: {save_path}")
-        try:
-            with open(save_path, 'r') as f:
-                existing_results = json.load(f)
-            ppl_res = existing_results.get("ppl", {})
-            ppl_times = existing_results.get("timing", {}).get("ppl", {})
-            acc_res = existing_results.get("lm_eval", {}).get("acc_summary", {})
-            acc_full = existing_results.get("lm_eval", {}).get("per_task", {})
-            acc_times = existing_results.get("timing", {}).get("lm_eval", {})
-            print(f"  Loaded {len(ppl_res)} PPL results, {len(acc_res)} ACC results")
-        except Exception as e:
-            print(f"  Warning: Failed to load existing results: {e}")
-            print(f"  Starting fresh evaluation")
-            ppl_res, ppl_times = {}, {}
-            acc_res, acc_full, acc_times = {}, {}, {}
+    if test_args.resume:
+        if save_path and save_path.exists():
+            print(f"Resuming from existing results: {save_path}")
+            try:
+                with open(save_path, 'r') as f:
+                    existing_results = json.load(f)
+                ppl_res = existing_results.get("ppl", {})
+                ppl_times = existing_results.get("timing", {}).get("ppl", {})
+                acc_res = existing_results.get("lm_eval", {}).get("acc_summary", {})
+                acc_full = existing_results.get("lm_eval", {}).get("per_task", {})
+                acc_times = existing_results.get("timing", {}).get("lm_eval", {})
+                print(f"  Loaded {len(ppl_res)} PPL results, {len(acc_res)} ACC results")
+            except Exception as e:
+                print(f"  Warning: Failed to load existing results: {e}")
+                print(f"  Starting fresh evaluation")
+                ppl_res, ppl_times = {}, {}
+                acc_res, acc_full, acc_times = {}, {}, {}
+        else:
+            print(f"Resume enabled but no existing results found at: {save_path}")
+            print(f"  Starting fresh evaluation (results will be saved incrementally)")
 
     # Helper to serialize numpy/jax types
     def to_serializable(obj):
