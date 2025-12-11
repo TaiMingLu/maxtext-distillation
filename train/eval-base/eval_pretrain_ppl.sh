@@ -4,17 +4,20 @@
 # Runs lm-evaluation-harness PPL tasks on Orbax checkpoints
 #
 # Usage:
-#   ./eval_pretrain_ppl.sh <run_name> [checkpoint_step] [checkpoint_type]
+#   ./eval_pretrain_ppl.sh <run_name> [checkpoint_step] [checkpoint_type] [--resume]
 #
 # Examples:
 #   ./eval_pretrain_ppl.sh exp1_llama3.1-1b-A1BT50BS42-a1-s43
 #   ./eval_pretrain_ppl.sh exp1_llama3.1-1b-A1BT50BS42-a1-s43 24999
 #   ./eval_pretrain_ppl.sh exp1_llama3.1-1b-A1BT50BS42-a1-s43 24999 distill
 #   ./eval_pretrain_ppl.sh llama3.1-1b-finewebedu-vanilla-s42-50b 24999 pretrain
+#   ./eval_pretrain_ppl.sh llama3.1-1b-finewebedu-vanilla-s42-50b 24999 pretrain --resume
 #
 # checkpoint_type:
 #   distill  - gs://BUCKET/ckpts/distill_pretrain/... (default)
 #   pretrain - gs://BUCKET/ckpts/pretrain/...
+#
+# --resume: Continue from incomplete results (saves progress after each task)
 #
 
 set +x
@@ -31,6 +34,13 @@ fi
 RUN_NAME="$1"
 CHECKPOINT_STEP="${2:-24999}"
 CHECKPOINT_TYPE="${3:-distill}"
+# Check for --resume flag in remaining args
+RESUME_FLAG="false"
+for arg in "$@"; do
+  if [[ "$arg" == "--resume" ]]; then
+    RESUME_FLAG="true"
+  fi
+done
 
 echo "========================"
 echo "environment variables:"
@@ -89,11 +99,24 @@ echo "  CHECKPOINT_TYPE: ${CHECKPOINT_TYPE}"
 echo "  CHECKPOINT_PATH: ${CHECKPOINT_PATH}"
 echo "  HF_MODEL_PATH: ${HF_MODEL_PATH}"
 echo "  EVAL_RESULTS_DIR: ${EVAL_RESULTS_DIR}"
+echo "  RESUME_FLAG: ${RESUME_FLAG}"
 echo "========================"
 
+# Check if results exist and are complete
 if [[ -f "${RESULT_JSON_PATH}" ]]; then
-  echo "Results already exist at ${RESULT_JSON_PATH}; skipping."
-  exit 0
+  # Check if results are complete (no _incomplete flag)
+  if grep -q '"_incomplete": true' "${RESULT_JSON_PATH}" 2>/dev/null; then
+    echo "Found incomplete results at ${RESULT_JSON_PATH}"
+    if [[ "${RESUME_FLAG}" == "true" ]]; then
+      echo "  -> Resuming evaluation..."
+    else
+      echo "  -> Use --resume to continue from where it left off, or delete the file to start fresh."
+      exit 0
+    fi
+  else
+    echo "Results already exist and are complete at ${RESULT_JSON_PATH}; skipping."
+    exit 0
+  fi
 fi
 
 cd ~/maxtext
@@ -123,7 +146,8 @@ if [[ "${TPU_SIZE}" -le 8 ]]; then
       --eval_mode=ppl \
       --eval_save_dir=${EVAL_RESULTS_DIR} \
       --ppl_batch_size=8 \
-      --ppl_seq_length=4096
+      --ppl_seq_length=4096 \
+      --resume=${RESUME_FLAG}
 else
   echo "Multi-host TPU detected (size=${TPU_SIZE}), using multihost_runner..."
   python -u multihost_runner_orig.py \
@@ -149,7 +173,8 @@ python3.10 -u scripts/test_orbax_eval.py ../MaxText/configs/base.yml \
     --eval_mode=ppl \
     --eval_save_dir=${EVAL_RESULTS_DIR} \
     --ppl_batch_size=8 \
-    --ppl_seq_length=4096
+    --ppl_seq_length=4096 \
+    --resume=${RESUME_FLAG}
 "
 fi
 

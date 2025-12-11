@@ -259,7 +259,8 @@ def scps(slices, run_name_dir, zip_name):
       print('scp to worker ', worker_num)
       command = [
           "gcloud", "compute", "tpus", "tpu-vm", "scp", f"--worker={worker_num}", zip_path,
-          f"{cur_slice.name}:~/", "--strict-host-key-checking=no", f"--project={args.PROJECT}", f"--zone={args.ZONE}", "--quiet"
+          f"{cur_slice.name}:~/", "--strict-host-key-checking=no", f"--project={args.PROJECT}", f"--zone={args.ZONE}",
+          "--quiet", "--force-key-file-overwrite"
       ]
       if args.INTERNAL_IP:
         command.append("--internal-ip")
@@ -304,7 +305,8 @@ def execute_main_command(main_command, slices, local_log_dir, zip_name):
       gcloud_command=[
           "gcloud", "alpha", "compute", "tpus", "tpu-vm", "ssh", cur_slice.name, f"--worker={worker_num}",
           "--command", remote_command_list_str, "--strict-host-key-checking=no",
-          f"--project={args.PROJECT}", f"--zone={args.ZONE}", "--quiet"]
+          f"--project={args.PROJECT}", f"--zone={args.ZONE}",
+          "--quiet", "--force-key-file-overwrite"]
       if args.INTERNAL_IP:
         gcloud_command.append("--internal-ip")
       commands.append(gcloud_command)

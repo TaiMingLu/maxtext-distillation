@@ -383,36 +383,99 @@ def clean_text_for_tokenizer(text: str) -> str:
     - Null bytes
     - Other malformed Unicode sequences
     - Certain control characters
-    """
-    # Remove null bytes
-    text = text.replace("\x00", "")
+    - Various problematic Unicode ranges
 
-    # Remove characters that can cause issues - filter by codepoint
-    # This includes surrogates (0xD800-0xDFFF) and other problematic ranges
+    This function aggressively cleans text to ensure tokenization succeeds.
+    """
+    if not text:
+        return text
+
+    # Step 1: Encode to bytes and decode back, removing any invalid sequences
+    # This handles most encoding issues
+    try:
+        text = text.encode('utf-8', errors='surrogatepass').decode('utf-8', errors='replace')
+    except Exception:
+        text = text.encode('utf-8', errors='replace').decode('utf-8', errors='replace')
+
+    # Step 2: Filter character by character - be aggressive
     cleaned_chars = []
     for char in text:
-        codepoint = ord(char)
-        # Skip surrogates (0xD800-0xDFFF)
+        try:
+            codepoint = ord(char)
+        except Exception:
+            continue  # Skip any char that fails ord()
+
+        # Skip null bytes
+        if codepoint == 0:
+            continue
+
+        # Skip surrogates (0xD800-0xDFFF) - main cause of the error
         if 0xD800 <= codepoint <= 0xDFFF:
             continue
-        # Skip certain control characters that cause issues
-        if codepoint < 0x20 and codepoint not in (0x09, 0x0A, 0x0D):  # Allow tab, newline, carriage return
+
+        # Skip control characters except tab, newline, carriage return
+        if codepoint < 0x20 and codepoint not in (0x09, 0x0A, 0x0D):
             continue
+
+        # Skip DELETE character
+        if codepoint == 0x7F:
+            continue
+
+        # Skip C1 control characters (0x80-0x9F)
+        if 0x80 <= codepoint <= 0x9F:
+            continue
+
+        # Skip replacement character (often indicates prior encoding issues)
+        if codepoint == 0xFFFD:
+            cleaned_chars.append(' ')  # Replace with space instead of skipping
+            continue
+
+        # Skip private use area characters that can cause issues
+        if 0xE000 <= codepoint <= 0xF8FF:
+            continue
+
+        # Skip supplementary private use areas
+        if 0xF0000 <= codepoint <= 0xFFFFD or 0x100000 <= codepoint <= 0x10FFFD:
+            continue
+
         # Skip invalid Unicode codepoints
         if codepoint > 0x10FFFF:
             continue
+
+        # Skip byte order marks
+        if codepoint in (0xFEFF, 0xFFFE):
+            continue
+
+        # Skip noncharacters
+        if codepoint in (0xFFFE, 0xFFFF) or (0xFDD0 <= codepoint <= 0xFDEF):
+            continue
+
         cleaned_chars.append(char)
 
     text = ''.join(cleaned_chars)
 
-    # Final pass: encode to UTF-8 and decode back, replacing any remaining invalid sequences
-    text = text.encode('utf-8', errors='surrogateescape').decode('utf-8', errors='replace')
+    # Step 3: Final safety encode/decode
+    try:
+        text = text.encode('utf-8', errors='ignore').decode('utf-8', errors='ignore')
+    except Exception:
+        pass
+
     return text
 
 def safe_tokenize(tokenizer, text: str, add_special_tokens: bool = True):
-    """Tokenize text with automatic cleaning to prevent tokenizer crashes."""
+    """Tokenize text with automatic cleaning to prevent tokenizer crashes.
+
+    If tokenization still fails after cleaning, falls back to ASCII-only.
+    """
     cleaned_text = clean_text_for_tokenizer(text)
-    return tokenizer.encode(cleaned_text, return_tensors='pt', add_special_tokens=add_special_tokens)
+
+    try:
+        return tokenizer.encode(cleaned_text, return_tensors='pt', add_special_tokens=add_special_tokens)
+    except Exception as e:
+        # If cleaning didn't help, try ASCII-only as last resort
+        print(f"Warning: Tokenization failed after cleaning, falling back to ASCII-only. Error: {e}")
+        ascii_text = cleaned_text.encode('ascii', errors='ignore').decode('ascii')
+        return tokenizer.encode(ascii_text, return_tensors='pt', add_special_tokens=add_special_tokens)
 
 def get_ppl_enc(task, tokenizer, add_special_tokens: bool = True):
     if task == 'wikitext':
@@ -591,26 +654,44 @@ def get_ppl_enc(task, tokenizer, add_special_tokens: bool = True):
     return testenc
 
 def get_ppl(
-    model, 
-    tokenizer, 
+    model,
+    tokenizer,
     tasks,
     batch_size: int = 1,
     calib_size: int = 256,
     max_length: int = 8192,
     add_special_tokens: bool = True,
-    task_range: list = []
+    task_range: list = [],
+    existing_ppl_results: dict = None,
+    existing_ppl_times: dict = None,
+    save_callback = None,
 ):
+    """
+    Args:
+        existing_ppl_results: Previously completed PPL results to skip (for resume)
+        existing_ppl_times: Previously completed PPL times (for resume)
+        save_callback: Callable to save intermediate results after each task
+    """
     # devices_in_data_fsdp = model.devices_in_data_fsdp
     # if batch_size % devices_in_data_fsdp != 0:
     #     print(f"🔁 Adjusting batch_size {batch_size} → {devices_in_data_fsdp * ((batch_size + devices_in_data_fsdp - 1) // devices_in_data_fsdp)} for device mesh compatibility.")
     #     batch_size = devices_in_data_fsdp * ((batch_size + devices_in_data_fsdp - 1) // devices_in_data_fsdp)
     if task_range:
         tasks = [t for t in tasks if t in task_range]
-    
-    print(f"Starting PPL evaluation for tasks: {tasks}")
-    ppl_res = {}
-    ppl_times = {}
-    for task in tasks:
+
+    # Initialize with existing results if resuming
+    ppl_res = dict(existing_ppl_results) if existing_ppl_results else {}
+    ppl_times = dict(existing_ppl_times) if existing_ppl_times else {}
+
+    # Filter out already completed tasks
+    remaining_tasks = [t for t in tasks if t not in ppl_res]
+    if len(remaining_tasks) < len(tasks):
+        skipped = len(tasks) - len(remaining_tasks)
+        print(f"Resuming PPL evaluation: skipping {skipped} already completed tasks")
+        print(f"  Completed: {[t for t in tasks if t in ppl_res]}")
+
+    print(f"Starting PPL evaluation for tasks: {remaining_tasks}")
+    for task in remaining_tasks:
         print(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] Currently evaluating PPL task: {task}")
         start_ts = time.perf_counter()
         testenc = get_ppl_enc(task, tokenizer, add_special_tokens=add_special_tokens)
@@ -648,7 +729,12 @@ def get_ppl(
             if task == "dclm":
                 print("dclm val loss", math.log(ppl_res[task]))
             print_device_memory(f"after PPL task {task}")
-                
+
+            # Save intermediate results after each task
+            if save_callback:
+                save_callback()
+                print(f"  -> Saved intermediate results after {task}")
+
     return ppl_res, ppl_times
 
 def get_acc(
@@ -662,7 +748,18 @@ def get_acc(
     task_limit_overrides=None,
     task_seq_overrides=None,
     task_batch_overrides=None,
+    existing_acc_results: dict = None,
+    existing_acc_full: dict = None,
+    existing_acc_times: dict = None,
+    save_callback = None,
 ):
+    """
+    Args:
+        existing_acc_results: Previously completed ACC summary results (for resume)
+        existing_acc_full: Previously completed ACC full results (for resume)
+        existing_acc_times: Previously completed ACC times (for resume)
+        save_callback: Callable to save intermediate results after each task
+    """
     # lm_eval_model = models.orbax_lm.HFLM(
     #     pretrained=model,
     #     tokenizer=tokenizer,
@@ -675,19 +772,29 @@ def get_acc(
     if task_range:
         tasks = [cfg for cfg in tasks if cfg["name"] in task_range]
 
+    # Initialize with existing results if resuming
+    acc_res = dict(existing_acc_results) if existing_acc_results else {}
+    full_res_by_task = dict(existing_acc_full) if existing_acc_full else {}
+    acc_times = dict(existing_acc_times) if existing_acc_times else {}
+
+    # Filter out already completed tasks
+    completed_task_names = set(acc_res.keys())
+    remaining_tasks = [cfg for cfg in tasks if cfg["name"] not in completed_task_names]
+    if len(remaining_tasks) < len(tasks):
+        skipped = len(tasks) - len(remaining_tasks)
+        print(f"Resuming ACC evaluation: skipping {skipped} already completed tasks")
+        print(f"  Completed: {list(completed_task_names)}")
+
     print("tasks to evaluate:")
-    print(json.dumps(tasks, indent=2))
+    print(json.dumps(remaining_tasks, indent=2))
     print(f"Starting accuracy evaluation with batch_size={batch_size}...")
-    acc_res = {}
-    full_res_by_task = {}
-    acc_times = {}
     task_limit_overrides = task_limit_overrides or {}
     task_seq_overrides = task_seq_overrides or {}
     task_batch_overrides = task_batch_overrides or {}
     default_seq_len = getattr(model, "eval_seq_len", None)
     default_loglikelihood_bs = getattr(model, "loglikelihood_batch_size", None)
 
-    for cfg in tasks:
+    for cfg in remaining_tasks:
         task = cfg["name"]
         cfg_limit = cfg.get("limit")
         cfg_batch_size = cfg.get("acc_batch_size", batch_size)
@@ -755,6 +862,12 @@ def get_acc(
             print(f"{task} ACC: {summary_value:.4f} (time: {duration_s:.2f}s)")
         full_res_by_task[task] = res
         print_device_memory(f"after ACC task {times_key}")
+
+        # Save intermediate results after each task
+        if save_callback:
+            save_callback()
+            print(f"  -> Saved intermediate results after {task}")
+
     if default_seq_len is not None and hasattr(model, "set_eval_seq_length"):
         model.set_eval_seq_length(default_seq_len)
     if default_loglikelihood_bs is not None and hasattr(model, "set_loglikelihood_batch_size"):
@@ -876,6 +989,76 @@ def main(config, test_args):
     ppl_res, ppl_times = {}, {}
     acc_res, acc_full, acc_times = {}, {}, {}
 
+    # Determine save path for incremental saves
+    save_path = None
+    if getattr(test_args, "eval_save_dir", ""):
+        os.makedirs(test_args.eval_save_dir, exist_ok=True)
+        save_dir = Path(test_args.eval_save_dir)
+        save_path = save_dir / f"{getattr(config, 'run_name', 'results')}.json"
+
+    # Load existing results if resuming
+    if test_args.resume and save_path and save_path.exists():
+        print(f"Resuming from existing results: {save_path}")
+        try:
+            with open(save_path, 'r') as f:
+                existing_results = json.load(f)
+            ppl_res = existing_results.get("ppl", {})
+            ppl_times = existing_results.get("timing", {}).get("ppl", {})
+            acc_res = existing_results.get("lm_eval", {}).get("acc_summary", {})
+            acc_full = existing_results.get("lm_eval", {}).get("per_task", {})
+            acc_times = existing_results.get("timing", {}).get("lm_eval", {})
+            print(f"  Loaded {len(ppl_res)} PPL results, {len(acc_res)} ACC results")
+        except Exception as e:
+            print(f"  Warning: Failed to load existing results: {e}")
+            print(f"  Starting fresh evaluation")
+            ppl_res, ppl_times = {}, {}
+            acc_res, acc_full, acc_times = {}, {}, {}
+
+    # Helper to serialize numpy/jax types
+    def to_serializable(obj):
+        try:
+            import numpy as _np
+            import jax.numpy as _jnp
+        except Exception:
+            _np, _jnp = None, None
+        if _np is not None and isinstance(obj, _np.generic):
+            return obj.item()
+        if _jnp is not None and hasattr(obj, "dtype") and hasattr(obj, "tolist"):
+            return obj.tolist()
+        if hasattr(obj, "tolist"):
+            return obj.tolist()
+        raise TypeError(f"Object of type {type(obj).__name__} is not JSON serializable")
+
+    # Create save callback for incremental saves
+    def save_intermediate_results():
+        if not save_path:
+            return
+        results_payload = {
+            "run_name": getattr(config, "run_name", ""),
+            "model_name": getattr(config, "model_name", ""),
+            "eval_mode": test_args.eval_mode,
+            "limit": test_args.limit,
+            "tasks_requested": test_args.tasks,
+            "add_special_tokens": test_args.add_special_tokens,
+            "ppl": ppl_res,
+            "lm_eval": {
+                "acc_summary": acc_res,
+                "per_task": acc_full,
+            },
+            "timing": {
+                "ppl": ppl_times,
+                "lm_eval": acc_times,
+            },
+            "_incomplete": True,  # Mark as incomplete until final save
+        }
+        temp_path = save_path.with_suffix('.json.tmp')
+        try:
+            with open(temp_path, 'w') as f:
+                json.dump(results_payload, f, indent=2, default=to_serializable)
+            shutil.move(str(temp_path), save_path)
+        except Exception as e:
+            print(f"  Warning: Failed to save intermediate results: {e}")
+
     # Run PPL evaluation if mode is 'ppl' or 'all'
     if test_args.eval_mode in ["ppl", "all"]:
         print_device_memory("before PPL eval")
@@ -888,6 +1071,9 @@ def main(config, test_args):
             tasks=PPL_TASKS,
             add_special_tokens=test_args.add_special_tokens,
             task_range=test_args.tasks,
+            existing_ppl_results=ppl_res if test_args.resume else None,
+            existing_ppl_times=ppl_times if test_args.resume else None,
+            save_callback=save_intermediate_results if save_path else None,
         )
         print(ppl_res)
         print({"ppl_times_s": ppl_times})
@@ -906,28 +1092,16 @@ def main(config, test_args):
             task_limit_overrides=task_limit_overrides,
             task_seq_overrides=task_seq_overrides,
             task_batch_overrides=task_batch_overrides,
+            existing_acc_results=acc_res if test_args.resume else None,
+            existing_acc_full=acc_full if test_args.resume else None,
+            existing_acc_times=acc_times if test_args.resume else None,
+            save_callback=save_intermediate_results if save_path else None,
         )
         print(acc_res)
         print({"acc_times_s": acc_times})
 
-    # Optionally save results to disk
-    if getattr(test_args, "eval_save_dir", ""):
-        os.makedirs(test_args.eval_save_dir, exist_ok=True)
-
-        def to_serializable(obj):
-            try:
-                import numpy as _np
-                import jax.numpy as _jnp
-            except Exception:  # pragma: no cover
-                _np, _jnp = None, None
-            if _np is not None and isinstance(obj, _np.generic):
-                return obj.item()
-            if _jnp is not None and hasattr(obj, "dtype") and hasattr(obj, "tolist"):
-                return obj.tolist()
-            if hasattr(obj, "tolist"):
-                return obj.tolist()
-            raise TypeError(f"Object of type {type(obj).__name__} is not JSON serializable")
-
+    # Final save (mark as complete by removing _incomplete flag)
+    if save_path:
         results_payload = {
             "run_name": getattr(config, "run_name", ""),
             "model_name": getattr(config, "model_name", ""),
@@ -944,10 +1118,8 @@ def main(config, test_args):
                 "ppl": ppl_times,
                 "lm_eval": acc_times,
             },
+            # No _incomplete flag = evaluation is complete
         }
-
-        save_dir = Path(test_args.eval_save_dir)
-        save_path = save_dir / f"{getattr(config, 'run_name', 'results')}.json"
 
         temp_root = Path.home() / ".maxtext_eval_tmp"
         temp_root.mkdir(parents=True, exist_ok=True)
@@ -1015,6 +1187,7 @@ if __name__ == "__main__":
     parser.add_argument("--acc_task_batch_sizes", type=str, default="", help="Per-task accuracy batch sizes, e.g. 'piqa:4,arc_easy:8'")
     parser.add_argument("--eval_mode", type=str, choices=["ppl", "acc", "all"], default="all", help="Evaluation mode: 'ppl' (perplexity only), 'acc' (accuracy only), or 'all' (both)")
     parser.add_argument("--apply_chat_template", type=str2bool, default=False, help="Apply chat template for ACC evaluation (use True for SFT models, False for pretrained)")
+    parser.add_argument("--resume", type=str2bool, default=False, help="Resume from existing JSON results file, skipping already completed tasks")
     test_args, _ = parser.parse_known_args()
 
     # Remove args defined in this test file to avoid error from pyconfig
@@ -1042,6 +1215,7 @@ if __name__ == "__main__":
         "--acc_task_batch_sizes",
         "--eval_mode",
         "--apply_chat_template",
+        "--resume",
     ]
     for arg in to_remove_args:
         model_args = [s for s in model_args if not s.startswith(arg)]

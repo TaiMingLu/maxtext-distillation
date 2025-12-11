@@ -8,9 +8,11 @@ Generate evaluation task YAML for distillation experiments.
 
 Usage:
     python generate_eval_scripts.py
-    python generate_eval_scripts.py --exp exp1 --eval-type all
-    python generate_eval_scripts.py --exp exp1 exp2 --eval-type pretrain
-    python generate_eval_scripts.py --exp exp1 --eval-type base_acc  # Base model ACC (no chat template)
+    python generate_eval_scripts.py --exp exp1 --eval-type base  # Default: base PPL + base ACC
+    python generate_eval_scripts.py --exp exp1 --eval-type all   # All eval types
+    python generate_eval_scripts.py --exp exp1 exp2 --eval-type ppl  # PPL only
+    python generate_eval_scripts.py --exp exp1 --eval-type base_acc  # Base model ACC only (no chat template)
+    python generate_eval_scripts.py --exp exp1 --eval-type sft  # SFT ACC only (with chat template)
 """
 
 import argparse
@@ -238,7 +240,12 @@ def generate_vanilla_tasks(checkpoint_step_pretrain: int, checkpoint_step_sft: i
 
 
 def generate_run_all_yaml(tasks: list, output_dir: str) -> str:
-    """Generate a run_all.yaml file that lists all eval tasks."""
+    """Generate a run_all.yaml file that lists all eval tasks.
+
+    All tasks are:
+    - Hidden by default (hide: true)
+    - Resumable by default (--resume flag)
+    """
     lines = ["tasks:"]
 
     for task in tasks:
@@ -253,12 +260,12 @@ def generate_run_all_yaml(tasks: list, output_dir: str) -> str:
 
         if eval_type == "ppl":
             ckpt_type = task.get("checkpoint_type", "distill")
-            lines.append(f"    run: bash train/eval-base/eval_pretrain_ppl.sh {run_name} {checkpoint_step} {ckpt_type}")
+            lines.append(f"    run: bash train/eval-base/eval_pretrain_ppl.sh {run_name} {checkpoint_step} {ckpt_type} --resume")
         elif eval_type == "base_acc":
             ckpt_type = task.get("checkpoint_type", "distill")
-            lines.append(f"    run: bash train/eval-base/eval_base_acc.sh {run_name} {checkpoint_step} {ckpt_type}")
+            lines.append(f"    run: bash train/eval-base/eval_base_acc.sh {run_name} {checkpoint_step} {ckpt_type} --resume")
         else:  # acc (SFT with chat template)
-            lines.append(f"    run: bash train/eval-base/eval_sft_acc.sh {run_name} {checkpoint_step}")
+            lines.append(f"    run: bash train/eval-base/eval_sft_acc.sh {run_name} {checkpoint_step} --resume")
 
         if depends_on:
             lines.append(f"    depends_on: {depends_on}")
@@ -283,9 +290,9 @@ def main():
     )
     parser.add_argument(
         "--eval-type",
-        choices=["all", "pretrain", "sft", "base_acc"],
-        default="all",
-        help="Which eval types to generate: all, pretrain (PPL only), sft (ACC with chat template), base_acc (ACC without chat template)",
+        choices=["all", "base", "ppl", "base_acc", "sft"],
+        default="base",
+        help="Which eval types to generate: base (PPL + base ACC, default), all (everything), ppl (PPL only), base_acc (ACC without chat template), sft (ACC with chat template)",
     )
     parser.add_argument(
         "--teacher-archs",
@@ -338,12 +345,16 @@ def main():
     for exp_name in args.exp:
         if exp_name == "vanilla":
             vanilla_tasks = generate_vanilla_tasks(PRETRAIN_CHECKPOINT_STEP, SFT_CHECKPOINT_STEP)
-            if args.eval_type == "pretrain":
+            if args.eval_type == "ppl":
                 vanilla_tasks = [t for t in vanilla_tasks if t["eval_type"] == "ppl"]
             elif args.eval_type == "sft":
                 vanilla_tasks = [t for t in vanilla_tasks if t["eval_type"] == "acc"]
             elif args.eval_type == "base_acc":
                 vanilla_tasks = [t for t in vanilla_tasks if t["eval_type"] == "base_acc"]
+            elif args.eval_type == "base":
+                # base = PPL + base_acc (no SFT)
+                vanilla_tasks = [t for t in vanilla_tasks if t["eval_type"] in ["ppl", "base_acc"]]
+            # else: all - keep all tasks
             all_tasks.extend(vanilla_tasks)
 
             if args.dry_run:
@@ -365,7 +376,7 @@ def main():
 
         for teacher_arch, tokens, alpha in product(teacher_archs, tokens_list, alphas):
             # Generate PPL eval for pretrain
-            if args.eval_type in ["all", "pretrain"]:
+            if args.eval_type in ["all", "base", "ppl"]:
                 ppl_task = generate_pretrain_ppl_task(
                     exp_name=exp_name,
                     teacher_arch=teacher_arch,
@@ -384,7 +395,7 @@ def main():
                     print(f"Added task: {ppl_task['task_id']}")
 
             # Generate base ACC eval for pretrain (no chat template)
-            if args.eval_type in ["all", "base_acc"]:
+            if args.eval_type in ["all", "base", "base_acc"]:
                 base_acc_task = generate_base_acc_task(
                     exp_name=exp_name,
                     teacher_arch=teacher_arch,
