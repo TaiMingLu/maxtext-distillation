@@ -382,14 +382,31 @@ def clean_text_for_tokenizer(text: str) -> str:
     - Surrogate pairs (U+D800 to U+DFFF)
     - Null bytes
     - Other malformed Unicode sequences
+    - Certain control characters
     """
-    import re
-    # Remove surrogate pairs (cause of most 'NormalizedString bad split' errors)
-    text = re.sub(r'[\ud800-\udfff]', '', text)
     # Remove null bytes
     text = text.replace("\x00", "")
-    # Encode to UTF-8 and decode back, replacing any invalid sequences
-    text = text.encode('utf-8', errors='replace').decode('utf-8', errors='replace')
+
+    # Remove characters that can cause issues - filter by codepoint
+    # This includes surrogates (0xD800-0xDFFF) and other problematic ranges
+    cleaned_chars = []
+    for char in text:
+        codepoint = ord(char)
+        # Skip surrogates (0xD800-0xDFFF)
+        if 0xD800 <= codepoint <= 0xDFFF:
+            continue
+        # Skip certain control characters that cause issues
+        if codepoint < 0x20 and codepoint not in (0x09, 0x0A, 0x0D):  # Allow tab, newline, carriage return
+            continue
+        # Skip invalid Unicode codepoints
+        if codepoint > 0x10FFFF:
+            continue
+        cleaned_chars.append(char)
+
+    text = ''.join(cleaned_chars)
+
+    # Final pass: encode to UTF-8 and decode back, replacing any remaining invalid sequences
+    text = text.encode('utf-8', errors='surrogateescape').decode('utf-8', errors='replace')
     return text
 
 def safe_tokenize(tokenizer, text: str, add_special_tokens: bool = True):
