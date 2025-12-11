@@ -47,6 +47,7 @@ import time
 from datetime import datetime
 import os
 import re
+import shlex
 
 ##### Define flags #####
 def get_project():
@@ -344,8 +345,14 @@ def run_commands(commands, id_to_print, jobname, worker_list, is_shell=False, ou
     else:
       output_log = subprocess.DEVNULL
 
-    children.append(subprocess.Popen(command, stdout=output_log, stderr=output_log, shell=is_shell,
-      cwd=os.path.dirname(PKG_DIR)))
+    # Wrap gcloud commands with 'yes |' to auto-answer any interactive prompts (e.g., SSH key overwrite)
+    if command and command[0] == "gcloud":
+      shell_command = "yes | " + " ".join(shlex.quote(c) for c in command)
+      children.append(subprocess.Popen(shell_command, stdout=output_log, stderr=output_log,
+        shell=True, cwd=os.path.dirname(PKG_DIR)))
+    else:
+      children.append(subprocess.Popen(command, stdout=output_log, stderr=output_log, stdin=subprocess.DEVNULL,
+        shell=is_shell, cwd=os.path.dirname(PKG_DIR)))
 
   while True:
     returncodes = [child.poll() for child in children]
