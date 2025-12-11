@@ -191,7 +191,7 @@ PPL_TASKS = [
     "gsm8k",
     "arxiv",
     "humaneval",
-    "pg19",
+    # "pg19",
     "codesearchnet",
     "pubmed_qa",
     "echr",
@@ -483,6 +483,45 @@ def safe_tokenize(tokenizer, text: str, add_special_tokens: bool = True):
             print(f"Warning: Even ASCII tokenization failed. Error: {type(e2).__name__}: {e2}")
             import torch
             return torch.tensor([[tokenizer.bos_token_id or 0]], dtype=torch.long)
+
+def safe_tokenize_batch(tokenizer, texts: list, add_special_tokens: bool = True, separator: str = "\n\n"):
+    """Tokenize a list of texts individually and concatenate, skipping problematic ones.
+
+    This is more robust than joining all texts and tokenizing at once, because
+    if one text fails, we can skip it and continue with the rest.
+    """
+    import torch
+    all_tokens = []
+    skipped = 0
+
+    for i, text in enumerate(texts):
+        cleaned_text = clean_text_for_tokenizer(text)
+        if separator and i > 0:
+            cleaned_text = separator + cleaned_text
+
+        try:
+            tokens = tokenizer.encode(cleaned_text, return_tensors='pt', add_special_tokens=(add_special_tokens and i == 0))
+            all_tokens.append(tokens.squeeze(0))
+        except BaseException as e:
+            # Try ASCII fallback
+            ascii_text = cleaned_text.encode('ascii', errors='ignore').decode('ascii')
+            try:
+                tokens = tokenizer.encode(ascii_text, return_tensors='pt', add_special_tokens=(add_special_tokens and i == 0))
+                all_tokens.append(tokens.squeeze(0))
+            except BaseException as e2:
+                skipped += 1
+                if skipped <= 10:  # Only log first 10 skips
+                    print(f"Warning: Skipping text {i} due to tokenization failure: {type(e2).__name__}")
+
+    if skipped > 0:
+        print(f"Total skipped texts due to tokenization failures: {skipped}/{len(texts)}")
+
+    if not all_tokens:
+        # All texts failed - return minimal tensor
+        print(f"Warning: All {len(texts)} texts failed to tokenize!")
+        return torch.tensor([[tokenizer.bos_token_id or 0]], dtype=torch.long)
+
+    return torch.cat(all_tokens).unsqueeze(0)
 
 def get_ppl_enc(task, tokenizer, add_special_tokens: bool = True):
     if task == 'wikitext':
