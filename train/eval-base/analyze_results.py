@@ -19,6 +19,7 @@ from collections import defaultdict
 from pathlib import Path
 from typing import Optional
 import pandas as pd
+from tqdm import tqdm
 
 
 # Known PPL tasks
@@ -227,7 +228,7 @@ def analyze_directory(results_dir: Path, eval_type: str = "auto") -> pd.DataFram
 
     print(f"Found {len(json_files)} JSON files in {results_dir}")
 
-    for json_path in json_files:
+    for json_path in tqdm(json_files, desc=f"Loading {results_dir.name}", unit="file"):
         # Parse filename
         file_info = parse_filename(json_path.name)
 
