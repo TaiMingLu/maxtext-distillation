@@ -36,14 +36,11 @@ EXP2_CONFIG = {
 PRETRAIN_CHECKPOINT_STEP = 24999
 SFT_CHECKPOINT_STEP = 999
 
-# Vanilla baselines
+# Vanilla baselines - all size/token combinations
 VANILLA_CONFIG = {
-    "checkpoints": [
-        {
-            "name": "llama3.1-1b-finewebedu-vanilla-s42-50b",
-            "checkpoint_type": "pretrain",
-        },
-    ],
+    "sizes": ["05b", "1b", "3b", "8b"],
+    "tokens": ["30b", "50b", "100b", "300b", "1000b"],
+    "seed": 42,
 }
 
 DEFAULT_TEACHER_SEED = 42
@@ -195,13 +192,27 @@ def generate_base_acc_task(
     }
 
 
+def get_vanilla_run_name(size: str, tokens: str, seed: int) -> str:
+    """Get vanilla run name like llama8b-finewebedu-vanilla-s42-300b."""
+    return f"llama{size}-finewebedu-vanilla-s{seed}-{tokens}"
+
+
+def get_vanilla_training_task_id(size: str, tokens: str, seed: int) -> str:
+    """Get the training task ID for vanilla (for depends_on)."""
+    return f"llama{size}_finewebedu_vanilla_s{seed}_{tokens}"
+
+
 def generate_vanilla_tasks(checkpoint_step_pretrain: int, checkpoint_step_sft: int) -> list:
-    """Generate eval tasks for vanilla models."""
+    """Generate eval tasks for vanilla models (all size/token combinations)."""
     tasks = []
 
-    for ckpt in VANILLA_CONFIG["checkpoints"]:
-        name = ckpt["name"]
-        ckpt_type = ckpt["checkpoint_type"]
+    sizes = VANILLA_CONFIG["sizes"]
+    tokens_list = VANILLA_CONFIG["tokens"]
+    seed = VANILLA_CONFIG["seed"]
+
+    for size, tokens in product(sizes, tokens_list):
+        name = get_vanilla_run_name(size, tokens, seed)
+        training_task_id = get_vanilla_training_task_id(size, tokens, seed)
 
         # PPL eval for vanilla pretrain
         ppl_task_id = f"eval_ppl_vanilla_{name.replace('-', '_')}"
@@ -209,9 +220,9 @@ def generate_vanilla_tasks(checkpoint_step_pretrain: int, checkpoint_step_sft: i
             "task_id": ppl_task_id,
             "run_name": name,
             "checkpoint_step": checkpoint_step_pretrain,
-            "checkpoint_type": ckpt_type,
+            "checkpoint_type": "pretrain",
             "eval_type": "ppl",
-            "depends_on": None,  # Vanilla has no dependency
+            "depends_on": training_task_id,
         })
 
         # Base ACC eval for vanilla pretrain (no chat template)
@@ -220,20 +231,20 @@ def generate_vanilla_tasks(checkpoint_step_pretrain: int, checkpoint_step_sft: i
             "task_id": base_acc_task_id,
             "run_name": name,
             "checkpoint_step": checkpoint_step_pretrain,
-            "checkpoint_type": ckpt_type,
+            "checkpoint_type": "pretrain",
             "eval_type": "base_acc",
-            "depends_on": None,  # Vanilla has no dependency
+            "depends_on": training_task_id,
         })
 
         # ACC eval for vanilla SFT (with chat template)
-        sft_name = f"sft_vanilla_{name}"
+        sft_name = f"sft_{name}"
         acc_task_id = f"eval_acc_sft_vanilla_{name.replace('-', '_')}"
         tasks.append({
             "task_id": acc_task_id,
             "run_name": sft_name,
             "checkpoint_step": checkpoint_step_sft,
             "eval_type": "acc",
-            "depends_on": f"sft_vanilla_{name.replace('-', '_')}",  # Depends on SFT training
+            "depends_on": f"sft_{training_task_id}",
         })
 
     return tasks
@@ -242,21 +253,29 @@ def generate_vanilla_tasks(checkpoint_step_pretrain: int, checkpoint_step_sft: i
 def generate_run_all_yaml(tasks: list, output_dir: str) -> str:
     """Generate a run_all.yaml file that lists all eval tasks.
 
-    All tasks are:
-    - Hidden by default (hide: true)
-    - Resumable by default (--resume flag)
+    - Vanilla tasks are NOT hidden (visible by default)
+    - Other tasks are hidden by default (hide: true)
+    - All tasks are resumable by default (--resume flag)
     """
+    # Sort tasks: vanilla first, then others
+    vanilla_tasks = [t for t in tasks if "vanilla" in t["task_id"]]
+    other_tasks = [t for t in tasks if "vanilla" not in t["task_id"]]
+    sorted_tasks = vanilla_tasks + other_tasks
+
     lines = ["tasks:"]
 
-    for task in tasks:
+    for task in sorted_tasks:
         task_id = task["task_id"]
         run_name = task["run_name"]
         checkpoint_step = task["checkpoint_step"]
         eval_type = task["eval_type"]
         depends_on = task.get("depends_on")
+        is_vanilla = "vanilla" in task_id
 
         lines.append(f"  - id: {task_id}")
-        lines.append(f"    hide: true")
+        # Do NOT hide vanilla tasks
+        if not is_vanilla:
+            lines.append(f"    hide: true")
 
         if eval_type == "ppl":
             ckpt_type = task.get("checkpoint_type", "distill")

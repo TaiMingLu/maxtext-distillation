@@ -3,47 +3,23 @@ tasks:
     run: bash train/exp1/exp1_llama1b-A05BT50BS42-a02-s43.sh
   - id: exp1_llama1b_finewebedu_distill_soft_A05BT50BS42_a04_s43
     run: bash train/exp1/exp1_llama1b-A05BT50BS42-a04-s43.sh
-  - id: exp1_llama1b_finewebedu_distill_soft_A05BT50BS42_a05_s43
-    run: bash train/exp1/exp1_llama1b-A05BT50BS42-a05-s43.sh
   - id: exp1_llama1b_finewebedu_distill_soft_A05BT50BS42_a06_s43
     run: bash train/exp1/exp1_llama1b-A05BT50BS42-a06-s43.sh
   - id: exp1_llama1b_finewebedu_distill_soft_A05BT50BS42_a08_s43
     run: bash train/exp1/exp1_llama1b-A05BT50BS42-a08-s43.sh
-  - id: exp1_llama1b_finewebedu_distill_soft_A05BT50BS42_a1_s43
-    run: bash train/exp1/exp1_llama1b-A05BT50BS42-a1-s43.sh
   - id: exp1_llama1b_finewebedu_distill_soft_A1BT50BS42_a02_s43
     run: bash train/exp1/exp1_llama1b-A1BT50BS42-a02-s43.sh
   - id: exp1_llama1b_finewebedu_distill_soft_A1BT50BS42_a04_s43
     run: bash train/exp1/exp1_llama1b-A1BT50BS42-a04-s43.sh
-  - id: exp1_llama1b_finewebedu_distill_soft_A1BT50BS42_a05_s43
-    run: bash train/exp1/exp1_llama1b-A1BT50BS42-a05-s43.sh
   - id: exp1_llama1b_finewebedu_distill_soft_A1BT50BS42_a06_s43
     run: bash train/exp1/exp1_llama1b-A1BT50BS42-a06-s43.sh
   - id: exp1_llama1b_finewebedu_distill_soft_A1BT50BS42_a08_s43
     run: bash train/exp1/exp1_llama1b-A1BT50BS42-a08-s43.sh
-  - id: exp1_llama1b_finewebedu_distill_soft_A1BT50BS42_a1_s43
-    run: bash train/exp1/exp1_llama1b-A1BT50BS42-a1-s43.sh
   - id: exp1_llama1b_finewebedu_distill_soft_A3BT50BS42_a02_s43
     run: bash train/exp1/exp1_llama1b-A3BT50BS42-a02-s43.sh
   - id: exp1_llama1b_finewebedu_distill_soft_A3BT50BS42_a04_s43
     run: bash train/exp1/exp1_llama1b-A3BT50BS42-a04-s43.sh
-  - id: exp1_llama1b_finewebedu_distill_soft_A3BT50BS42_a05_s43
-    run: bash train/exp1/exp1_llama1b-A3BT50BS42-a05-s43.sh
   - id: exp1_llama1b_finewebedu_distill_soft_A3BT50BS42_a06_s43
     run: bash train/exp1/exp1_llama1b-A3BT50BS42-a06-s43.sh
   - id: exp1_llama1b_finewebedu_distill_soft_A3BT50BS42_a08_s43
     run: bash train/exp1/exp1_llama1b-A3BT50BS42-a08-s43.sh
-  - id: exp1_llama1b_finewebedu_distill_soft_A3BT50BS42_a1_s43
-    run: bash train/exp1/exp1_llama1b-A3BT50BS42-a1-s43.sh
-  - id: exp1_llama1b_finewebedu_distill_soft_A8BT50BS42_a02_s43
-    run: bash train/exp1/exp1_llama1b-A8BT50BS42-a02-s43.sh
-  - id: exp1_llama1b_finewebedu_distill_soft_A8BT50BS42_a04_s43
-    run: bash train/exp1/exp1_llama1b-A8BT50BS42-a04-s43.sh
-  - id: exp1_llama1b_finewebedu_distill_soft_A8BT50BS42_a05_s43
-    run: bash train/exp1/exp1_llama1b-A8BT50BS42-a05-s43.sh
-  - id: exp1_llama1b_finewebedu_distill_soft_A8BT50BS42_a06_s43
-    run: bash train/exp1/exp1_llama1b-A8BT50BS42-a06-s43.sh
-  - id: exp1_llama1b_finewebedu_distill_soft_A8BT50BS42_a08_s43
-    run: bash train/exp1/exp1_llama1b-A8BT50BS42-a08-s43.sh
-  - id: exp1_llama1b_finewebedu_distill_soft_A8BT50BS42_a1_s43
-    run: bash train/exp1/exp1_llama1b-A8BT50BS42-a1-s43.sh

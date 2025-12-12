@@ -32,7 +32,7 @@ export LR=3.e-4
 export MIN_LR_RATIO=0.1
 export WARMUP_RATIO=0.05
 export ASYNC_CHECKPOINTING=false
-export BASE_OUTPUT_DIRECTORY="gs://$BUCKET_NAME/ckpts/pretrain"
+export BASE_OUTPUT_DIRECTORY="gs://$BUCKET_NAME/ckpts/vanilla"
 export DATA_FILES='/home/terry/gcs-bucket/datasets/fineweb-edu/*.array_record'
 
 export RUN_NAME="${MODEL_NAME}-finewebedu-vanilla-s43-50b"
@@ -88,7 +88,7 @@ python -u multihost_runner_orig.py \
         checkpoint_max_to_keep=100 \
         gcs_metrics=True \
         use_wandb=True \
-        wandb_project=maxtext_1b \
+        wandb_project=maxtext_exp \
         wandb_run_name=${RUN_NAME} \
         wandb_run_id=${RUN_ID} \
         packing=true \

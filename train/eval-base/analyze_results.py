@@ -6,9 +6,12 @@ Parses result JSONs from PPL and ACC evaluations, extracts run metadata
 from filenames, and organizes results by experiment configuration.
 
 Usage:
-    python analyze_results.py /path/to/results_dir
-    python analyze_results.py /path/to/results_dir --output results.csv
-    python analyze_results.py /path/to/ppl_results /path/to/acc_results --merge
+    python analyze_results.py                    # Analyze all (ppl + base_acc + sft_acc)
+    python analyze_results.py ppl                # PPL only
+    python analyze_results.py base_acc           # Base ACC only
+    python analyze_results.py ppl base_acc       # PPL + Base ACC
+    python analyze_results.py -o results.csv     # Save all to CSV
+    python analyze_results.py --show-incomplete  # Only incomplete runs
 """
 
 import argparse
@@ -429,20 +432,48 @@ def print_summary_stats(df: pd.DataFrame):
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Analyze evaluation results")
+    # Hardcoded base path for results
+    BASE_RESULTS_DIR = Path("/home/terry/gcs-bucket/eval_new11")
+
+    # Available result types and their directory names
+    RESULT_TYPES = {
+        "ppl": "ppl_results",
+        "base_acc": "base_acc_results",
+        "sft_acc": "acc_results",
+    }
+
+    parser = argparse.ArgumentParser(
+        description="Analyze evaluation results",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""
+Examples:
+    python analyze_results.py                    # Analyze all (ppl + base_acc + sft_acc)
+    python analyze_results.py ppl                # PPL only
+    python analyze_results.py base_acc           # Base ACC only
+    python analyze_results.py ppl base_acc       # PPL + Base ACC
+    python analyze_results.py -o results.csv     # Save to CSV
+        """
+    )
     parser.add_argument(
-        "dirs",
-        nargs="+",
-        help="Directories containing JSON result files",
+        "types",
+        nargs="*",
+        default=[],
+        help="Result types to analyze: ppl, base_acc, sft_acc, or all (default: all)",
     )
     parser.add_argument(
         "--output", "-o",
-        help="Output CSV file path",
+        default="analysis_results.json",
+        help="Output file path (default: analysis_results.json)",
     )
     parser.add_argument(
-        "--merge",
+        "--no-save",
         action="store_true",
-        help="Merge results from multiple directories by run_name",
+        help="Don't save to file, only print to terminal",
+    )
+    parser.add_argument(
+        "--base-dir",
+        default=str(BASE_RESULTS_DIR),
+        help=f"Base directory for results (default: {BASE_RESULTS_DIR})",
     )
     parser.add_argument(
         "--no-summary",
@@ -462,10 +493,30 @@ def main():
 
     args = parser.parse_args()
 
+    base_dir = Path(args.base_dir)
+
+    # Validate types
+    valid_types = ["ppl", "base_acc", "sft_acc", "all"]
+    for t in args.types:
+        if t not in valid_types:
+            print(f"Error: Invalid type '{t}'. Choose from: {', '.join(valid_types)}")
+            return
+
+    # Determine which result types to analyze
+    if "all" in args.types or not args.types:
+        types_to_analyze = list(RESULT_TYPES.keys())
+    else:
+        types_to_analyze = args.types
+
     # Analyze each directory
     dfs = []
-    for dir_path in args.dirs:
-        path = Path(dir_path)
+    for result_type in types_to_analyze:
+        dir_name = RESULT_TYPES.get(result_type)
+        if not dir_name:
+            print(f"Warning: Unknown result type: {result_type}")
+            continue
+
+        path = base_dir / dir_name
         if not path.exists():
             print(f"Warning: Directory not found: {path}")
             continue
@@ -481,11 +532,11 @@ def main():
         print("No results found!")
         return
 
-    # Merge or concatenate
-    if args.merge:
+    # Always merge when analyzing multiple types (combines PPL + ACC for same runs)
+    if len(dfs) > 1:
         result = merge_results(dfs)
     else:
-        result = pd.concat(dfs, ignore_index=True)
+        result = dfs[0]
 
     # Filter by completion status
     if args.show_incomplete and "_incomplete" in result.columns:
@@ -500,10 +551,40 @@ def main():
     if not args.no_summary:
         print_summary_stats(result)
 
-    # Save to CSV
-    if args.output:
-        result.to_csv(args.output, index=False)
-        print(f"\nSaved to: {args.output}")
+    # Save to file (default behavior)
+    if not args.no_save:
+        output_path = args.output
+
+        # Convert DataFrame to JSON-serializable format
+        # Replace NaN/None with None for valid JSON
+        def clean_for_json(obj):
+            if isinstance(obj, dict):
+                return {k: clean_for_json(v) for k, v in obj.items()}
+            elif isinstance(obj, list):
+                return [clean_for_json(v) for v in obj]
+            elif isinstance(obj, float) and (pd.isna(obj) or obj != obj):  # NaN check
+                return None
+            elif pd.isna(obj):
+                return None
+            return obj
+
+        runs_list = result.to_dict(orient="records")
+        runs_clean = clean_for_json(runs_list)
+
+        result_dict = {
+            "metadata": {
+                "types_analyzed": types_to_analyze,
+                "base_dir": str(base_dir),
+                "total_runs": len(result),
+                "incomplete_runs": int(result["_incomplete"].sum()) if "_incomplete" in result.columns else 0,
+            },
+            "runs": runs_clean,
+        }
+
+        # Save as JSON
+        with open(output_path, 'w') as f:
+            json.dump(result_dict, f, indent=2)
+        print(f"\nSaved to: {output_path}")
     else:
         # Print to stdout
         print("\n" + "=" * 60)

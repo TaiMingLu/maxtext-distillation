@@ -34,7 +34,7 @@ export KD_ALPHA=0.8  #KD_ALPHA=0.0 -- pure cross-entropy (no KD), KD_ALPHA=1.0 -
 export KD_TEMPERATURE=1.0
 export KD_TEACHER_PARAMETERS_PATH="/home/terry/gcs-bucket/ckpts/pretrain_param_only_v6/llama3b-vanilla-50B-s42/checkpoint_24999/0/items"
 export TEACHER_MODEL_NAME="llama3.1-3b"
-export BASE_OUTPUT_DIRECTORY="gs://$BUCKET_NAME/ckpts/distill_pretrain"
+export BASE_OUTPUT_DIRECTORY="gs://$BUCKET_NAME/ckpts/exp1"
 export DATA_FILES='/home/terry/gcs-data/datasets/fineweb-edu/*.array_record'
 
 export RUN_NAME="exp1_llama3.1-1b-A3BT50BS42-a08-s43"
@@ -75,7 +75,7 @@ python -u multihost_runner_orig.py \
     export TPU_LOG_DIR=/home/terry/tpu_logs
     source ~/maxtext_env/bin/activate
     export WANDB_API_KEY='01126ae90da25bae0d86704140ac978cb9fd9c73'
-    export WANDB_PROJECT=maxtext_1b
+    export WANDB_PROJECT=maxtext_exp
     export WANDB_NAME=${RUN_NAME}
     python3.10 -u -m MaxText.train MaxText/configs/base.yml \
         run_name=${RUN_NAME} \
@@ -100,7 +100,7 @@ python -u multihost_runner_orig.py \
         checkpoint_max_to_keep=10 \
         gcs_metrics=True \
         use_wandb=True \
-        wandb_project=maxtext_1b \
+        wandb_project=maxtext_exp \
         wandb_run_name=${RUN_NAME} \
         wandb_run_id=${RUN_ID} \
         packing=true \
