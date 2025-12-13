@@ -42,8 +42,8 @@ export PRETRAINED_CHECKPOINT="gs://${BUCKET_NAME}/ckpts/pretrain/llama3.1-1b-fin
 export BASE_OUTPUT_DIRECTORY="gs://$BUCKET_NAME/ckpts/sft"
 
 # Run naming
-export RUN_NAME="sft_vanilla1b_b1_s10000"
-export RUN_ID="sft_vanilla1b_b1_s10000"
+export RUN_NAME="sft_vanilla1b_b1_s10000_pretrain_setup"
+export RUN_ID="sft_vanilla1b_b1_s10000_pretrain_setup"
 
 # HuggingFace dataset configuration
 # Dolci-Instruct-SFT-7B: 2.15M samples with messages format [{role, content}, ...]
