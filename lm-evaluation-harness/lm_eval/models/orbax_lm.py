@@ -277,17 +277,17 @@ class OrbaxLM(LM):
         self, requests: list["Instance"], disable_tqdm: bool = False
     ) -> list[tuple[float, bool]]:
         new_reqs = []
-        # # Debug: print first few requests to understand the format
-        # debug_count = 0
+        # Debug: print first few requests to understand the format
+        debug_count = 0
         for context, continuation in [req.args for req in requests]:
-            # if debug_count < 2:
-            #     print(f"\n[DEBUG loglikelihood] Request {debug_count}:")
-            #     print(f"  Context (len={len(context)}):")
-            #     print(f"  ---BEGIN CONTEXT---")
-            #     print(context)
-            #     print(f"  ---END CONTEXT---")
-            #     print(f"  Continuation: '{continuation}'")
-            #     debug_count += 1
+            if debug_count < 2:
+                print(f"\n[DEBUG loglikelihood] Request {debug_count}:")
+                print(f"  Context (len={len(context)}):")
+                print(f"  ---BEGIN CONTEXT---")
+                print(context)
+                print(f"  ---END CONTEXT---")
+                print(f"  Continuation: '{continuation}'")
+                debug_count += 1
             if context == "":
                 # BOS or EOS as context
                 context_enc, continuation_enc = (
