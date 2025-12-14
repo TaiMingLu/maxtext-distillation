@@ -277,14 +277,16 @@ def generate_run_all_yaml(tasks: list, output_dir: str) -> str:
         if not is_vanilla:
             lines.append(f"    hide: true")
 
+        # Map checkpoint_type to actual directory name
+        ckpt_type = task.get("checkpoint_type", "distill")
+        ckpt_dir = "distill_pretrain" if ckpt_type == "distill" else ckpt_type
+
         if eval_type == "ppl":
-            ckpt_type = task.get("checkpoint_type", "distill")
-            lines.append(f"    run: bash train/eval-base/eval_pretrain_ppl.sh {run_name} {checkpoint_step} {ckpt_type} --resume")
+            lines.append(f"    run: bash train/eval-base/eval_pretrain_ppl.sh {run_name} llama3.1-1b {checkpoint_step} {ckpt_dir} --resume")
         elif eval_type == "base_acc":
-            ckpt_type = task.get("checkpoint_type", "distill")
-            lines.append(f"    run: bash train/eval-base/eval_base_acc.sh {run_name} {checkpoint_step} {ckpt_type} --resume")
+            lines.append(f"    run: bash train/eval-base/eval_base_acc.sh {run_name} llama3.1-1b {checkpoint_step} {ckpt_dir} --resume")
         else:  # acc (SFT with chat template)
-            lines.append(f"    run: bash train/eval-base/eval_sft_acc.sh {run_name} {checkpoint_step} --resume")
+            lines.append(f"    run: bash train/eval-base/eval_sft_acc.sh {run_name} llama3.1-1b {checkpoint_step} sft --resume")
 
         if depends_on:
             lines.append(f"    depends_on: {depends_on}")

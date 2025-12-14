@@ -4,18 +4,12 @@
 # Runs lm-evaluation-harness PPL tasks on Orbax checkpoints
 #
 # Usage:
-#   ./eval_pretrain_ppl.sh <run_name> [checkpoint_step] [checkpoint_type] [--resume]
+#   ./eval_pretrain_ppl.sh <run_name> <model_name> <checkpoint_step> <ckpt_dir> [--resume]
 #
 # Examples:
-#   ./eval_pretrain_ppl.sh exp1_llama3.1-1b-A1BT50BS42-a1-s43
-#   ./eval_pretrain_ppl.sh exp1_llama3.1-1b-A1BT50BS42-a1-s43 24999
-#   ./eval_pretrain_ppl.sh exp1_llama3.1-1b-A1BT50BS42-a1-s43 24999 distill
-#   ./eval_pretrain_ppl.sh llama3.1-1b-finewebedu-vanilla-s42-50b 24999 pretrain
-#   ./eval_pretrain_ppl.sh llama3.1-1b-finewebedu-vanilla-s42-50b 24999 pretrain --resume
-#
-# checkpoint_type:
-#   distill  - gs://BUCKET/ckpts/distill_pretrain/... (default)
-#   pretrain - gs://BUCKET/ckpts/pretrain/...
+#   ./eval_pretrain_ppl.sh llama3.1-1b-finewebedu-vanilla-s42_v6 llama3.1-1b 24999 pretrain
+#   ./eval_pretrain_ppl.sh llama3.1-1b-finewebedu-vanilla-s42_v6 llama3.1-1b 24999 pretrain --resume
+#   ./eval_pretrain_ppl.sh exp1_llama3.1-1b-A1BT50BS42-a1-s43 llama3.1-1b 24999 distill
 #
 # --resume: Continue from incomplete results (saves progress after each task)
 #
@@ -23,17 +17,20 @@
 set +x
 set -eo pipefail
 
-if [[ $# -lt 1 ]]; then
-  echo "Usage: $0 <run_name> [checkpoint_step] [checkpoint_type]"
-  echo "  run_name: Name of the pretrain run"
-  echo "  checkpoint_step: Checkpoint step to evaluate (default: 24999)"
-  echo "  checkpoint_type: 'distill' or 'pretrain' (default: distill)"
+if [[ $# -lt 4 ]]; then
+  echo "Usage: $0 <run_name> <model_name> <checkpoint_step> <ckpt_dir> [--resume]"
+  echo "  run_name: Name of the run (e.g., llama3.1-1b-finewebedu-vanilla-s42_v6)"
+  echo "  model_name: Model architecture (e.g., llama3.1-1b)"
+  echo "  checkpoint_step: Checkpoint step to evaluate"
+  echo "  ckpt_dir: Checkpoint directory type (e.g., pretrain, distill)"
+  echo "  --resume: Continue from incomplete results"
   exit 1
 fi
 
 RUN_NAME="$1"
-CHECKPOINT_STEP="${2:-24999}"
-CHECKPOINT_TYPE="${3:-distill}"
+MODEL_NAME="$2"
+CHECKPOINT_STEP="$3"
+CKPT_DIR="$4"
 # Check for --resume flag in remaining args
 RESUME_FLAG="false"
 for arg in "$@"; do
@@ -59,29 +56,8 @@ for var in "${required_vars[@]}"; do
   fi
 done
 
-# Extract model name from run name (e.g., exp1_llama3.1-1b-... -> llama3.1-1b)
-MODEL_NAME=$(echo "${RUN_NAME}" | sed -E 's/.*_(llama[0-9.]+-(0?[0-9]+b)).*/\1/')
-if [[ -z "${MODEL_NAME}" || "${MODEL_NAME}" == "${RUN_NAME}" ]]; then
-  # Try another pattern for vanilla runs (e.g., llama3.1-1b-finewebedu-vanilla-...)
-  MODEL_NAME=$(echo "${RUN_NAME}" | sed -E 's/^(llama[0-9.]+-(0?[0-9]+b)).*/\1/')
-fi
-if [[ -z "${MODEL_NAME}" || "${MODEL_NAME}" == "${RUN_NAME}" ]]; then
-  echo "[ERROR] Could not extract model name from run name: ${RUN_NAME}"
-  echo "Expected format: *_llama3.1-1b-* or llama3.1-1b-* or similar"
-  exit 1
-fi
-
-# Checkpoint path based on type
-if [[ "${CHECKPOINT_TYPE}" == "distill" ]]; then
-  CHECKPOINT_PATH="gs://${BUCKET_NAME}/ckpts/distill_pretrain/${RUN_NAME}/checkpoints/${CHECKPOINT_STEP}/items"
-elif [[ "${CHECKPOINT_TYPE}" == "pretrain" ]]; then
-  CHECKPOINT_PATH="gs://${BUCKET_NAME}/ckpts/pretrain/${RUN_NAME}/checkpoints/${CHECKPOINT_STEP}/items"
-else
-  echo "[ERROR] Invalid checkpoint_type: ${CHECKPOINT_TYPE}. Use 'distill' or 'pretrain'"
-  exit 1
-fi
-
 # Configuration
+CHECKPOINT_PATH="gs://${BUCKET_NAME}/ckpts/${CKPT_DIR}/${RUN_NAME}/checkpoints/${CHECKPOINT_STEP}/items"
 HF_MODEL_PATH="/home/terry/gcs-bucket/HF_HOME/Llama-3.2-1B-Instruct"
 EVAL_RESULTS_DIR="/home/terry/gcs-bucket/eval_new11/ppl_results"
 RESULT_JSON_PATH="${EVAL_RESULTS_DIR}/${RUN_NAME}_step${CHECKPOINT_STEP}.json"
@@ -95,7 +71,7 @@ echo "PPL Evaluation Configuration:"
 echo "  RUN_NAME: ${RUN_NAME}"
 echo "  MODEL_NAME: ${MODEL_NAME}"
 echo "  CHECKPOINT_STEP: ${CHECKPOINT_STEP}"
-echo "  CHECKPOINT_TYPE: ${CHECKPOINT_TYPE}"
+echo "  CKPT_DIR: ${CKPT_DIR}"
 echo "  CHECKPOINT_PATH: ${CHECKPOINT_PATH}"
 echo "  HF_MODEL_PATH: ${HF_MODEL_PATH}"
 echo "  EVAL_RESULTS_DIR: ${EVAL_RESULTS_DIR}"
