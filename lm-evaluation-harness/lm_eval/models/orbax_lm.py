@@ -150,6 +150,18 @@ class OrbaxLM(LM):
         # Store tokenizer name for chat template support
         self._tokenizer_name = getattr(tokenizer, "name_or_path", None) or "unknown"
 
+        # Override tokenizer's chat_template to remove default system prompt
+        # (Llama 3 injects "Cutting Knowledge Date..." by default)
+        self.tokenizer.chat_template = (
+            "{% set loop_messages = messages %}"
+            "{% for message in loop_messages %}"
+            "{% set content = '<|start_header_id|>' + message['role'] + '<|end_header_id|>\n\n'+ message['content'] | trim + '<|eot_id|>' %}"
+            "{% if loop.index0 == 0 %}{% set content = bos_token + content %}{% endif %}"
+            "{{ content }}"
+            "{% endfor %}"
+            "{% if add_generation_prompt %}{{ '<|start_header_id|>assistant<|end_header_id|>\n\n' }}{% endif %}"
+        )
+
         self._compiled_forward = self._create_fast_forward()
 
     @property
