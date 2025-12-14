@@ -4,12 +4,11 @@
 # Runs lm-evaluation-harness accuracy tasks on Orbax checkpoints
 #
 # Usage:
-#   ./eval_sft_acc.sh <sft_run_name> [checkpoint_step] [--resume]
+#   ./eval_sft_acc.sh <run_name> <model_name> <checkpoint_step> <ckpt_dir> [--resume]
 #
 # Examples:
-#   ./eval_sft_acc.sh sft_exp1_llama3.1-1b-A1BT50BS42-a1-s43
-#   ./eval_sft_acc.sh sft_exp1_llama3.1-1b-A1BT50BS42-a1-s43 999
-#   ./eval_sft_acc.sh sft_exp1_llama3.1-1b-A1BT50BS42-a1-s43 999 --resume
+#   ./eval_sft_acc.sh sft_vanilla1b_b1_s10000 llama3.1-1b 9999 sft
+#   ./eval_sft_acc.sh sft_vanilla1b_b1_s10000 llama3.1-1b 9999 sft --resume
 #
 # --resume: Continue from incomplete results (saves progress after each task)
 #
@@ -17,16 +16,20 @@
 set +x
 set -eo pipefail
 
-if [[ $# -lt 1 ]]; then
-  echo "Usage: $0 <sft_run_name> [checkpoint_step] [--resume]"
-  echo "  sft_run_name: Name of the SFT run (e.g., sft_exp1_llama3.1-1b-A1BT50BS42-a1-s43)"
-  echo "  checkpoint_step: Checkpoint step to evaluate (default: 999)"
+if [[ $# -lt 4 ]]; then
+  echo "Usage: $0 <run_name> <model_name> <checkpoint_step> <ckpt_dir> [--resume]"
+  echo "  run_name: Name of the run (e.g., sft_vanilla1b_b1_s10000)"
+  echo "  model_name: Model architecture (e.g., llama3.1-1b)"
+  echo "  checkpoint_step: Checkpoint step to evaluate"
+  echo "  ckpt_dir: Checkpoint directory type (e.g., sft, pretrain)"
   echo "  --resume: Continue from incomplete results"
   exit 1
 fi
 
 RUN_NAME="$1"
-CHECKPOINT_STEP="${2:-999}"
+MODEL_NAME="$2"
+CHECKPOINT_STEP="$3"
+CKPT_DIR="$4"
 # Check for --resume flag in remaining args
 RESUME_FLAG="false"
 for arg in "$@"; do
@@ -52,16 +55,8 @@ for var in "${required_vars[@]}"; do
   fi
 done
 
-# Extract model name from run name (e.g., sft_exp1_llama3.1-1b-... -> llama3.1-1b)
-MODEL_NAME=$(echo "${RUN_NAME}" | sed -E 's/.*_(llama[0-9.]+-(0?[0-9]+b)).*/\1/')
-if [[ -z "${MODEL_NAME}" || "${MODEL_NAME}" == "${RUN_NAME}" ]]; then
-  echo "[ERROR] Could not extract model name from run name: ${RUN_NAME}"
-  echo "Expected format: sft_*_llama3.1-1b-* or similar"
-  exit 1
-fi
-
 # Configuration
-CHECKPOINT_PATH="gs://${BUCKET_NAME}/ckpts/sft/${RUN_NAME}/checkpoints/${CHECKPOINT_STEP}/items"
+CHECKPOINT_PATH="gs://${BUCKET_NAME}/ckpts/${CKPT_DIR}/${RUN_NAME}/checkpoints/${CHECKPOINT_STEP}/items"
 HF_MODEL_PATH="/home/terry/gcs-bucket/HF_HOME/Llama-3.2-1B-Instruct"
 EVAL_RESULTS_DIR="/home/terry/gcs-bucket/eval_new11/acc_results"
 RESULT_JSON_PATH="${EVAL_RESULTS_DIR}/${RUN_NAME}_step${CHECKPOINT_STEP}.json"
