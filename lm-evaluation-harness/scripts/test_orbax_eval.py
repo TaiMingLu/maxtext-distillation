@@ -889,6 +889,8 @@ def get_acc(
             confirm_run_unsafe_code=True,
             limit=eval_limit,
             apply_chat_template=test_args.apply_chat_template,
+            # Only use fewshot_as_multiturn when apply_chat_template is True
+            fewshot_as_multiturn=test_args.fewshot_as_multiturn and test_args.apply_chat_template,
         )
         
         task_metrics = res['results'][task]
@@ -1246,6 +1248,7 @@ if __name__ == "__main__":
     parser.add_argument("--acc_task_batch_sizes", type=str, default="", help="Per-task accuracy batch sizes, e.g. 'piqa:4,arc_easy:8'")
     parser.add_argument("--eval_mode", type=str, choices=["ppl", "acc", "all"], default="all", help="Evaluation mode: 'ppl' (perplexity only), 'acc' (accuracy only), or 'all' (both)")
     parser.add_argument("--apply_chat_template", type=str2bool, default=False, help="Apply chat template for ACC evaluation (use True for SFT models, False for pretrained)")
+    parser.add_argument("--fewshot_as_multiturn", type=str2bool, default=True, help="Format few-shot examples as multi-turn conversation (recommended for SFT models)")
     parser.add_argument("--resume", type=str2bool, default=False, help="Resume from existing JSON results file, skipping already completed tasks")
     test_args, _ = parser.parse_known_args()
 
@@ -1274,6 +1277,7 @@ if __name__ == "__main__":
         "--acc_task_batch_sizes",
         "--eval_mode",
         "--apply_chat_template",
+        "--fewshot_as_multiturn",
         "--resume",
     ]
     for arg in to_remove_args:
