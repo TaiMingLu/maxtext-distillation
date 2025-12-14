@@ -254,10 +254,30 @@ class SFTPromptMasking(grain.MapTransform):
     for i, text in enumerate(element[self.text_column_name]):
       inputs += text
       targets += [self.unk_id] * len(text) if self.completion_only and element["is_prompt"][i] else text
-    return {
+
+    result = {
         "inputs": np.asarray(inputs[: self.max_target_length], dtype=np.int32),
         "targets": np.asarray(targets[: self.max_target_length], dtype=np.int32),
     }
+
+    # DEBUG: Print exactly what model sees (set env var to enable)
+    import os
+    import random
+    if os.environ.get("DEBUG_SFT_SAMPLES") and random.random() < 0.001:
+      from transformers import AutoTokenizer
+      tok_path = os.environ.get("DEBUG_SFT_TOKENIZER", "/home/terry/gcs-bucket/HF_HOME/Llama-3.2-1B-Instruct")
+      tokenizer = AutoTokenizer.from_pretrained(tok_path)
+      print("\n" + "=" * 70)
+      print("DEBUG: EXACT MODEL INPUT (after all processing)")
+      print("=" * 70)
+      print("INPUTS (what model sees):")
+      print(tokenizer.decode(result["inputs"], skip_special_tokens=False))
+      print("-" * 70)
+      print("TARGETS (for loss, masked tokens shown as decoded unk):")
+      print(tokenizer.decode(result["targets"], skip_special_tokens=False))
+      print("=" * 70 + "\n")
+
+    return result
 
 
 @dataclasses.dataclass
