@@ -165,51 +165,70 @@ def has_valid_messages(example, data_column_name):
   return True
 
 
+# =============================================================================
+# CHAT TEMPLATE (llama_special, no system prompt, no BOS)
+# =============================================================================
+# Format:
+#   <|start_header_id|>user<|end_header_id|>\n\n{user}<|eot_id|><|start_header_id|>assistant<|end_header_id|>\n\n{assistant}<|eot_id|>
+#
+# This template:
+# - Does NOT use HuggingFace's default chat template (which adds system prompts)
+# - Does NOT add BOS token (to match pretraining without BOS)
+# - Uses Llama special tokens for clear turn boundaries
+
+SFT_TEMPLATE = {
+    "user_start": "<|start_header_id|>user<|end_header_id|>\n\n",
+    "user_end": "<|eot_id|>",
+    "assistant_start": "<|start_header_id|>assistant<|end_header_id|>\n\n",
+    "assistant_end": "<|eot_id|>",
+}
+
+
 def apply_chat_template(example, tokenizer_model, data_column_name):
-  """Formats conversational data by applying the tokenizer's chat template
-  and identifying prompt/completion segments.
+  """Formats conversational data using custom template (no system prompt, no BOS).
 
   Args:
     example: A dictionary containing conversational data. It is expected to have a key
       specified by `data_column_name` that holds a list of messages.
-    tokenizer_model: The tokenizer instance associated with the language model,
-      which contains the specific chat template.
+    tokenizer_model: The tokenizer instance (used for reference, but we use custom template).
     data_column_name: The name of the column in the `example` dictionary
       that contains the list of messages.
 
   Returns:
     The modified `example` dictionary.
       - The `data_column_name` column will be updated to a list of
-        messages, each formatted according to the tokenizer's chat template.
+        formatted messages (strings, not tokenized).
       - A new column named "is_prompt" will be added, where `True`
         indicates a user message (prompt) and `False` indicates an assistant
         message (completion).
   """
   messages = []
   is_prompt = []
-  prompt = None
+
   try:
     for message in example[data_column_name]:
-      if message["role"] == "user":
-        prompt = message
-        prompt_in_chat_template = tokenizer_model.apply_chat_template([prompt], add_generation_prompt=False, tokenize=False)
-        messages.append(prompt_in_chat_template)
+      role = message["role"]
+      content = message["content"]
+
+      if role == "user":
+        # Format: <|start_header_id|>user<|end_header_id|>\n\n{content}<|eot_id|>
+        text = SFT_TEMPLATE["user_start"] + content + SFT_TEMPLATE["user_end"]
+        messages.append(text)
         is_prompt.append(True)
-      elif message["role"] == "assistant":
-        prompt_completion_tokens = tokenizer_model.apply_chat_template(
-            [prompt, message], add_generation_prompt=False, tokenize=True
-        )
-        prompt_tokens = tokenizer_model.apply_chat_template([prompt], add_generation_prompt=False, tokenize=True)
-        completion_tokens = prompt_completion_tokens[len(prompt_tokens) :]
-        completion_in_chat_template = tokenizer_model.decode(completion_tokens, skip_special_tokens=False)
-        messages.append(completion_in_chat_template)
+
+      elif role == "assistant":
+        # Format: <|start_header_id|>assistant<|end_header_id|>\n\n{content}<|eot_id|>
+        text = SFT_TEMPLATE["assistant_start"] + content + SFT_TEMPLATE["assistant_end"]
+        messages.append(text)
         is_prompt.append(False)
+
   except Exception as e:
     # Mark as invalid - will be filtered out later
     example["is_prompt"] = []
     example[data_column_name] = []
     example["_invalid"] = True
     return example
+
   example["is_prompt"] = is_prompt
   example[data_column_name] = messages
   example["_invalid"] = False
@@ -231,14 +250,18 @@ def tokenization(example, hf_tokenizer, truncation, max_length, column_names):
 @dataclasses.dataclass
 class SFTPromptMasking(grain.MapTransform):
   """Construct inputs and targets for SFT training. Concat prompt and completion to generate inputs.
-  For targets, if train on completion only, the prompt will be masked by unk_id. Otherwise the same as inputs.
+  For targets, if train on completion only, the prompt will be masked by mask_id. Otherwise the same as inputs.
+
+  IMPORTANT: mask_id should be -1 (not 0) because some tokenizers use 0 as a valid token ID
+  (e.g., Llama tokenizers use 0 for '!' character). Using 0 as mask would accidentally
+  exclude those tokens from loss computation.
   """
 
-  def __init__(self, text_column_name, completion_only, max_target_length, unk_id=0):
+  def __init__(self, text_column_name, completion_only, max_target_length, mask_id=-1):
     self.text_column_name = text_column_name
     self.completion_only = completion_only
     self.max_target_length = max_target_length
-    self.unk_id = unk_id
+    self.mask_id = mask_id
 
   def map(self, element):
     """
@@ -246,53 +269,39 @@ class SFTPromptMasking(grain.MapTransform):
     It concatenates the prompt and completion to form the `inputs` sequence.
     For the `targets` sequence:
     - If `self.completion_only` is `True`, the prompt portion of the
-      concatenated sequence is masked using `self.unk_id`.
+      concatenated sequence is masked using `self.mask_id`.
     - If `self.completion_only` is `False`, the target sequence is
       identical to the input sequence.
     """
     inputs, targets = [], []
     for i, text in enumerate(element[self.text_column_name]):
       inputs += text
-      targets += [self.unk_id] * len(text) if self.completion_only and element["is_prompt"][i] else text
+      targets += [self.mask_id] * len(text) if self.completion_only and element["is_prompt"][i] else text
 
     result = {
         "inputs": np.asarray(inputs[: self.max_target_length], dtype=np.int32),
         "targets": np.asarray(targets[: self.max_target_length], dtype=np.int32),
     }
 
-    # DEBUG: Print exactly what model sees (set env var to enable)
-    import os
-    import random
-    if os.environ.get("DEBUG_SFT_SAMPLES") and random.random() < 0.001:
-      from transformers import AutoTokenizer
-      tok_path = os.environ.get("DEBUG_SFT_TOKENIZER", "/home/terry/gcs-bucket/HF_HOME/Llama-3.2-1B-Instruct")
-      tokenizer = AutoTokenizer.from_pretrained(tok_path)
-      print("\n" + "=" * 70)
-      print("DEBUG: EXACT MODEL INPUT (after all processing)")
-      print("=" * 70)
-      print("INPUTS (what model sees):")
-      print(tokenizer.decode(result["inputs"], skip_special_tokens=False))
-      print("-" * 70)
-      print("TARGETS (for loss, masked tokens shown as decoded unk):")
-      print(tokenizer.decode(result["targets"], skip_special_tokens=False))
-      print("=" * 70 + "\n")
-
     return result
 
 
 @dataclasses.dataclass
 class SFTPromptMaskingVision(grain.MapTransform):
-  """SFT prompt masking for multimodal"""
+  """SFT prompt masking for multimodal.
 
-  def __init__(self, query_column, response_column, max_target_length, unk_id):
+  IMPORTANT: mask_id should be -1 (not 0) because some tokenizers use 0 as a valid token ID.
+  """
+
+  def __init__(self, query_column, response_column, max_target_length, mask_id=-1):
     self.query_column = query_column
     self.response_column = response_column
     self.max_target_length = max_target_length
-    self.unk_id = unk_id
+    self.mask_id = mask_id
 
   def map(self, element):
     inputs = np.concatenate((element[self.query_column], element[self.response_column]))
-    targets = np.concatenate((np.asarray([self.unk_id] * len(element[self.query_column])), element[self.response_column]))
+    targets = np.concatenate((np.asarray([self.mask_id] * len(element[self.query_column])), element[self.response_column]))
     return {
         "inputs": np.asarray(inputs[: self.max_target_length], dtype=np.int32),
         "targets": np.asarray(targets[: self.max_target_length], dtype=np.int32),

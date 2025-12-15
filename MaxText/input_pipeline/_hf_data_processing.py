@@ -110,7 +110,7 @@ def vision_sft_preprocessing_pipeline(
           query_column=text_columns[0],
           response_column=text_columns[1],
           max_target_length=config.max_target_length,
-          unk_id=pad_id,
+          mask_id=-1,  # Use -1 as mask (not pad_id which could be 0 or valid token)
       )
   )
   # TODO(aireenmei, hengtaoguo): support packing
@@ -261,7 +261,7 @@ def preprocessing_pipeline(
             text_column_name=data_column_names[0],
             completion_only=sft_train_on_completion_only,
             max_target_length=max_target_length,
-            unk_id=pad_id,
+            mask_id=-1,  # Use -1 as mask (not pad_id which could be 0 or valid token)
         )
     )
     data_column_names = ("inputs", "targets")

@@ -25,6 +25,18 @@ from jax.experimental.pjit import pjit
 from flax.linen import partitioning as nn_partitioning
 
 
+# =============================================================================
+# SFT Chat Template (matches training format exactly)
+# Format: NO system prompt, NO BOS token
+# =============================================================================
+SFT_TEMPLATE = {
+    "user_start": "<|start_header_id|>user<|end_header_id|>\n\n",
+    "user_end": "<|eot_id|>",
+    "assistant_start": "<|start_header_id|>assistant<|end_header_id|>\n\n",
+    "assistant_end": "<|eot_id|>",
+}
+
+
 def loss_fn(model, config, data, dropout_rng, params, is_train=True):
   """loss_fn for both train and eval.
 
@@ -150,18 +162,6 @@ class OrbaxLM(LM):
         # Store tokenizer name for chat template support
         self._tokenizer_name = getattr(tokenizer, "name_or_path", None) or "unknown"
 
-        # Override tokenizer's chat_template to remove default system prompt
-        # (Llama 3 injects "Cutting Knowledge Date..." by default)
-        self.tokenizer.chat_template = (
-            "{% set loop_messages = messages %}"
-            "{% for message in loop_messages %}"
-            "{% set content = '<|start_header_id|>' + message['role'] + '<|end_header_id|>\n\n'+ message['content'] | trim + '<|eot_id|>' %}"
-            "{% if loop.index0 == 0 %}{% set content = bos_token + content %}{% endif %}"
-            "{{ content }}"
-            "{% endfor %}"
-            "{% if add_generation_prompt %}{{ '<|start_header_id|>assistant<|end_header_id|>\n\n' }}{% endif %}"
-        )
-
         self._compiled_forward = self._create_fast_forward()
 
     @property
@@ -183,14 +183,38 @@ class OrbaxLM(LM):
         return self.eot_token_id
 
     def apply_chat_template(self, chat_history: list[dict[str, str]], add_generation_prompt=True) -> str:
-        """Delegate to tokenizer's chat template."""
-        # Remove system messages - SFT training didn't include them
-        chat_history = [msg for msg in chat_history if msg["role"] != "system"]
-        return self.tokenizer.apply_chat_template(
-            chat_history,
-            tokenize=False,
-            add_generation_prompt=add_generation_prompt,
-        )
+        """
+        Format chat history using our SFT training format.
+
+        Format (NO system prompt, NO BOS token):
+          <|start_header_id|>user<|end_header_id|>\n\n{user}<|eot_id|><|start_header_id|>assistant<|end_header_id|>\n\n{assistant}<|eot_id|>
+
+        For generation, appends: <|start_header_id|>assistant<|end_header_id|>\n\n
+        """
+        result = []
+
+        for message in chat_history:
+            role = message.get("role", "")
+            content = message.get("content", "")
+
+            # Skip system messages - SFT training didn't include them
+            if role == "system":
+                continue
+
+            if role == "user":
+                text = SFT_TEMPLATE["user_start"] + content + SFT_TEMPLATE["user_end"]
+                result.append(text)
+            elif role == "assistant":
+                text = SFT_TEMPLATE["assistant_start"] + content + SFT_TEMPLATE["assistant_end"]
+                result.append(text)
+
+        formatted = "".join(result)
+
+        # Add generation prompt (assistant header) for model to continue
+        if add_generation_prompt:
+            formatted += SFT_TEMPLATE["assistant_start"]
+
+        return formatted
 
     def _create_fast_forward(self):
         # Extract shardings from actual loaded params (jax arrays have .sharding attribute)

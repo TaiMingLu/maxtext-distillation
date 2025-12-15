@@ -91,7 +91,7 @@ def prepare_maxtext_inputs(maxtext_data, config):
       text_column_name="messages",
       completion_only=False,
       max_target_length=config.max_target_length,
-      unk_id=tokenizer.unk_token_id,
+      mask_id=-1,  # Use -1 as mask (not token id which could be valid)
   ).map(tokenized_data)
 
   global_batch_size = int(jax.device_count() * config.per_device_batch_size * config.gradient_accumulation_steps)
