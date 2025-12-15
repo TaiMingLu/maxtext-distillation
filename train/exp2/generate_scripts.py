@@ -12,8 +12,8 @@ import os
 from itertools import product
 
 # Default configurations
-DEFAULT_TEACHER_ARCHS = ["05b", "1b", "3b"]
-DEFAULT_TOKENS = ["30B", "50B", "100B"]
+DEFAULT_TEACHER_ARCHS = ["05b", "1b", "3b", "8b"]
+DEFAULT_TOKENS = ["300B"]
 DEFAULT_TEACHER_SEED = 42
 DEFAULT_ALPHAS = [0.5, 1.0]
 DEFAULT_STUDENT_SEED = 43
@@ -31,6 +31,7 @@ TOKENS_TO_STEP = {
     "30B": 14999,
     "50B": 24999,
     "100B": 49999,
+    "300B": 149999,
 }
 
 SCRIPT_TEMPLATE = '''#!/bin/bash

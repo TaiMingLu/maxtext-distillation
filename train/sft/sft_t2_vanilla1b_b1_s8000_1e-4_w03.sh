@@ -48,7 +48,7 @@ export RUN_ID="sft_t2_vanilla1b_b1_s8000_1e-4_w03"
 # HuggingFace dataset configuration
 # Dolci-Instruct-SFT-7B: 2.15M samples with messages format [{role, content}, ...]
 # Using local copy to avoid re-downloading each run
-export HF_PATH='/home/terry/gcs-bucket/datasets/Dolci-Instruct-SFT-7B'
+export HF_PATH='/home/terry/gcs-data/datasets/Dolci-Instruct-SFT-7B'
 export TRAIN_SPLIT='train'
 export EVAL_SPLIT='train'  # No separate eval split, use subset of train
 

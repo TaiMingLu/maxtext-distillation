@@ -55,7 +55,7 @@ export EVAL_SPLIT='train'  # No separate eval split, use subset of train
 # Tokenizer - MUST use Instruct version for chat template
 # The base model (Llama-3.2-1B) does NOT have a chat template
 # The Instruct model has the chat template needed for SFT on conversational data
-export TOKENIZER_PATH='/home/terry/gcs-bucket/HF_HOME/Llama-3.2-1B-Instruct'
+export TOKENIZER_PATH='/home/terry/gcs-data/HF_HOME/Llama-3.2-1B-Instruct'
 # Set your HuggingFace token (required for gated Llama models)
 export HF_ACCESS_TOKEN="${HF_ACCESS_TOKEN:-}"
 
