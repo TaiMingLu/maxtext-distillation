@@ -5,7 +5,7 @@ cd ~/maxtext
 source ~/maxtext_env/bin/activate
 
 export BUCKET_NAME=taiming_us_central1_b
-export TPU_PREFIX=taiming-v6e-8_050013
+export TPU_PREFIX=taiming-qw-v6e-8_1
 gcloud config set project vision-mix
 gcloud config set compute/zone us-central1-b
 
@@ -26,6 +26,12 @@ for var in "${required_vars[@]}"; do
   fi
 done
 
+
+python3.10 -u -m MaxText.generate_param_only_checkpoint MaxText/configs/base.yml \
+  load_full_state_path=gs://taiming_us_central1/ckpts/pretrain/llama3.1-1b-finewebedu-vanilla-s42-300b/checkpoints/149999/items \
+  checkpoint_dir=gs://taiming_us_central1_b/ckpts/pretrain_param_only_v6/llama1b-vanilla-300B-s42/checkpoint_149999 \
+  enable_checkpointing=True async_checkpointing=False \
+  model_name=llama3.1-1b
 
 
 # python3.10 -u -m MaxText.generate_param_only_checkpoint MaxText/configs/base.yml \

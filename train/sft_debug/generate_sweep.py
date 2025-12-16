@@ -257,6 +257,31 @@ def generate_run_all_yaml(script_infos: list, output_dir: str) -> str:
     return output_path
 
 
+def generate_eval_all_yaml(script_infos: list, output_dir: str, exp_version: str) -> str:
+    """Generate an eval_all.yaml file with evaluation tasks for all SFT runs + vanilla baseline."""
+    lines = ["tasks:"]
+
+    # Add vanilla baseline evaluation first
+    lines.append(f"  - id: eval_{exp_version}_vanilla1b_pretrain")
+    lines.append("    run: bash train/eval-base/eval_base_acc.sh llama3.1-1b-finewebedu-vanilla-s42_v6 llama3.1-1b 24999 pretrain --resume")
+
+    # Add SFT evaluations
+    for info in script_infos:
+        run_name = info["run_name"]
+        # checkpoint step is steps - 1 (e.g., 8000 steps -> checkpoint 7999)
+        ckpt_step = info["steps"] - 1
+        lines.append(f"  - id: eval_{run_name}")
+        lines.append(f"    run: bash train/eval-base/eval_sft_acc.sh {run_name} llama3.1-1b {ckpt_step} sft --resume")
+
+    content = "\n".join(lines) + "\n"
+
+    output_path = os.path.join(output_dir, "eval_all.yaml")
+    with open(output_path, "w") as f:
+        f.write(content)
+
+    return output_path
+
+
 def main():
     parser = argparse.ArgumentParser(
         description="Generate SFT hyperparameter sweep scripts")
@@ -346,6 +371,10 @@ def main():
         # Generate run_all.yaml
         run_all_path = generate_run_all_yaml(generated, args.output_dir)
         print(f"Generated: {run_all_path}")
+
+        # Generate eval_all.yaml
+        eval_all_path = generate_eval_all_yaml(generated, args.output_dir, args.exp_version)
+        print(f"Generated: {eval_all_path}")
 
         # Print summary table
         print("\n" + "=" * 70)
