@@ -4,13 +4,13 @@ Generate SFT hyperparameter sweep scripts.
 
 Generates shell scripts for different combinations of:
 - Learning rates
-- Warmup ratios
+- LR schedules (constant vs cosine decay)
 - Batch sizes
 - Step counts
 
 Usage:
     python generate_sweep.py
-    python generate_sweep.py --lrs 1e-4 5e-5 --warmups 0.1 0.3 --batch-sizes 1 2
+    python generate_sweep.py --lrs 1e-4 5e-5 --batch-sizes 1 2
     python generate_sweep.py --dry-run
 """
 
@@ -24,11 +24,17 @@ from itertools import product
 # =============================================================================
 
 DEFAULT_CONFIG = {
-    "learning_rates": ["1e-4", "2e-4", "5e-4", "1e-5", "2e-5", "5e-5", "1e-6", "2e-6", "5e-6"],
-    "warmup_ratios": [0.1, 0.25],
-    "batch_sizes": [1],
-    "steps": [8000],
-    "experiment_version": "t3",  # Increment when changing config
+    "learning_rates": ["1e-4", "5e-4", "1e-5", "5e-5", "1e-6", "5e-6"],
+    "batch_sizes": [2],
+    "steps": [4000],
+    "experiment_version": "t4",  # Increment when changing config
+}
+
+# LR Schedule Recipes
+# Each recipe defines: (suffix, warmup_ratio, min_lr_ratio)
+LR_RECIPES = {
+    "constant": ("", 0.1, 1.0),           # No suffix: 10% warmup, constant LR
+    "cosine": ("_cos", 0.01, 0.1),        # _cos suffix: 1% warmup, decay to 1/10
 }
 
 # Fixed parameters (not part of sweep)
@@ -36,7 +42,6 @@ FIXED_PARAMS = {
     "model_name": "llama3.1-1b",
     "seq_len": 4096,
     "grad_accum": 1,
-    "min_lr_ratio": 1.0,  # Constant LR (no decay)
     "async_checkpointing": "false",
     "checkpoint_period": 1000,
     "checkpoint_max_to_keep": 1,
@@ -55,6 +60,10 @@ SCRIPT_TEMPLATE = '''#!/bin/bash
 #
 # SFT (Supervised Fine-Tuning) script for Llama 1B
 # Loads vanilla pretrained checkpoint (no distillation) and fine-tunes on Dolci dataset
+#
+# Recipe: {recipe_name}
+#   - Warmup: {warmup_ratio}
+#   - LR decay: {min_lr_ratio} (1.0 = constant, <1.0 = cosine decay)
 #
 
 cd ~/maxtext
@@ -85,7 +94,7 @@ export GRAD_ACCUM={grad_accum}
 # SFT training hyperparameters
 export NUM_STEPS={steps}
 export LR={lr}
-export MIN_LR_RATIO={min_lr_ratio}  # Constant LR (no decay)
+export MIN_LR_RATIO={min_lr_ratio}  # 1.0 = constant, <1.0 = cosine decay
 export WARMUP_RATIO={warmup_ratio}
 export ASYNC_CHECKPOINTING={async_checkpointing}
 
@@ -116,6 +125,7 @@ echo "BATCH_SIZE: $BATCH_SIZE"
 echo "GRAD_ACCUM: $GRAD_ACCUM"
 echo "LR: $LR"
 echo "NUM_STEPS: $NUM_STEPS"
+echo "MIN_LR_RATIO: $MIN_LR_RATIO"
 echo "WARMUP_RATIO: $WARMUP_RATIO"
 echo "PRETRAINED_CHECKPOINT: $PRETRAINED_CHECKPOINT"
 echo "BASE_OUTPUT_DIRECTORY: $BASE_OUTPUT_DIRECTORY"
@@ -176,29 +186,15 @@ python -u multihost_runner_orig.py \\
 '''
 
 
-def format_lr(lr: str) -> str:
-    """Format learning rate for filename (e.g., '1e-4' -> '1e-4', '5e-5' -> '5e-5')."""
-    return lr.replace(".", "")
-
-
-def format_warmup(warmup: float) -> str:
-    """Format warmup ratio for filename suffix (e.g., 0.1 -> '', 0.3 -> '_w03')."""
-    if warmup == 0.1:
-        return ""  # Default, no suffix
-    # Convert 0.3 -> "w03", 0.5 -> "w05", etc.
-    return f"_w{int(warmup * 10):02d}"
-
-
 def generate_run_name(
     exp_version: str,
     batch_size: int,
     steps: int,
     lr: str,
-    warmup: float,
+    recipe_suffix: str,
 ) -> str:
-    """Generate run name like 'sft_t3_vanilla1b_b1_s8000_1e-4_w03'."""
-    warmup_suffix = format_warmup(warmup)
-    return f"sft_{exp_version}_vanilla1b_b{batch_size}_s{steps}_{lr}{warmup_suffix}"
+    """Generate run name like 'sft_t4_vanilla1b_b1_s8000_1e-4' or 'sft_t4_vanilla1b_b1_s8000_1e-4_cos'."""
+    return f"sft_{exp_version}_vanilla1b_b{batch_size}_s{steps}_{lr}{recipe_suffix}"
 
 
 def generate_script(
@@ -206,11 +202,14 @@ def generate_script(
     batch_size: int,
     steps: int,
     lr: str,
-    warmup: float,
+    recipe_name: str,
+    recipe_suffix: str,
+    warmup_ratio: float,
+    min_lr_ratio: float,
     output_dir: str,
 ) -> dict:
     """Generate a single SFT training script. Returns dict with script info."""
-    run_name = generate_run_name(exp_version, batch_size, steps, lr, warmup)
+    run_name = generate_run_name(exp_version, batch_size, steps, lr, recipe_suffix)
     run_id = run_name  # Same as run_name
     script_name = f"{run_name}.sh"
 
@@ -220,7 +219,9 @@ def generate_script(
         batch_size=batch_size,
         steps=steps,
         lr=lr,
-        warmup_ratio=warmup,
+        warmup_ratio=warmup_ratio,
+        min_lr_ratio=min_lr_ratio,
+        recipe_name=recipe_name,
         **FIXED_PARAMS,
     )
 
@@ -235,7 +236,9 @@ def generate_script(
         "run_id": run_id,
         "run_name": run_name,
         "lr": lr,
-        "warmup": warmup,
+        "recipe": recipe_name,
+        "warmup": warmup_ratio,
+        "min_lr": min_lr_ratio,
         "batch_size": batch_size,
         "steps": steps,
     }
@@ -271,7 +274,7 @@ def generate_eval_all_yaml(script_infos: list, output_dir: str, exp_version: str
         # checkpoint step is steps - 1 (e.g., 8000 steps -> checkpoint 7999)
         ckpt_step = info["steps"] - 1
         lines.append(f"  - id: eval_{run_name}")
-        lines.append(f"    run: bash train/eval-base/eval_sft_acc.sh {run_name} llama3.1-1b {ckpt_step} sft --resume")
+        lines.append(f"    run: bash train/eval-base/eval_base_acc.sh {run_name} llama3.1-1b {ckpt_step} sft --resume")
 
     content = "\n".join(lines) + "\n"
 
@@ -297,11 +300,11 @@ def main():
         help=f"Learning rates (default: {DEFAULT_CONFIG['learning_rates']})",
     )
     parser.add_argument(
-        "--warmups",
+        "--recipes",
         nargs="+",
-        type=float,
-        default=DEFAULT_CONFIG["warmup_ratios"],
-        help=f"Warmup ratios (default: {DEFAULT_CONFIG['warmup_ratios']})",
+        choices=list(LR_RECIPES.keys()),
+        default=list(LR_RECIPES.keys()),
+        help=f"LR recipes to use (default: {list(LR_RECIPES.keys())})",
     )
     parser.add_argument(
         "--batch-sizes",
@@ -336,19 +339,26 @@ def main():
 
     # Generate all combinations
     combinations = list(
-        product(args.batch_sizes, args.steps, args.lrs, args.warmups))
+        product(args.batch_sizes, args.steps, args.lrs, args.recipes))
 
     print(f"Generating {len(combinations)} scripts...")
     print(f"  Experiment version: {args.exp_version}")
     print(f"  Learning rates: {args.lrs}")
-    print(f"  Warmup ratios: {args.warmups}")
+    print(f"  Recipes: {args.recipes}")
     print(f"  Batch sizes: {args.batch_sizes}")
     print(f"  Steps: {args.steps}")
     print()
+    print("LR Recipes:")
+    for name in args.recipes:
+        suffix, warmup, min_lr = LR_RECIPES[name]
+        suffix_str = suffix if suffix else "(none)"
+        print(f"  {name}: suffix={suffix_str}, warmup={warmup}, min_lr_ratio={min_lr}")
+    print()
 
-    for batch_size, steps, lr, warmup in combinations:
+    for batch_size, steps, lr, recipe_name in combinations:
+        recipe_suffix, warmup_ratio, min_lr_ratio = LR_RECIPES[recipe_name]
         run_name = generate_run_name(
-            args.exp_version, batch_size, steps, lr, warmup)
+            args.exp_version, batch_size, steps, lr, recipe_suffix)
         script_name = f"{run_name}.sh"
 
         if args.dry_run:
@@ -359,7 +369,10 @@ def main():
                 batch_size=batch_size,
                 steps=steps,
                 lr=lr,
-                warmup=warmup,
+                recipe_name=recipe_name,
+                recipe_suffix=recipe_suffix,
+                warmup_ratio=warmup_ratio,
+                min_lr_ratio=min_lr_ratio,
                 output_dir=args.output_dir,
             )
             generated.append(info)
@@ -377,14 +390,13 @@ def main():
         print(f"Generated: {eval_all_path}")
 
         # Print summary table
-        print("\n" + "=" * 70)
+        print("\n" + "=" * 80)
         print("SUMMARY TABLE")
-        print("=" * 70)
-        print(f"{'Script':<50} {'LR':<8} {'Warmup':<8}")
-        print("-" * 70)
+        print("=" * 80)
+        print(f"{'Script':<55} {'LR':<8} {'Recipe':<10} {'Warmup':<8} {'MinLR':<8}")
+        print("-" * 80)
         for info in generated:
-            warmup_str = f"{info['warmup']:.1f}"
-            print(f"{info['script_name']:<50} {info['lr']:<8} {warmup_str:<8}")
+            print(f"{info['script_name']:<55} {info['lr']:<8} {info['recipe']:<10} {info['warmup']:<8} {info['min_lr']:<8}")
 
 
 if __name__ == "__main__":

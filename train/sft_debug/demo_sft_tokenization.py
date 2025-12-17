@@ -2,8 +2,10 @@
 """
 Demo script showing how SFT tokenization works.
 
-Format (llama_special, no system prompt, no BOS):
-  <|start_header_id|>user<|end_header_id|>\n\n{user_msg}<|eot_id|><|start_header_id|>assistant<|end_header_id|>\n\n{assistant_response}<|eot_id|>
+Format: Plain completion (no special tokens)
+  {user}\n{assistant}\n
+
+This preserves completion-style evaluation performance on benchmarks like MMLU/ARC.
 
 Usage:
     python demo_sft_tokenization.py --tokenizer_path /path/to/tokenizer
@@ -14,20 +16,20 @@ from transformers import AutoTokenizer
 
 
 # =============================================================================
-# CHAT TEMPLATE (llama_special, no system prompt, no BOS)
+# SFT Template: Plain completion format (no special tokens)
 # =============================================================================
 
 TEMPLATE = {
-    "user_start": "<|start_header_id|>user<|end_header_id|>\n\n",
-    "user_end": "<|eot_id|>",
-    "assistant_start": "<|start_header_id|>assistant<|end_header_id|>\n\n",
-    "assistant_end": "<|eot_id|>",
+    "user_start": "",
+    "user_end": "\n",
+    "assistant_start": "",
+    "assistant_end": "\n",
 }
 
 
 def format_conversation(messages):
     """
-    Format a conversation using llama_special template (no system prompt, no BOS).
+    Format a conversation using plain completion format (no special tokens).
 
     Returns list of (text, is_prompt) tuples for each segment.
     """
@@ -135,7 +137,7 @@ def show_tokenization(tokenizer, messages):
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Demo SFT tokenization (llama_special, no system prompt, no BOS)")
+    parser = argparse.ArgumentParser(description="Demo SFT tokenization (plain completion format)")
     parser.add_argument(
         "--tokenizer_path",
         default="/home/terry/gcs-bucket/HF_HOME/Llama-3.2-1B-Instruct",
@@ -157,14 +159,14 @@ def main():
 
     # Show the template format
     print("#" * 80)
-    print("# TEMPLATE FORMAT (llama_special, no system prompt, no BOS)")
+    print("# TEMPLATE FORMAT: Plain completion (no special tokens)")
     print("#" * 80)
     print()
     print("Single-turn:")
-    print("  <|start_header_id|>user<|end_header_id|>\\n\\n{user}<|eot_id|><|start_header_id|>assistant<|end_header_id|>\\n\\n{assistant}<|eot_id|>")
+    print("  {user}\\n{assistant}\\n")
     print()
     print("Multi-turn:")
-    print("  <|start_header_id|>user<|end_header_id|>\\n\\n{user1}<|eot_id|><|start_header_id|>assistant<|end_header_id|>\\n\\n{asst1}<|eot_id|><|start_header_id|>user<|end_header_id|>\\n\\n{user2}<|eot_id|><|start_header_id|>assistant<|end_header_id|>\\n\\n{asst2}<|eot_id|>")
+    print("  {user1}\\n{asst1}\\n{user2}\\n{asst2}\\n")
     print()
 
     # Single-turn example

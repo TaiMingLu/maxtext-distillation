@@ -1,39 +1,27 @@
 tasks:
-  - id: eval_t3_vanilla1b_pretrain
+  - id: eval_t4_vanilla1b_pretrain
     run: bash train/eval-base/eval_base_acc.sh llama3.1-1b-finewebedu-vanilla-s42_v6 llama3.1-1b 24999 pretrain --resume
-  - id: eval_sft_t3_vanilla1b_b1_s8000_1e-4
-    run: bash train/eval-base/eval_sft_acc.sh sft_t3_vanilla1b_b1_s8000_1e-4 llama3.1-1b 7999 sft --resume
-  - id: eval_sft_t3_vanilla1b_b1_s8000_1e-4_w02
-    run: bash train/eval-base/eval_sft_acc.sh sft_t3_vanilla1b_b1_s8000_1e-4_w02 llama3.1-1b 7999 sft --resume
-  - id: eval_sft_t3_vanilla1b_b1_s8000_2e-4
-    run: bash train/eval-base/eval_sft_acc.sh sft_t3_vanilla1b_b1_s8000_2e-4 llama3.1-1b 7999 sft --resume
-  - id: eval_sft_t3_vanilla1b_b1_s8000_2e-4_w02
-    run: bash train/eval-base/eval_sft_acc.sh sft_t3_vanilla1b_b1_s8000_2e-4_w02 llama3.1-1b 7999 sft --resume
-  - id: eval_sft_t3_vanilla1b_b1_s8000_5e-4
-    run: bash train/eval-base/eval_sft_acc.sh sft_t3_vanilla1b_b1_s8000_5e-4 llama3.1-1b 7999 sft --resume
-  - id: eval_sft_t3_vanilla1b_b1_s8000_5e-4_w02
-    run: bash train/eval-base/eval_sft_acc.sh sft_t3_vanilla1b_b1_s8000_5e-4_w02 llama3.1-1b 7999 sft --resume
-  - id: eval_sft_t3_vanilla1b_b1_s8000_1e-5
-    run: bash train/eval-base/eval_sft_acc.sh sft_t3_vanilla1b_b1_s8000_1e-5 llama3.1-1b 7999 sft --resume
-  - id: eval_sft_t3_vanilla1b_b1_s8000_1e-5_w02
-    run: bash train/eval-base/eval_sft_acc.sh sft_t3_vanilla1b_b1_s8000_1e-5_w02 llama3.1-1b 7999 sft --resume
-  - id: eval_sft_t3_vanilla1b_b1_s8000_2e-5
-    run: bash train/eval-base/eval_sft_acc.sh sft_t3_vanilla1b_b1_s8000_2e-5 llama3.1-1b 7999 sft --resume
-  - id: eval_sft_t3_vanilla1b_b1_s8000_2e-5_w02
-    run: bash train/eval-base/eval_sft_acc.sh sft_t3_vanilla1b_b1_s8000_2e-5_w02 llama3.1-1b 7999 sft --resume
-  - id: eval_sft_t3_vanilla1b_b1_s8000_5e-5
-    run: bash train/eval-base/eval_sft_acc.sh sft_t3_vanilla1b_b1_s8000_5e-5 llama3.1-1b 7999 sft --resume
-  - id: eval_sft_t3_vanilla1b_b1_s8000_5e-5_w02
-    run: bash train/eval-base/eval_sft_acc.sh sft_t3_vanilla1b_b1_s8000_5e-5_w02 llama3.1-1b 7999 sft --resume
-  - id: eval_sft_t3_vanilla1b_b1_s8000_1e-6
-    run: bash train/eval-base/eval_sft_acc.sh sft_t3_vanilla1b_b1_s8000_1e-6 llama3.1-1b 7999 sft --resume
-  - id: eval_sft_t3_vanilla1b_b1_s8000_1e-6_w02
-    run: bash train/eval-base/eval_sft_acc.sh sft_t3_vanilla1b_b1_s8000_1e-6_w02 llama3.1-1b 7999 sft --resume
-  - id: eval_sft_t3_vanilla1b_b1_s8000_2e-6
-    run: bash train/eval-base/eval_sft_acc.sh sft_t3_vanilla1b_b1_s8000_2e-6 llama3.1-1b 7999 sft --resume
-  - id: eval_sft_t3_vanilla1b_b1_s8000_2e-6_w02
-    run: bash train/eval-base/eval_sft_acc.sh sft_t3_vanilla1b_b1_s8000_2e-6_w02 llama3.1-1b 7999 sft --resume
-  - id: eval_sft_t3_vanilla1b_b1_s8000_5e-6
-    run: bash train/eval-base/eval_sft_acc.sh sft_t3_vanilla1b_b1_s8000_5e-6 llama3.1-1b 7999 sft --resume
-  - id: eval_sft_t3_vanilla1b_b1_s8000_5e-6_w02
-    run: bash train/eval-base/eval_sft_acc.sh sft_t3_vanilla1b_b1_s8000_5e-6_w02 llama3.1-1b 7999 sft --resume
+  - id: eval_sft_t4_vanilla1b_b2_s4000_1e-4
+    run: bash train/eval-base/eval_base_acc.sh sft_t4_vanilla1b_b2_s4000_1e-4 llama3.1-1b 3999 sft --resume
+  - id: eval_sft_t4_vanilla1b_b2_s4000_1e-4_cos
+    run: bash train/eval-base/eval_base_acc.sh sft_t4_vanilla1b_b2_s4000_1e-4_cos llama3.1-1b 3999 sft --resume
+  - id: eval_sft_t4_vanilla1b_b2_s4000_5e-4
+    run: bash train/eval-base/eval_base_acc.sh sft_t4_vanilla1b_b2_s4000_5e-4 llama3.1-1b 3999 sft --resume
+  - id: eval_sft_t4_vanilla1b_b2_s4000_5e-4_cos
+    run: bash train/eval-base/eval_base_acc.sh sft_t4_vanilla1b_b2_s4000_5e-4_cos llama3.1-1b 3999 sft --resume
+  - id: eval_sft_t4_vanilla1b_b2_s4000_1e-5
+    run: bash train/eval-base/eval_base_acc.sh sft_t4_vanilla1b_b2_s4000_1e-5 llama3.1-1b 3999 sft --resume
+  - id: eval_sft_t4_vanilla1b_b2_s4000_1e-5_cos
+    run: bash train/eval-base/eval_base_acc.sh sft_t4_vanilla1b_b2_s4000_1e-5_cos llama3.1-1b 3999 sft --resume
+  - id: eval_sft_t4_vanilla1b_b2_s4000_5e-5
+    run: bash train/eval-base/eval_base_acc.sh sft_t4_vanilla1b_b2_s4000_5e-5 llama3.1-1b 3999 sft --resume
+  - id: eval_sft_t4_vanilla1b_b2_s4000_5e-5_cos
+    run: bash train/eval-base/eval_base_acc.sh sft_t4_vanilla1b_b2_s4000_5e-5_cos llama3.1-1b 3999 sft --resume
+  - id: eval_sft_t4_vanilla1b_b2_s4000_1e-6
+    run: bash train/eval-base/eval_base_acc.sh sft_t4_vanilla1b_b2_s4000_1e-6 llama3.1-1b 3999 sft --resume
+  - id: eval_sft_t4_vanilla1b_b2_s4000_1e-6_cos
+    run: bash train/eval-base/eval_base_acc.sh sft_t4_vanilla1b_b2_s4000_1e-6_cos llama3.1-1b 3999 sft --resume
+  - id: eval_sft_t4_vanilla1b_b2_s4000_5e-6
+    run: bash train/eval-base/eval_base_acc.sh sft_t4_vanilla1b_b2_s4000_5e-6 llama3.1-1b 3999 sft --resume
+  - id: eval_sft_t4_vanilla1b_b2_s4000_5e-6_cos
+    run: bash train/eval-base/eval_base_acc.sh sft_t4_vanilla1b_b2_s4000_5e-6_cos llama3.1-1b 3999 sft --resume

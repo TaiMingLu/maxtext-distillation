@@ -26,14 +26,15 @@ from flax.linen import partitioning as nn_partitioning
 
 
 # =============================================================================
-# SFT Chat Template (matches training format exactly)
-# Format: NO system prompt, NO BOS token
+# SFT Template: Plain completion format (no special tokens)
 # =============================================================================
+# Format: {user}\n{assistant}\n (just newline separators)
+# This preserves completion-style evaluation performance on benchmarks like MMLU/ARC
 SFT_TEMPLATE = {
-    "user_start": "<|start_header_id|>user<|end_header_id|>\n\n",
-    "user_end": "<|eot_id|>",
-    "assistant_start": "<|start_header_id|>assistant<|end_header_id|>\n\n",
-    "assistant_end": "<|eot_id|>",
+    "user_start": "",
+    "user_end": "\n",
+    "assistant_start": "",
+    "assistant_end": "\n",
 }
 
 
@@ -184,12 +185,10 @@ class OrbaxLM(LM):
 
     def apply_chat_template(self, chat_history: list[dict[str, str]], add_generation_prompt=True) -> str:
         """
-        Format chat history using our SFT training format.
+        Format chat history using plain completion format (no special tokens).
 
-        Format (NO system prompt, NO BOS token):
-          <|start_header_id|>user<|end_header_id|>\n\n{user}<|eot_id|><|start_header_id|>assistant<|end_header_id|>\n\n{assistant}<|eot_id|>
-
-        For generation, appends: <|start_header_id|>assistant<|end_header_id|>\n\n
+        Format: {user}\n{assistant}\n
+        This preserves completion-style evaluation performance on benchmarks like MMLU/ARC.
         """
         result = []
 

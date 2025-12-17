@@ -172,20 +172,22 @@ def has_valid_messages(example, data_column_name):
 #   <|start_header_id|>user<|end_header_id|>\n\n{user}<|eot_id|><|start_header_id|>assistant<|end_header_id|>\n\n{assistant}<|eot_id|>
 #
 # This template:
-# - Does NOT use HuggingFace's default chat template (which adds system prompts)
-# - Does NOT add BOS token (to match pretraining without BOS)
-# - Uses Llama special tokens for clear turn boundaries
+# =============================================================================
+# SFT Template: Plain completion format (no special tokens)
+# =============================================================================
+# Format: {user}\n{assistant}\n (just newline separators)
+# This preserves completion-style evaluation performance on benchmarks like MMLU/ARC
 
 SFT_TEMPLATE = {
-    "user_start": "<|start_header_id|>user<|end_header_id|>\n\n",
-    "user_end": "<|eot_id|>",
-    "assistant_start": "<|start_header_id|>assistant<|end_header_id|>\n\n",
-    "assistant_end": "<|eot_id|>",
+    "user_start": "",
+    "user_end": "\n",
+    "assistant_start": "",
+    "assistant_end": "\n",
 }
 
 
 def apply_chat_template(example, tokenizer_model, data_column_name):
-  """Formats conversational data using custom template (no system prompt, no BOS).
+  """Formats conversational data using plain completion format (no special tokens).
 
   Args:
     example: A dictionary containing conversational data. It is expected to have a key
@@ -211,13 +213,13 @@ def apply_chat_template(example, tokenizer_model, data_column_name):
       content = message["content"]
 
       if role == "user":
-        # Format: <|start_header_id|>user<|end_header_id|>\n\n{content}<|eot_id|>
+        # Format: {content}\n
         text = SFT_TEMPLATE["user_start"] + content + SFT_TEMPLATE["user_end"]
         messages.append(text)
         is_prompt.append(True)
 
       elif role == "assistant":
-        # Format: <|start_header_id|>assistant<|end_header_id|>\n\n{content}<|eot_id|>
+        # Format: {content}\n
         text = SFT_TEMPLATE["assistant_start"] + content + SFT_TEMPLATE["assistant_end"]
         messages.append(text)
         is_prompt.append(False)
