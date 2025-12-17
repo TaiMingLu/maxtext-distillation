@@ -5,7 +5,7 @@ cd ~/maxtext
 source ~/maxtext_env/bin/activate
 
 export BUCKET_NAME=taiming_us_central1
-export TPU_PREFIX=taiming-qw-v6e-64_11
+export TPU_PREFIX=taiming-qw-v6e-64_16
 gcloud config set project vision-mix
 gcloud config set compute/zone us-central1-b
 
@@ -27,6 +27,18 @@ for var in "${required_vars[@]}"; do
 done
 
 
+# python -u multihost_runner_orig.py \
+#     --TPU_PREFIX=$TPU_PREFIX \
+#     --INTERNAL_IP=true \
+#     --COMMAND="
+#     export TPU_LOG_DIR=/home/terry/tpu_logs
+#     source ~/maxtext_env/bin/activate
+#     python3.10 -u -m MaxText.generate_param_only_checkpoint MaxText/configs/base.yml \
+#       load_full_state_path=gs://taiming_us_central1/ckpts/pretrain/llama3.1-3b-finewebedu-vanilla-s42-300b/checkpoints/149999/items \
+#       checkpoint_dir=gs://taiming_us_central1/ckpts/pretrain_param_only_v6/llama3b-vanilla-300B-s42/checkpoint_149999 \
+#       enable_checkpointing=True async_checkpointing=False \
+#       model_name=llama3.1-3b
+#     "
 python -u multihost_runner_orig.py \
     --TPU_PREFIX=$TPU_PREFIX \
     --INTERNAL_IP=true \
@@ -34,10 +46,95 @@ python -u multihost_runner_orig.py \
     export TPU_LOG_DIR=/home/terry/tpu_logs
     source ~/maxtext_env/bin/activate
     python3.10 -u -m MaxText.generate_param_only_checkpoint MaxText/configs/base.yml \
-      load_full_state_path=gs://taiming_us_central1/ckpts/pretrain/llama3.1-3b-finewebedu-vanilla-s42-300b/checkpoints/149999/items \
-      checkpoint_dir=gs://taiming_us_central1/ckpts/pretrain_param_only_v6/llama3b-vanilla-300B-s42/checkpoint_149999 \
+      load_full_state_path=gs://taiming_us_central1/ckpts/pretrain/llama3.1-05b-finewebedu-vanilla-s42-10b/checkpoints/4999/items \
+      checkpoint_dir=gs://taiming_us_central1/ckpts/pretrain_param_only_v6/llama05b-vanilla-10B-s42/checkpoint_4999 \
+      enable_checkpointing=True async_checkpointing=False \
+      model_name=llama3.1-05b
+    "
+python -u multihost_runner_orig.py \
+    --TPU_PREFIX=$TPU_PREFIX \
+    --INTERNAL_IP=true \
+    --COMMAND="
+    export TPU_LOG_DIR=/home/terry/tpu_logs
+    source ~/maxtext_env/bin/activate
+    python3.10 -u -m MaxText.generate_param_only_checkpoint MaxText/configs/base.yml \
+      load_full_state_path=gs://taiming_us_central1/ckpts/pretrain/llama3.1-1b-finewebedu-vanilla-s42-10b/checkpoints/4999/items \
+      checkpoint_dir=gs://taiming_us_central1/ckpts/pretrain_param_only_v6/llama1b-vanilla-10B-s42/checkpoint_4999 \
+      enable_checkpointing=True async_checkpointing=False \
+      model_name=llama3.1-1b
+    "
+python -u multihost_runner_orig.py \
+    --TPU_PREFIX=$TPU_PREFIX \
+    --INTERNAL_IP=true \
+    --COMMAND="
+    export TPU_LOG_DIR=/home/terry/tpu_logs
+    source ~/maxtext_env/bin/activate
+    python3.10 -u -m MaxText.generate_param_only_checkpoint MaxText/configs/base.yml \
+      load_full_state_path=gs://taiming_us_central1/ckpts/pretrain/llama3.1-3b-finewebedu-vanilla-s42-10b/checkpoints/4999/items \
+      checkpoint_dir=gs://taiming_us_central1/ckpts/pretrain_param_only_v6/llama3b-vanilla-10B-s42/checkpoint_4999 \
       enable_checkpointing=True async_checkpointing=False \
       model_name=llama3.1-3b
+    "
+python -u multihost_runner_orig.py \
+    --TPU_PREFIX=$TPU_PREFIX \
+    --INTERNAL_IP=true \
+    --COMMAND="
+    export TPU_LOG_DIR=/home/terry/tpu_logs
+    source ~/maxtext_env/bin/activate
+    python3.10 -u -m MaxText.generate_param_only_checkpoint MaxText/configs/base.yml \
+      load_full_state_path=gs://taiming_us_central1/ckpts/pretrain/llama3.1-8b-finewebedu-vanilla-s42-10b/checkpoints/4999/items \
+      checkpoint_dir=gs://taiming_us_central1/ckpts/pretrain_param_only_v6/llama8b-vanilla-10B-s42/checkpoint_4999 \
+      enable_checkpointing=True async_checkpointing=False \
+      model_name=llama3.1-8b
+    "
+
+python -u multihost_runner_orig.py \
+    --TPU_PREFIX=$TPU_PREFIX \
+    --INTERNAL_IP=true \
+    --COMMAND="
+    export TPU_LOG_DIR=/home/terry/tpu_logs
+    source ~/maxtext_env/bin/activate
+    python3.10 -u -m MaxText.generate_param_only_checkpoint MaxText/configs/base.yml \
+      load_full_state_path=gs://taiming_us_central1/ckpts/pretrain/llama3.1-05b-finewebedu-vanilla-s42-5b/checkpoints/2499/items \
+      checkpoint_dir=gs://taiming_us_central1/ckpts/pretrain_param_only_v6/llama05b-vanilla-5B-s42/checkpoint_2499 \
+      enable_checkpointing=True async_checkpointing=False \
+      model_name=llama3.1-05b
+    "
+python -u multihost_runner_orig.py \
+    --TPU_PREFIX=$TPU_PREFIX \
+    --INTERNAL_IP=true \
+    --COMMAND="
+    export TPU_LOG_DIR=/home/terry/tpu_logs
+    source ~/maxtext_env/bin/activate
+    python3.10 -u -m MaxText.generate_param_only_checkpoint MaxText/configs/base.yml \
+      load_full_state_path=gs://taiming_us_central1/ckpts/pretrain/llama3.1-1b-finewebedu-vanilla-s42-5b/checkpoints/2499/items \
+      checkpoint_dir=gs://taiming_us_central1/ckpts/pretrain_param_only_v6/llama1b-vanilla-5B-s42/checkpoint_2499 \
+      enable_checkpointing=True async_checkpointing=False \
+      model_name=llama3.1-1b
+    "
+python -u multihost_runner_orig.py \
+    --TPU_PREFIX=$TPU_PREFIX \
+    --INTERNAL_IP=true \
+    --COMMAND="
+    export TPU_LOG_DIR=/home/terry/tpu_logs
+    source ~/maxtext_env/bin/activate
+    python3.10 -u -m MaxText.generate_param_only_checkpoint MaxText/configs/base.yml \
+      load_full_state_path=gs://taiming_us_central1/ckpts/pretrain/llama3.1-3b-finewebedu-vanilla-s42-5b/checkpoints/2499/items \
+      checkpoint_dir=gs://taiming_us_central1/ckpts/pretrain_param_only_v6/llama3b-vanilla-5B-s42/checkpoint_2499 \
+      enable_checkpointing=True async_checkpointing=False \
+      model_name=llama3.1-3b
+    "
+python -u multihost_runner_orig.py \
+    --TPU_PREFIX=$TPU_PREFIX \
+    --INTERNAL_IP=true \
+    --COMMAND="
+    export TPU_LOG_DIR=/home/terry/tpu_logs
+    source ~/maxtext_env/bin/activate
+    python3.10 -u -m MaxText.generate_param_only_checkpoint MaxText/configs/base.yml \
+      load_full_state_path=gs://taiming_us_central1/ckpts/pretrain/llama3.1-8b-finewebedu-vanilla-s42-5b/checkpoints/2499/items \
+      checkpoint_dir=gs://taiming_us_central1/ckpts/pretrain_param_only_v6/llama8b-vanilla-5B-s42/checkpoint_2499 \
+      enable_checkpointing=True async_checkpointing=False \
+      model_name=llama3.1-8b
     "
 
 # python -u multihost_runner_orig.py \
