@@ -13,7 +13,8 @@ from itertools import product
 
 # Default configurations
 DEFAULT_TEACHER_ARCHS = ["05b", "1b", "3b", "8b"]
-DEFAULT_TOKENS = ["300B"]
+# DEFAULT_TOKENS = ["300B"] 
+DEFAULT_TOKENS = ["10B", "5B"] 
 DEFAULT_TEACHER_SEED = 42
 DEFAULT_ALPHAS = [0.5, 1.0]
 DEFAULT_STUDENT_SEED = 43
@@ -28,6 +29,8 @@ ARCH_TO_MODEL = {
 
 # Mapping from tokens to checkpoint step
 TOKENS_TO_STEP = {
+    "5B": 2499,
+    "10B": 4999,
     "30B": 14999,
     "50B": 24999,
     "100B": 49999,
@@ -70,7 +73,7 @@ export KD_ALPHA={kd_alpha}  #KD_ALPHA=0.0 -- pure cross-entropy (no KD), KD_ALPH
 export KD_TEMPERATURE=1.0
 export KD_TEACHER_PARAMETERS_PATH="/home/terry/gcs-bucket/ckpts/pretrain_param_only_v6/{teacher_ckpt_name}/checkpoint_{checkpoint_step}/0/items"
 export TEACHER_MODEL_NAME="{teacher_model_name}"
-export BASE_OUTPUT_DIRECTORY="gs://$BUCKET_NAME/ckpts/distill_pretrain"
+export BASE_OUTPUT_DIRECTORY="gs://$BUCKET_NAME/ckpts/exp2"
 export DATA_FILES='/home/terry/gcs-data/datasets/fineweb-edu/*.array_record'
 
 export RUN_NAME="{run_name}"
@@ -133,7 +136,7 @@ python -u multihost_runner_orig.py \\
         cosine_learning_rate_final_fraction=${{MIN_LR_RATIO}} \\
         warmup_steps_fraction=${{WARMUP_RATIO}} \\
         checkpoint_period=2500 \\
-        checkpoint_max_to_keep=10 \\
+        checkpoint_max_to_keep=2 \\
         gcs_metrics=True \\
         use_wandb=True \\
         wandb_project=maxtext_1b \\
