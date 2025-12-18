@@ -187,6 +187,7 @@ PPL_TASKS = [
     "wikitext",
     "cnn_dailymail",
     "finewebedu-train-0.001",
+    "finewebedu-test-100M",
     "dm_mathematics",
     "gsm8k",
     "arxiv",
@@ -198,7 +199,6 @@ PPL_TASKS = [
     "xquad",
 ]
     # "wikitext2",
-    # "finewebedu-test-100M",
     # "dclm",
     # "arxiv_full",  # nick007x/arxiv-papers - huge dataset, use streaming
 
