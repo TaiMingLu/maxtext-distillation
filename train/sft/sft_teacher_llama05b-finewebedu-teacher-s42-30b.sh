@@ -1,7 +1,7 @@
 #!/bin/bash
 #
-# SFT (Supervised Fine-Tuning) script for llama3.1-1b
-# Loads pretrained checkpoint from exp2 and fine-tunes on Dolci dataset
+# SFT (Supervised Fine-Tuning) script for llama3.2-1b
+# Loads pretrained checkpoint from pretrain and fine-tunes on Dolci dataset
 #
 # Hyperparameters (from sweep):
 #   - LR: 5e-5 with cosine decay to 0.1
@@ -29,7 +29,7 @@ for var in "${required_vars[@]}"; do
 done
 
 # Model configuration
-export MODEL_NAME='llama3.1-1b'
+export MODEL_NAME='llama3.2-1b'
 export SEQ_LEN=4096
 export BATCH_SIZE=4
 export GRAD_ACCUM=1
@@ -42,13 +42,13 @@ export WARMUP_RATIO=0.01  # 1% warmup
 export ASYNC_CHECKPOINTING=false
 
 # Pretrained checkpoint to load
-export PRETRAINED_CHECKPOINT="gs://${BUCKET_NAME}/ckpts/exp2/exp2_llama3.1-1b-A8BT100BS42-a05-s43/checkpoints/24999/items"
+export PRETRAINED_CHECKPOINT="gs://${BUCKET_NAME}/ckpts/pretrain/llama05b-finewebedu-teacher-s42-30b/checkpoints/14999/items"
 # Output directory for SFT checkpoints
 export BASE_OUTPUT_DIRECTORY="gs://$BUCKET_NAME/ckpts/sft"
 
 # Run naming
-export RUN_NAME="sft_exp2_llama3.1-1b-A8BT100BS42-a05-s43"
-export RUN_ID="sft_exp2_llama3.1_1b_A8BT100BS42_a05_s43"
+export RUN_NAME="sft_llama05b-finewebedu-teacher-s42-30b"
+export RUN_ID="sft_teacher_llama05b_finewebedu_teacher_s42_30b"
 
 # HuggingFace dataset configuration
 export HF_PATH='/home/terry/gcs-data/datasets/Dolci-Instruct-SFT-7B'

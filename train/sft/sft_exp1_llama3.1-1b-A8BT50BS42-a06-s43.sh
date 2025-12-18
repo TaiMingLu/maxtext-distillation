@@ -1,7 +1,12 @@
 #!/bin/bash
 #
-# SFT (Supervised Fine-Tuning) script for Llama 1B
+# SFT (Supervised Fine-Tuning) script for llama3.1-1b
 # Loads pretrained checkpoint from exp1 and fine-tunes on Dolci dataset
+#
+# Hyperparameters (from sweep):
+#   - LR: 5e-5 with cosine decay to 0.1
+#   - Warmup: 0.01
+#   - Batch size: 4, Steps: 4000
 #
 
 cd ~/maxtext
@@ -26,18 +31,18 @@ done
 # Model configuration
 export MODEL_NAME='llama3.1-1b'
 export SEQ_LEN=4096
-export BATCH_SIZE=8  # per-device batch size; on v6e-32 (32 chips): 8 * 32 * 4096 = ~1M tokens/step
+export BATCH_SIZE=4
 export GRAD_ACCUM=1
 
-# SFT training hyperparameters (typically lower LR than pretraining)
-export NUM_STEPS=1000  # ~1B tokens total (1M tokens/step * 1000 steps)
-export LR=1.e-5
-export MIN_LR_RATIO=1.0  # Constant LR (no decay)
-export WARMUP_RATIO=0.1
+# SFT training hyperparameters (best from sweep)
+export NUM_STEPS=4000
+export LR=5e-5
+export MIN_LR_RATIO=0.1  # Cosine decay to 1/10
+export WARMUP_RATIO=0.01  # 1% warmup
 export ASYNC_CHECKPOINTING=false
 
-# Pretrained checkpoint to load (from exp1 distillation run)
-export PRETRAINED_CHECKPOINT="gs://${BUCKET_NAME}/ckpts/distill_pretrain/exp1_llama3.1-1b-A8BT50BS42-a06-s43/checkpoints/24999/items"
+# Pretrained checkpoint to load
+export PRETRAINED_CHECKPOINT="gs://${BUCKET_NAME}/ckpts/exp1/exp1_llama3.1-1b-A8BT50BS42-a06-s43/checkpoints/24999/items"
 # Output directory for SFT checkpoints
 export BASE_OUTPUT_DIRECTORY="gs://$BUCKET_NAME/ckpts/sft"
 
@@ -46,17 +51,12 @@ export RUN_NAME="sft_exp1_llama3.1-1b-A8BT50BS42-a06-s43"
 export RUN_ID="sft_exp1_llama3.1_1b_A8BT50BS42_a06_s43"
 
 # HuggingFace dataset configuration
-# Dolci-Instruct-SFT-7B: 2.15M samples with messages format [{role, content}, ...]
-# Using local copy to avoid re-downloading each run
-export HF_PATH='/home/terry/gcs-bucket/datasets/Dolci-Instruct-SFT-7B'
+export HF_PATH='/home/terry/gcs-data/datasets/Dolci-Instruct-SFT-7B'
 export TRAIN_SPLIT='train'
-export EVAL_SPLIT='train'  # No separate eval split, use subset of train
+export EVAL_SPLIT='train'
 
-# Tokenizer - MUST use Instruct version for chat template
-# The base model (Llama-3.2-1B) does NOT have a chat template
-# The Instruct model has the chat template needed for SFT on conversational data
-export TOKENIZER_PATH='/home/terry/gcs-bucket/HF_HOME/Llama-3.2-1B-Instruct'
-# Set your HuggingFace token (required for gated Llama models)
+# Tokenizer
+export TOKENIZER_PATH='/home/terry/gcs-data/HF_HOME/Llama-3.2-1B-Instruct'
 export HF_ACCESS_TOKEN="${HF_ACCESS_TOKEN:-}"
 
 echo "========================"
@@ -65,8 +65,9 @@ echo "parameters:"
 echo "MODEL_NAME: $MODEL_NAME"
 echo "SEQ_LEN: $SEQ_LEN"
 echo "BATCH_SIZE: $BATCH_SIZE"
-echo "GRAD_ACCUM: $GRAD_ACCUM"
 echo "LR: $LR"
+echo "MIN_LR_RATIO: $MIN_LR_RATIO"
+echo "WARMUP_RATIO: $WARMUP_RATIO"
 echo "NUM_STEPS: $NUM_STEPS"
 echo "PRETRAINED_CHECKPOINT: $PRETRAINED_CHECKPOINT"
 echo "BASE_OUTPUT_DIRECTORY: $BASE_OUTPUT_DIRECTORY"
@@ -96,7 +97,7 @@ python -u multihost_runner_orig.py \
         hf_access_token=${HF_ACCESS_TOKEN} \
         max_target_length=${SEQ_LEN} \
         per_device_batch_size=${BATCH_SIZE} \
-        gradient_accumulation_steps=${GRAD_ACCUM} \
+        gradient_accumulation_steps=1 \
         steps=${NUM_STEPS} \
         learning_rate=${LR} \
         cosine_learning_rate_final_fraction=${MIN_LR_RATIO} \
