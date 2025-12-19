@@ -42,13 +42,13 @@ export WARMUP_RATIO=0.01  # 1% warmup
 export ASYNC_CHECKPOINTING=false
 
 # Pretrained checkpoint to load
-export PRETRAINED_CHECKPOINT="gs://${BUCKET_NAME}/ckpts/exp2/exp2_llama3.1-1b-A3BT100BS42-a1-s43/checkpoints/24999/items"
+export PRETRAINED_CHECKPOINT="gs://${BUCKET_NAME}/ckpts/pretrain_param_only_v6/llama1b-vanilla-100B-s42/checkpoint_49999"
 # Output directory for SFT checkpoints
 export BASE_OUTPUT_DIRECTORY="gs://$BUCKET_NAME/ckpts/sft"
 
 # Run naming
-export RUN_NAME="sft_exp2_llama3.1-1b-A3BT100BS42-a1-s43"
-export RUN_ID="sft_exp2_llama3.1_1b_A3BT100BS42_a1_s43"
+export RUN_NAME="sft_llama1b-vanilla-100B-s42"
+export RUN_ID="sft_teacher_llama1b_vanilla_100B_s42"
 
 # HuggingFace dataset configuration
 export HF_PATH='/home/terry/gcs-data/datasets/Dolci-Instruct-SFT-7B'

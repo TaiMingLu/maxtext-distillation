@@ -1,7 +1,7 @@
 #!/bin/bash
 #
 # SFT (Supervised Fine-Tuning) script for llama3.1-1b
-# Loads pretrained checkpoint from exp2 and fine-tunes on Dolci dataset
+# Loads pretrained checkpoint and fine-tunes on Dolci dataset
 #
 # Hyperparameters (from sweep):
 #   - LR: 5e-5 with cosine decay to 0.1

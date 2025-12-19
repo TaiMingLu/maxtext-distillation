@@ -269,6 +269,9 @@ def generate_distill_script(
     # Pretrain run name (source checkpoint)
     pretrain_run_name = f"{exp_name}_llama3.1-1b-{teacher_naming}-{alpha_str}-s{student_seed}"
 
+    # Full checkpoint path: exp1 or exp2 directory
+    checkpoint_path = f"{exp_name}/{pretrain_run_name}/checkpoints/{checkpoint_step}/items"
+
     # SFT script filename and run name
     script_name = f"sft_{exp_name}_llama3.1-1b-{teacher_naming}-{alpha_str}-s{student_seed}.sh"
     run_name = f"sft_{exp_name}_llama3.1-1b-{teacher_naming}-{alpha_str}-s{student_seed}"
@@ -279,9 +282,7 @@ def generate_distill_script(
 
     content = SCRIPT_TEMPLATE.format(
         model_name="llama3.1-1b",
-        ckpt_dir=exp_name,  # exp1 or exp2
-        pretrain_run_name=pretrain_run_name,
-        checkpoint_step=checkpoint_step,
+        checkpoint_path=checkpoint_path,
         run_name=run_name,
         run_id=run_id,
         **SFT_HYPERPARAMS,
@@ -310,7 +311,10 @@ def generate_teacher_script(
     output_dir: str,
 ) -> dict:
     """Generate SFT training script for teacher model."""
-    pretrain_run_name = f"llama{size}-finewebedu-teacher-s{seed}-{tokens}"
+    # Teacher run name format: llama{size}b-vanilla-{tokens}B-s{seed}
+    # e.g., llama05b-vanilla-100B-s42
+    tokens_upper = tokens.upper()  # Ensure uppercase B
+    pretrain_run_name = f"llama{size}-vanilla-{tokens_upper}-s{seed}"
     checkpoint_step = get_checkpoint_step_for_tokens(tokens)
     model_name = size_to_model_name(size)
 
@@ -318,14 +322,15 @@ def generate_teacher_script(
     run_name = f"sft_{pretrain_run_name}"
     run_id = f"sft_teacher_{pretrain_run_name.replace('-', '_')}"
 
+    # Full checkpoint path: pretrain_param_only_v6 with checkpoint_{step} format
+    checkpoint_path = f"pretrain_param_only_v6/{pretrain_run_name}/checkpoint_{checkpoint_step}"
+
     # Depends on teacher training
     depends_on = f"llama{size}_finewebedu_teacher_s{seed}_{tokens}"
 
     content = SCRIPT_TEMPLATE.format(
         model_name=model_name,
-        ckpt_dir="pretrain",  # Teachers are in pretrain/
-        pretrain_run_name=pretrain_run_name,
-        checkpoint_step=checkpoint_step,
+        checkpoint_path=checkpoint_path,
         run_name=run_name,
         run_id=run_id,
         **SFT_HYPERPARAMS,
@@ -354,15 +359,16 @@ def generate_baseline_script(output_dir: str) -> dict:
     model_name = BASELINE_CONFIG["model_name"]
     ckpt_dir = BASELINE_CONFIG["ckpt_dir"]
 
+    # Full checkpoint path for baseline
+    checkpoint_path = f"{ckpt_dir}/{pretrain_run_name}/checkpoints/{checkpoint_step}/items"
+
     script_name = f"sft_baseline_{pretrain_run_name}.sh"
     run_name = f"sft_{pretrain_run_name}"
     run_id = f"sft_baseline_{pretrain_run_name.replace('-', '_').replace('.', '_')}"
 
     content = SCRIPT_TEMPLATE.format(
         model_name=model_name,
-        ckpt_dir=ckpt_dir,  # vanilla
-        pretrain_run_name=pretrain_run_name,
-        checkpoint_step=checkpoint_step,
+        checkpoint_path=checkpoint_path,
         run_name=run_name,
         run_id=run_id,
         **SFT_HYPERPARAMS,

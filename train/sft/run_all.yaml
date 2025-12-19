@@ -167,53 +167,53 @@ tasks:
   - id: sft_exp2_llama3.1_1b_A8BT300BS42_a1_s43
     run: bash train/sft/sft_exp2_llama3.1-1b-A8BT300BS42-a1-s43.sh
     hide: true
-  - id: sft_teacher_llama05b_finewebedu_teacher_s42_30b
-    run: bash train/sft/sft_teacher_llama05b-finewebedu-teacher-s42-30b.sh
+  - id: sft_teacher_llama05b_vanilla_30B_s42
+    run: bash train/sft/sft_teacher_llama05b-vanilla-30B-s42.sh
     hide: true
-  - id: sft_teacher_llama05b_finewebedu_teacher_s42_50b
-    run: bash train/sft/sft_teacher_llama05b-finewebedu-teacher-s42-50b.sh
+  - id: sft_teacher_llama05b_vanilla_50B_s42
+    run: bash train/sft/sft_teacher_llama05b-vanilla-50B-s42.sh
     hide: true
-  - id: sft_teacher_llama05b_finewebedu_teacher_s42_100b
-    run: bash train/sft/sft_teacher_llama05b-finewebedu-teacher-s42-100b.sh
+  - id: sft_teacher_llama05b_vanilla_100B_s42
+    run: bash train/sft/sft_teacher_llama05b-vanilla-100B-s42.sh
     hide: true
-  - id: sft_teacher_llama05b_finewebedu_teacher_s42_300b
-    run: bash train/sft/sft_teacher_llama05b-finewebedu-teacher-s42-300b.sh
+  - id: sft_teacher_llama05b_vanilla_300B_s42
+    run: bash train/sft/sft_teacher_llama05b-vanilla-300B-s42.sh
     hide: true
-  - id: sft_teacher_llama1b_finewebedu_teacher_s42_30b
-    run: bash train/sft/sft_teacher_llama1b-finewebedu-teacher-s42-30b.sh
+  - id: sft_teacher_llama1b_vanilla_30B_s42
+    run: bash train/sft/sft_teacher_llama1b-vanilla-30B-s42.sh
     hide: true
-  - id: sft_teacher_llama1b_finewebedu_teacher_s42_50b
-    run: bash train/sft/sft_teacher_llama1b-finewebedu-teacher-s42-50b.sh
+  - id: sft_teacher_llama1b_vanilla_50B_s42
+    run: bash train/sft/sft_teacher_llama1b-vanilla-50B-s42.sh
     hide: true
-  - id: sft_teacher_llama1b_finewebedu_teacher_s42_100b
-    run: bash train/sft/sft_teacher_llama1b-finewebedu-teacher-s42-100b.sh
+  - id: sft_teacher_llama1b_vanilla_100B_s42
+    run: bash train/sft/sft_teacher_llama1b-vanilla-100B-s42.sh
     hide: true
-  - id: sft_teacher_llama1b_finewebedu_teacher_s42_300b
-    run: bash train/sft/sft_teacher_llama1b-finewebedu-teacher-s42-300b.sh
+  - id: sft_teacher_llama1b_vanilla_300B_s42
+    run: bash train/sft/sft_teacher_llama1b-vanilla-300B-s42.sh
     hide: true
-  - id: sft_teacher_llama3b_finewebedu_teacher_s42_30b
-    run: bash train/sft/sft_teacher_llama3b-finewebedu-teacher-s42-30b.sh
+  - id: sft_teacher_llama3b_vanilla_30B_s42
+    run: bash train/sft/sft_teacher_llama3b-vanilla-30B-s42.sh
     hide: true
-  - id: sft_teacher_llama3b_finewebedu_teacher_s42_50b
-    run: bash train/sft/sft_teacher_llama3b-finewebedu-teacher-s42-50b.sh
+  - id: sft_teacher_llama3b_vanilla_50B_s42
+    run: bash train/sft/sft_teacher_llama3b-vanilla-50B-s42.sh
     hide: true
-  - id: sft_teacher_llama3b_finewebedu_teacher_s42_100b
-    run: bash train/sft/sft_teacher_llama3b-finewebedu-teacher-s42-100b.sh
+  - id: sft_teacher_llama3b_vanilla_100B_s42
+    run: bash train/sft/sft_teacher_llama3b-vanilla-100B-s42.sh
     hide: true
-  - id: sft_teacher_llama3b_finewebedu_teacher_s42_300b
-    run: bash train/sft/sft_teacher_llama3b-finewebedu-teacher-s42-300b.sh
+  - id: sft_teacher_llama3b_vanilla_300B_s42
+    run: bash train/sft/sft_teacher_llama3b-vanilla-300B-s42.sh
     hide: true
-  - id: sft_teacher_llama8b_finewebedu_teacher_s42_30b
-    run: bash train/sft/sft_teacher_llama8b-finewebedu-teacher-s42-30b.sh
+  - id: sft_teacher_llama8b_vanilla_30B_s42
+    run: bash train/sft/sft_teacher_llama8b-vanilla-30B-s42.sh
     hide: true
-  - id: sft_teacher_llama8b_finewebedu_teacher_s42_50b
-    run: bash train/sft/sft_teacher_llama8b-finewebedu-teacher-s42-50b.sh
+  - id: sft_teacher_llama8b_vanilla_50B_s42
+    run: bash train/sft/sft_teacher_llama8b-vanilla-50B-s42.sh
     hide: true
-  - id: sft_teacher_llama8b_finewebedu_teacher_s42_100b
-    run: bash train/sft/sft_teacher_llama8b-finewebedu-teacher-s42-100b.sh
+  - id: sft_teacher_llama8b_vanilla_100B_s42
+    run: bash train/sft/sft_teacher_llama8b-vanilla-100B-s42.sh
     hide: true
-  - id: sft_teacher_llama8b_finewebedu_teacher_s42_300b
-    run: bash train/sft/sft_teacher_llama8b-finewebedu-teacher-s42-300b.sh
+  - id: sft_teacher_llama8b_vanilla_300B_s42
+    run: bash train/sft/sft_teacher_llama8b-vanilla-300B-s42.sh
     hide: true
   - id: sft_baseline_llama3_1_1b_finewebedu_vanilla_s43_50b
     run: bash train/sft/sft_baseline_llama3.1-1b-finewebedu-vanilla-s43-50b.sh
