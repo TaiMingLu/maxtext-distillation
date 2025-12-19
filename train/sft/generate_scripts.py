@@ -242,8 +242,7 @@ def get_teacher_naming(arch: str, tokens: str, seed: int) -> str:
 
 def size_to_model_name(size: str) -> str:
     """Convert size string to model name (e.g., '8b' -> 'llama3.1-8b')."""
-    if size == "05b":
-        return "llama3.1-0.5b"
+    # Valid: llama3.1-05b, llama3.1-1b, llama3.1-3b, llama3.1-8b
     return f"llama3.1-{size}"
 
 

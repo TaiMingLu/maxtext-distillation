@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# SFT (Supervised Fine-Tuning) script for llama3.1-0.5b
+# SFT (Supervised Fine-Tuning) script for llama3.1-05b
 # Loads pretrained checkpoint and fine-tunes on Dolci dataset
 #
 # Hyperparameters (from sweep):
@@ -29,7 +29,7 @@ for var in "${required_vars[@]}"; do
 done
 
 # Model configuration
-export MODEL_NAME='llama3.1-0.5b'
+export MODEL_NAME='llama3.1-05b'
 export SEQ_LEN=4096
 export BATCH_SIZE=4
 export GRAD_ACCUM=1

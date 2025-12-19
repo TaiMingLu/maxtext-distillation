@@ -224,19 +224,19 @@ tasks:
     depends_on: sft_exp2_llama3.1_1b_A8BT300BS42_a1_s43
     hide: true
   - id: eval_sft_llama05b_vanilla_30B_s42
-    run: bash train/eval-base/eval_base_acc.sh sft_llama05b-vanilla-30B-s42 llama3.1-0.5b 3999 sft --resume
+    run: bash train/eval-base/eval_base_acc.sh sft_llama05b-vanilla-30B-s42 llama3.1-05b 3999 sft --resume
     depends_on: sft_teacher_llama05b_vanilla_30B_s42
     hide: true
   - id: eval_sft_llama05b_vanilla_50B_s42
-    run: bash train/eval-base/eval_base_acc.sh sft_llama05b-vanilla-50B-s42 llama3.1-0.5b 3999 sft --resume
+    run: bash train/eval-base/eval_base_acc.sh sft_llama05b-vanilla-50B-s42 llama3.1-05b 3999 sft --resume
     depends_on: sft_teacher_llama05b_vanilla_50B_s42
     hide: true
   - id: eval_sft_llama05b_vanilla_100B_s42
-    run: bash train/eval-base/eval_base_acc.sh sft_llama05b-vanilla-100B-s42 llama3.1-0.5b 3999 sft --resume
+    run: bash train/eval-base/eval_base_acc.sh sft_llama05b-vanilla-100B-s42 llama3.1-05b 3999 sft --resume
     depends_on: sft_teacher_llama05b_vanilla_100B_s42
     hide: true
   - id: eval_sft_llama05b_vanilla_300B_s42
-    run: bash train/eval-base/eval_base_acc.sh sft_llama05b-vanilla-300B-s42 llama3.1-0.5b 3999 sft --resume
+    run: bash train/eval-base/eval_base_acc.sh sft_llama05b-vanilla-300B-s42 llama3.1-05b 3999 sft --resume
     depends_on: sft_teacher_llama05b_vanilla_300B_s42
     hide: true
   - id: eval_sft_llama1b_vanilla_30B_s42
