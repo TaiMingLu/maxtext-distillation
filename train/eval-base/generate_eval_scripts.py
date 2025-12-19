@@ -50,8 +50,9 @@ TOKEN_TO_CHECKPOINT_STEP = {
 # Teacher baselines - all size/token combinations
 TEACHER_CONFIG = {
     "sizes": ["05b", "1b", "3b", "8b"],
-    "tokens": ["30b", "50b", "100b", "300b"],
+    "tokens": ["30B", "50B", "100B", "300B"],  # Uppercase for run_name
     "seed": 42,
+    "ckpt_dir": "pretrain_param_only_v6",
 }
 
 # Baseline - single 1B model trained from scratch
@@ -235,8 +236,8 @@ def generate_base_acc_task(
 
 
 def get_teacher_run_name(size: str, tokens: str, seed: int) -> str:
-    """Get teacher run name like llama8b-finewebedu-teacher-s42-300b."""
-    return f"llama{size}-finewebedu-teacher-s{seed}-{tokens}"
+    """Get teacher run name like llama05b-vanilla-100B-s42."""
+    return f"llama{size}-vanilla-{tokens}-s{seed}"
 
 
 def get_teacher_training_task_id(size: str, tokens: str, seed: int) -> str:
@@ -246,9 +247,6 @@ def get_teacher_training_task_id(size: str, tokens: str, seed: int) -> str:
 
 def size_to_model_name(size: str) -> str:
     """Convert size string to model name (e.g., '8b' -> 'llama3.1-8b')."""
-    # Handle special case for 05b -> 0.5b
-    if size == "05b":
-        return "llama3.2-1b"  # Use 1b model config for 0.5b
     return f"llama3.1-{size}"
 
 
@@ -259,6 +257,7 @@ def generate_teacher_tasks(checkpoint_step_sft: int) -> list:
     sizes = TEACHER_CONFIG["sizes"]
     tokens_list = TEACHER_CONFIG["tokens"]
     seed = TEACHER_CONFIG["seed"]
+    ckpt_dir = TEACHER_CONFIG["ckpt_dir"]
 
     for size, tokens in product(sizes, tokens_list):
         name = get_teacher_run_name(size, tokens, seed)
@@ -277,9 +276,10 @@ def generate_teacher_tasks(checkpoint_step_sft: int) -> list:
             "task_id": ppl_task_id,
             "run_name": name,
             "checkpoint_step": checkpoint_step_pretrain,
-            "ckpt_dir": "pretrain",
+            "ckpt_dir": ckpt_dir,
             "model_name": model_name,
             "eval_type": "ppl",
+            "param_only": True,
             "depends_on": pretrain_depends_on,
         })
 
@@ -289,9 +289,10 @@ def generate_teacher_tasks(checkpoint_step_sft: int) -> list:
             "task_id": base_acc_task_id,
             "run_name": name,
             "checkpoint_step": checkpoint_step_pretrain,
-            "ckpt_dir": "pretrain",
+            "ckpt_dir": ckpt_dir,
             "model_name": model_name,
             "eval_type": "base_acc",
+            "param_only": True,
             "depends_on": pretrain_depends_on,
         })
 
@@ -390,13 +391,15 @@ def generate_run_all_yaml(tasks: list, output_dir: str) -> str:
         ckpt_dir = task.get("ckpt_dir", "sft")
         # Get model name (default to llama3.1-1b for distill tasks)
         model_name = task.get("model_name", "llama3.1-1b")
+        # Check if param_only checkpoint format
+        param_only_flag = " --param_only" if task.get("param_only") else ""
 
         if eval_type == "ppl":
-            lines.append(f"    run: bash train/eval-base/eval_pretrain_ppl.sh {run_name} {model_name} {checkpoint_step} {ckpt_dir} --resume")
+            lines.append(f"    run: bash train/eval-base/eval_pretrain_ppl.sh {run_name} {model_name} {checkpoint_step} {ckpt_dir} --resume{param_only_flag}")
         elif eval_type == "base_acc":
-            lines.append(f"    run: bash train/eval-base/eval_base_acc.sh {run_name} {model_name} {checkpoint_step} {ckpt_dir} --resume")
+            lines.append(f"    run: bash train/eval-base/eval_base_acc.sh {run_name} {model_name} {checkpoint_step} {ckpt_dir} --resume{param_only_flag}")
         else:  # acc (SFT with chat template)
-            lines.append(f"    run: bash train/eval-base/eval_sft_acc.sh {run_name} {model_name} {checkpoint_step} {ckpt_dir} --resume")
+            lines.append(f"    run: bash train/eval-base/eval_sft_acc.sh {run_name} {model_name} {checkpoint_step} {ckpt_dir} --resume{param_only_flag}")
 
         if depends_on:
             lines.append(f"    depends_on: {depends_on}")

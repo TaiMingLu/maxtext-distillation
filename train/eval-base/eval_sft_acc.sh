@@ -30,11 +30,15 @@ RUN_NAME="$1"
 MODEL_NAME="$2"
 CHECKPOINT_STEP="$3"
 CKPT_DIR="$4"
-# Check for --resume flag in remaining args
+# Check for --resume and --param_only flags in remaining args
 RESUME_FLAG="false"
+PARAM_ONLY="false"
 for arg in "$@"; do
   if [[ "$arg" == "--resume" ]]; then
     RESUME_FLAG="true"
+  fi
+  if [[ "$arg" == "--param_only" ]]; then
+    PARAM_ONLY="true"
   fi
 done
 
@@ -56,7 +60,11 @@ for var in "${required_vars[@]}"; do
 done
 
 # Configuration
-CHECKPOINT_PATH="gs://${BUCKET_NAME}/ckpts/${CKPT_DIR}/${RUN_NAME}/checkpoints/${CHECKPOINT_STEP}/items"
+if [[ "${PARAM_ONLY}" == "true" ]]; then
+  CHECKPOINT_PATH="gs://${BUCKET_NAME}/ckpts/${CKPT_DIR}/${RUN_NAME}/checkpoint_${CHECKPOINT_STEP}"
+else
+  CHECKPOINT_PATH="gs://${BUCKET_NAME}/ckpts/${CKPT_DIR}/${RUN_NAME}/checkpoints/${CHECKPOINT_STEP}/items"
+fi
 HF_MODEL_PATH="/home/terry/gcs-bucket/HF_HOME/Llama-3.2-1B-Instruct"
 EVAL_RESULTS_DIR="/home/terry/gcs-bucket/eval_1218/acc_results"
 RESULT_JSON_PATH="${EVAL_RESULTS_DIR}/${RUN_NAME}_step${CHECKPOINT_STEP}.json"

@@ -83,7 +83,7 @@ DEFAULT_STUDENT_SEED = 43
 SCRIPT_TEMPLATE = '''#!/bin/bash
 #
 # SFT (Supervised Fine-Tuning) script for {model_name}
-# Loads pretrained checkpoint from {ckpt_dir} and fine-tunes on Dolci dataset
+# Loads pretrained checkpoint and fine-tunes on Dolci dataset
 #
 # Hyperparameters (from sweep):
 #   - LR: {lr} with cosine decay to {min_lr_ratio}
@@ -124,7 +124,7 @@ export WARMUP_RATIO={warmup_ratio}  # 1% warmup
 export ASYNC_CHECKPOINTING=false
 
 # Pretrained checkpoint to load
-export PRETRAINED_CHECKPOINT="gs://${{BUCKET_NAME}}/ckpts/{ckpt_dir}/{pretrain_run_name}/checkpoints/{checkpoint_step}/items"
+export PRETRAINED_CHECKPOINT="gs://${{BUCKET_NAME}}/ckpts/{checkpoint_path}"
 # Output directory for SFT checkpoints
 export BASE_OUTPUT_DIRECTORY="gs://$BUCKET_NAME/ckpts/sft"
 
@@ -243,7 +243,7 @@ def get_teacher_naming(arch: str, tokens: str, seed: int) -> str:
 def size_to_model_name(size: str) -> str:
     """Convert size string to model name (e.g., '8b' -> 'llama3.1-8b')."""
     if size == "05b":
-        return "llama3.2-1b"  # Use 1b model config for 0.5b
+        return "llama3.1-0.5b"
     return f"llama3.1-{size}"
 
 

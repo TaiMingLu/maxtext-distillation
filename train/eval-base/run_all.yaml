@@ -170,51 +170,51 @@ tasks:
   - id: eval_ppl_exp2_llama3.1_1b_A8BT300BS42_a1_s43
     hide: true
     run: bash train/eval-base/eval_pretrain_ppl.sh exp2_llama3.1-1b-A8BT300BS42-a1-s43 llama3.1-1b 24999 exp2 --resume
-  - id: eval_ppl_teacher_llama05b_finewebedu_teacher_s42_30b
+  - id: eval_ppl_teacher_llama05b_vanilla_30B_s42
     hide: true
-    run: bash train/eval-base/eval_pretrain_ppl.sh llama05b-finewebedu-teacher-s42-30b llama3.2-1b 14999 pretrain --resume
-  - id: eval_ppl_teacher_llama05b_finewebedu_teacher_s42_50b
+    run: bash train/eval-base/eval_pretrain_ppl.sh llama05b-vanilla-30B-s42 llama3.1-05b 14999 pretrain_param_only_v6 --resume --param_only
+  - id: eval_ppl_teacher_llama05b_vanilla_50B_s42
     hide: true
-    run: bash train/eval-base/eval_pretrain_ppl.sh llama05b-finewebedu-teacher-s42-50b llama3.2-1b 24999 pretrain --resume
-  - id: eval_ppl_teacher_llama05b_finewebedu_teacher_s42_100b
+    run: bash train/eval-base/eval_pretrain_ppl.sh llama05b-vanilla-50B-s42 llama3.1-05b 24999 pretrain_param_only_v6 --resume --param_only
+  - id: eval_ppl_teacher_llama05b_vanilla_100B_s42
     hide: true
-    run: bash train/eval-base/eval_pretrain_ppl.sh llama05b-finewebedu-teacher-s42-100b llama3.2-1b 49999 pretrain --resume
-  - id: eval_ppl_teacher_llama05b_finewebedu_teacher_s42_300b
+    run: bash train/eval-base/eval_pretrain_ppl.sh llama05b-vanilla-100B-s42 llama3.1-05b 49999 pretrain_param_only_v6 --resume --param_only
+  - id: eval_ppl_teacher_llama05b_vanilla_300B_s42
     hide: true
-    run: bash train/eval-base/eval_pretrain_ppl.sh llama05b-finewebedu-teacher-s42-300b llama3.2-1b 149999 pretrain --resume
-  - id: eval_ppl_teacher_llama1b_finewebedu_teacher_s42_30b
+    run: bash train/eval-base/eval_pretrain_ppl.sh llama05b-vanilla-300B-s42 llama3.1-05b 149999 pretrain_param_only_v6 --resume --param_only
+  - id: eval_ppl_teacher_llama1b_vanilla_30B_s42
     hide: true
-    run: bash train/eval-base/eval_pretrain_ppl.sh llama1b-finewebedu-teacher-s42-30b llama3.1-1b 14999 pretrain --resume
-  - id: eval_ppl_teacher_llama1b_finewebedu_teacher_s42_50b
+    run: bash train/eval-base/eval_pretrain_ppl.sh llama1b-vanilla-30B-s42 llama3.1-1b 14999 pretrain_param_only_v6 --resume --param_only
+  - id: eval_ppl_teacher_llama1b_vanilla_50B_s42
     hide: true
-    run: bash train/eval-base/eval_pretrain_ppl.sh llama1b-finewebedu-teacher-s42-50b llama3.1-1b 24999 pretrain --resume
-  - id: eval_ppl_teacher_llama1b_finewebedu_teacher_s42_100b
+    run: bash train/eval-base/eval_pretrain_ppl.sh llama1b-vanilla-50B-s42 llama3.1-1b 24999 pretrain_param_only_v6 --resume --param_only
+  - id: eval_ppl_teacher_llama1b_vanilla_100B_s42
     hide: true
-    run: bash train/eval-base/eval_pretrain_ppl.sh llama1b-finewebedu-teacher-s42-100b llama3.1-1b 49999 pretrain --resume
-  - id: eval_ppl_teacher_llama1b_finewebedu_teacher_s42_300b
+    run: bash train/eval-base/eval_pretrain_ppl.sh llama1b-vanilla-100B-s42 llama3.1-1b 49999 pretrain_param_only_v6 --resume --param_only
+  - id: eval_ppl_teacher_llama1b_vanilla_300B_s42
     hide: true
-    run: bash train/eval-base/eval_pretrain_ppl.sh llama1b-finewebedu-teacher-s42-300b llama3.1-1b 149999 pretrain --resume
-  - id: eval_ppl_teacher_llama3b_finewebedu_teacher_s42_30b
+    run: bash train/eval-base/eval_pretrain_ppl.sh llama1b-vanilla-300B-s42 llama3.1-1b 149999 pretrain_param_only_v6 --resume --param_only
+  - id: eval_ppl_teacher_llama3b_vanilla_30B_s42
     hide: true
-    run: bash train/eval-base/eval_pretrain_ppl.sh llama3b-finewebedu-teacher-s42-30b llama3.1-3b 14999 pretrain --resume
-  - id: eval_ppl_teacher_llama3b_finewebedu_teacher_s42_50b
+    run: bash train/eval-base/eval_pretrain_ppl.sh llama3b-vanilla-30B-s42 llama3.1-3b 14999 pretrain_param_only_v6 --resume --param_only
+  - id: eval_ppl_teacher_llama3b_vanilla_50B_s42
     hide: true
-    run: bash train/eval-base/eval_pretrain_ppl.sh llama3b-finewebedu-teacher-s42-50b llama3.1-3b 24999 pretrain --resume
-  - id: eval_ppl_teacher_llama3b_finewebedu_teacher_s42_100b
+    run: bash train/eval-base/eval_pretrain_ppl.sh llama3b-vanilla-50B-s42 llama3.1-3b 24999 pretrain_param_only_v6 --resume --param_only
+  - id: eval_ppl_teacher_llama3b_vanilla_100B_s42
     hide: true
-    run: bash train/eval-base/eval_pretrain_ppl.sh llama3b-finewebedu-teacher-s42-100b llama3.1-3b 49999 pretrain --resume
-  - id: eval_ppl_teacher_llama3b_finewebedu_teacher_s42_300b
+    run: bash train/eval-base/eval_pretrain_ppl.sh llama3b-vanilla-100B-s42 llama3.1-3b 49999 pretrain_param_only_v6 --resume --param_only
+  - id: eval_ppl_teacher_llama3b_vanilla_300B_s42
     hide: true
-    run: bash train/eval-base/eval_pretrain_ppl.sh llama3b-finewebedu-teacher-s42-300b llama3.1-3b 149999 pretrain --resume
-  - id: eval_ppl_teacher_llama8b_finewebedu_teacher_s42_30b
+    run: bash train/eval-base/eval_pretrain_ppl.sh llama3b-vanilla-300B-s42 llama3.1-3b 149999 pretrain_param_only_v6 --resume --param_only
+  - id: eval_ppl_teacher_llama8b_vanilla_30B_s42
     hide: true
-    run: bash train/eval-base/eval_pretrain_ppl.sh llama8b-finewebedu-teacher-s42-30b llama3.1-8b 14999 pretrain --resume
-  - id: eval_ppl_teacher_llama8b_finewebedu_teacher_s42_50b
+    run: bash train/eval-base/eval_pretrain_ppl.sh llama8b-vanilla-30B-s42 llama3.1-8b 14999 pretrain_param_only_v6 --resume --param_only
+  - id: eval_ppl_teacher_llama8b_vanilla_50B_s42
     hide: true
-    run: bash train/eval-base/eval_pretrain_ppl.sh llama8b-finewebedu-teacher-s42-50b llama3.1-8b 24999 pretrain --resume
-  - id: eval_ppl_teacher_llama8b_finewebedu_teacher_s42_100b
+    run: bash train/eval-base/eval_pretrain_ppl.sh llama8b-vanilla-50B-s42 llama3.1-8b 24999 pretrain_param_only_v6 --resume --param_only
+  - id: eval_ppl_teacher_llama8b_vanilla_100B_s42
     hide: true
-    run: bash train/eval-base/eval_pretrain_ppl.sh llama8b-finewebedu-teacher-s42-100b llama3.1-8b 49999 pretrain --resume
-  - id: eval_ppl_teacher_llama8b_finewebedu_teacher_s42_300b
+    run: bash train/eval-base/eval_pretrain_ppl.sh llama8b-vanilla-100B-s42 llama3.1-8b 49999 pretrain_param_only_v6 --resume --param_only
+  - id: eval_ppl_teacher_llama8b_vanilla_300B_s42
     hide: true
-    run: bash train/eval-base/eval_pretrain_ppl.sh llama8b-finewebedu-teacher-s42-300b llama3.1-8b 149999 pretrain --resume
+    run: bash train/eval-base/eval_pretrain_ppl.sh llama8b-vanilla-300B-s42 llama3.1-8b 149999 pretrain_param_only_v6 --resume --param_only
