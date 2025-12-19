@@ -941,6 +941,58 @@ def main(config, test_args):
         raise ValueError("ppl sequence length must be set either via config.max_target_length or --ppl_seq_length")
     acc_seq_len = test_args.acc_seq_length or ppl_seq_len
 
+    # === EARLY CHECK: Determine if there are any missing benchmarks before loading model ===
+    save_path = None
+    if getattr(test_args, "eval_save_dir", ""):
+        os.makedirs(test_args.eval_save_dir, exist_ok=True)
+        save_dir = Path(test_args.eval_save_dir)
+        save_path = save_dir / f"{getattr(config, 'run_name', 'results')}.json"
+
+    existing_ppl_res, existing_acc_res = {}, {}
+    if test_args.resume and save_path and save_path.exists():
+        try:
+            with open(save_path, 'r') as f:
+                existing_results = json.load(f)
+            existing_ppl_res = existing_results.get("ppl", {})
+            existing_acc_res = existing_results.get("lm_eval", {}).get("acc_summary", {})
+        except Exception as e:
+            print(f"Warning: Failed to load existing results for early check: {e}")
+
+    # Determine which tasks would be run
+    ppl_tasks_to_run = []
+    acc_tasks_to_run = []
+
+    if test_args.eval_mode in ["ppl", "all"]:
+        ppl_task_list = PPL_TASKS
+        if test_args.tasks:
+            ppl_task_list = [t for t in ppl_task_list if t in test_args.tasks]
+        ppl_tasks_to_run = [t for t in ppl_task_list if t not in existing_ppl_res]
+
+    if test_args.eval_mode in ["acc", "all"]:
+        acc_task_list = ACC_TASKS
+        if test_args.tasks:
+            acc_task_list = [cfg for cfg in acc_task_list if cfg["name"] in test_args.tasks]
+        acc_tasks_to_run = [cfg for cfg in acc_task_list if cfg["name"] not in existing_acc_res]
+
+    if not ppl_tasks_to_run and not acc_tasks_to_run:
+        print("=" * 60)
+        print("All requested benchmarks already completed. Nothing to do.")
+        print(f"  Existing PPL tasks: {list(existing_ppl_res.keys())}")
+        print(f"  Existing ACC tasks: {list(existing_acc_res.keys())}")
+        print(f"  Results file: {save_path}")
+        print("=" * 60)
+        return
+
+    print("=" * 60)
+    print(f"Missing benchmarks to evaluate:")
+    if ppl_tasks_to_run:
+        print(f"  PPL tasks: {ppl_tasks_to_run}")
+    if acc_tasks_to_run:
+        print(f"  ACC tasks: {[cfg['name'] for cfg in acc_tasks_to_run]}")
+    print("Proceeding to load model...")
+    print("=" * 60)
+    # === END EARLY CHECK ===
+
     if getattr(config, "max_target_length", None) != ppl_seq_len:
         print(f"Overriding config.max_target_length from {getattr(config, 'max_target_length', None)} to {ppl_seq_len} for model init/PPL")
         config.max_target_length = ppl_seq_len
@@ -1033,18 +1085,11 @@ def main(config, test_args):
         max_loglikelihood_seq_length=acc_seq_len,
     )
     
-    # Initialize results
+    # Initialize results (already loaded during early check if resuming)
     ppl_res, ppl_times = {}, {}
     acc_res, acc_full, acc_times = {}, {}, {}
 
-    # Determine save path for incremental saves
-    save_path = None
-    if getattr(test_args, "eval_save_dir", ""):
-        os.makedirs(test_args.eval_save_dir, exist_ok=True)
-        save_dir = Path(test_args.eval_save_dir)
-        save_path = save_dir / f"{getattr(config, 'run_name', 'results')}.json"
-
-    # Load existing results if resuming
+    # Load existing results if resuming (save_path already set during early check)
     if test_args.resume:
         if save_path and save_path.exists():
             print(f"Resuming from existing results: {save_path}")
