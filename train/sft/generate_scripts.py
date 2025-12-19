@@ -322,8 +322,8 @@ def generate_teacher_script(
     run_name = f"sft_{pretrain_run_name}"
     run_id = f"sft_teacher_{pretrain_run_name.replace('-', '_')}"
 
-    # Full checkpoint path: pretrain_param_only_v6 with checkpoint_{step} format
-    checkpoint_path = f"pretrain_param_only_v6/{pretrain_run_name}/checkpoint_{checkpoint_step}"
+    # Full checkpoint path: pretrain_param_only_v6 with checkpoint_{step}/0 format
+    checkpoint_path = f"pretrain_param_only_v6/{pretrain_run_name}/checkpoint_{checkpoint_step}/0"
 
     # Depends on teacher training
     depends_on = f"llama{size}_finewebedu_teacher_s{seed}_{tokens}"
