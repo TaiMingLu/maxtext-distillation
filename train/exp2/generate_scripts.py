@@ -14,7 +14,7 @@ from itertools import product
 # Default configurations
 DEFAULT_TEACHER_ARCHS = ["05b", "1b", "3b", "8b"]
 # DEFAULT_TOKENS = ["300B"] 
-DEFAULT_TOKENS = ["10B", "5B"] 
+DEFAULT_TOKENS = ["80B"] 
 DEFAULT_TEACHER_SEED = 42
 DEFAULT_ALPHAS = [0.5, 1.0]
 DEFAULT_STUDENT_SEED = 43
@@ -33,6 +33,7 @@ TOKENS_TO_STEP = {
     "10B": 4999,
     "30B": 14999,
     "50B": 24999,
+    "80B": 39999,
     "100B": 49999,
     "300B": 149999,
 }
