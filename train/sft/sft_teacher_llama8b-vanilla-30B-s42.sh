@@ -42,7 +42,7 @@ export WARMUP_RATIO=0.01  # 1% warmup
 export ASYNC_CHECKPOINTING=false
 
 # Pretrained checkpoint to load
-export PRETRAINED_CHECKPOINT="gs://${BUCKET_NAME}/ckpts/pretrain_param_only_v6/llama8b-vanilla-30B-s42/checkpoint_14999/0"
+export PRETRAINED_CHECKPOINT="gs://${BUCKET_NAME}/ckpts/pretrain_param_only_v6/llama8b-vanilla-30B-s42/checkpoint_14999/0/items"
 # Output directory for SFT checkpoints
 export BASE_OUTPUT_DIRECTORY="gs://$BUCKET_NAME/ckpts/sft"
 
