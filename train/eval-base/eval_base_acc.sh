@@ -95,20 +95,21 @@ echo "  FORCE_EVAL: ${FORCE_EVAL}"
 echo "  RESUME_FLAG: ${RESUME_FLAG}"
 echo "========================"
 
-# Check if results exist and are complete
+# Check if results exist
 if [[ -f "${RESULT_JSON_PATH}" ]] && [[ "${FORCE_EVAL}" == "false" ]]; then
-  # Check if results are complete (no _incomplete flag)
-  if grep -q '"_incomplete": true' "${RESULT_JSON_PATH}" 2>/dev/null; then
-    echo "Found incomplete results at ${RESULT_JSON_PATH}"
-    if [[ "${RESUME_FLAG}" == "true" ]]; then
-      echo "  -> Resuming evaluation..."
-    else
+  if [[ "${RESUME_FLAG}" == "true" ]]; then
+    echo "Results exist at ${RESULT_JSON_PATH}, --resume flag set, will check for missing benchmarks..."
+  else
+    # Check if results are complete (no _incomplete flag)
+    if grep -q '"_incomplete": true' "${RESULT_JSON_PATH}" 2>/dev/null; then
+      echo "Found incomplete results at ${RESULT_JSON_PATH}"
       echo "  -> Use --resume to continue from where it left off, or delete the file to start fresh."
       exit 0
+    else
+      echo "Results already exist and are complete at ${RESULT_JSON_PATH}; skipping."
+      echo "  -> Use --resume to re-check for any new benchmarks."
+      exit 0
     fi
-  else
-    echo "Results already exist and are complete at ${RESULT_JSON_PATH}; skipping."
-    exit 0
   fi
 fi
 
