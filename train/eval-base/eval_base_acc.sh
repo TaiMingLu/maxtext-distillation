@@ -68,7 +68,7 @@ done
 
 # Configuration
 if [[ "${PARAM_ONLY}" == "true" ]]; then
-  CHECKPOINT_PATH="gs://${BUCKET_NAME}/ckpts/${CKPT_DIR}/${RUN_NAME}/checkpoint_${CHECKPOINT_STEP}/0"
+  CHECKPOINT_PATH="gs://${BUCKET_NAME}/ckpts/${CKPT_DIR}/${RUN_NAME}/checkpoint_${CHECKPOINT_STEP}/0/items"
 else
   CHECKPOINT_PATH="gs://${BUCKET_NAME}/ckpts/${CKPT_DIR}/${RUN_NAME}/checkpoints/${CHECKPOINT_STEP}/items"
 fi
