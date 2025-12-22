@@ -37,13 +37,13 @@ export TEACHER_MODEL_NAME="llama3.1-05b"
 export BASE_OUTPUT_DIRECTORY="gs://$BUCKET_NAME/ckpts/ablate1"
 export DATA_FILES='/home/terry/gcs-data/datasets/fineweb-edu/*.array_record'
 
-export RUN_NAME="ablate1_llama3.1-1b-A05BT300BS42-a05-s43"
-export RUN_ID="ablate1_llama1b_finewebedu_distill_soft_A05BT300BS42_a05_s43"
+export RUN_NAME="ablate1_llama3.1-1b-A05BT300BS42-a02-s43"
+export RUN_ID="ablate1_llama1b_finewebedu_distill_soft_A05BT300BS42_a02_s43"
 
 # Distillation parameters
 
 echo "========================"
-echo "running ablate1_llama1b-A05BT300BS42-a05-s43.sh"
+echo "running ablate1_llama1b-A05BT300BS42-a02-s43.sh"
 echo "parameters:"
 echo "MODEL_NAME: $MODEL_NAME"
 echo "SEQ_LEN: $SEQ_LEN"
