@@ -30,7 +30,7 @@ export WARMUP_RATIO=0.05
 export ASYNC_CHECKPOINTING=false
 
 export USE_KD=true
-export KD_ALPHA=0.5  #KD_ALPHA=0.0 -- pure cross-entropy (no KD), KD_ALPHA=1.0 -- makes purely the KD term
+export KD_ALPHA=0.2  #KD_ALPHA=0.0 -- pure cross-entropy (no KD), KD_ALPHA=1.0 -- makes purely the KD term
 export KD_TEMPERATURE=1.0
 export KD_TEACHER_PARAMETERS_PATH="/home/terry/gcs-bucket/ckpts/pretrain_param_only_v6/llama1b-vanilla-300B-s42/checkpoint_149999/0/items"
 export TEACHER_MODEL_NAME="llama3.1-1b"
