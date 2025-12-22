@@ -28,7 +28,8 @@ EXP1_CONFIG = {
 
 EXP2_CONFIG = {
     "teacher_archs": ["05b", "1b", "3b", "8b"],
-    "tokens": ["30B", "50B", "100B", "300B"],
+    "tokens": ["5B", "10B", "30B", "50B", "80B", "100B", "300B"],
+    # "tokens": ["5B", "10B", "80B"],
     "alphas": [0.5, 1.0],
 }
 
@@ -50,7 +51,8 @@ TOKEN_TO_CHECKPOINT_STEP = {
 # Teacher baselines - all size/token combinations
 TEACHER_CONFIG = {
     "sizes": ["05b", "1b", "3b", "8b"],
-    "tokens": ["30B", "50B", "100B", "300B"],  # Uppercase for run_name
+    "tokens": ["5B", "10B", "30B", "50B", "80B", "100B", "300B"],  # Uppercase for run_name
+    # "tokens": ["5B", "10B", "80B"],
     "seed": 42,
     "ckpt_dir": "pretrain_param_only_v6",
 }

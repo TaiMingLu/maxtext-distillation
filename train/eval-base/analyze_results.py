@@ -5,6 +5,8 @@ Analyze evaluation results from JSON files.
 Parses result JSONs from PPL and ACC evaluations, extracts run metadata
 from filenames, and organizes results by experiment configuration.
 
+Supports reading from both local paths and GCS (gs://) paths directly.
+
 Usage:
     python analyze_results.py                    # Analyze all (ppl + base_acc + sft_acc)
     python analyze_results.py ppl                # PPL only
@@ -12,6 +14,7 @@ Usage:
     python analyze_results.py ppl base_acc       # PPL + Base ACC
     python analyze_results.py -o results.csv     # Save all to CSV
     python analyze_results.py --show-incomplete  # Only incomplete runs
+    python analyze_results.py --base-dir gs://bucket/eval_1218  # Read from GCS directly
 """
 
 import argparse
@@ -20,19 +23,26 @@ import os
 import re
 from collections import defaultdict
 from pathlib import Path
-from typing import Optional
+from typing import Optional, Union
 import pandas as pd
 from tqdm import tqdm
 
+# GCS support
+try:
+    from google.cloud import storage
+    HAS_GCS = True
+except ImportError:
+    HAS_GCS = False
 
-# Known PPL tasks
+
+# Known PPL tasks (should match test_orbax_eval.py PPL_TASKS)
 PPL_TASKS = [
     "c4", "wikitext", "cnn_dailymail", "finewebedu-train-0.001",
-    "dm_mathematics", "gsm8k", "arxiv", "humaneval", "pg19",
-    "codesearchnet", "pubmed_qa", "echr", "xquad"
+    "finewebedu-test-100M", "dm_mathematics", "gsm8k", "arxiv",
+    "humaneval", "pg19", "codesearchnet", "pubmed_qa", "echr", "xquad"
 ]
 
-# Known ACC tasks
+# Known ACC tasks (should match test_orbax_eval.py ACC_TASKS)
 ACC_TASKS = [
     "hellaswag", "winogrande", "arc_easy", "piqa", "boolq",
     "sciq", "mmlu", "mathqa"
@@ -45,14 +55,17 @@ def parse_run_name(run_name: str) -> dict:
 
     Examples:
         - exp1_llama3.1-1b-A05BT50BS42-a04-s43 -> KD run
-        - llama3.1-1b-finewebedu-vanilla-s42-50b -> vanilla run
+        - exp2_llama3.1-1b-A8BT100BS42-a1-s43 -> KD run
+        - llama05b-vanilla-100B-s42 -> teacher run
+        - llama3.1-1b-finewebedu-vanilla-s43-50b -> baseline run
         - sft_exp1_llama3.1-1b-A05BT50BS42-a04-s43 -> SFT run
 
     Returns dict with:
-        - is_vanilla: bool
+        - is_teacher: bool (teacher models like llama05b-vanilla-100B-s42)
+        - is_baseline: bool (single baseline like llama3.1-1b-finewebedu-vanilla-s43-50b)
         - is_sft: bool
         - is_kd: bool
-        - exp_name: str (exp1, exp2, or None for vanilla)
+        - exp_name: str (exp1, exp2, or None for teacher/baseline)
         - model_arch: str (e.g., llama3.1-1b)
         - teacher_arch: str or None (e.g., 05b, 1b, 3b, 8b)
         - teacher_tokens: str or None (e.g., 50B, 30B, 100B)
@@ -62,7 +75,8 @@ def parse_run_name(run_name: str) -> dict:
     """
     result = {
         "run_name": run_name,
-        "is_vanilla": False,
+        "is_teacher": False,
+        "is_baseline": False,
         "is_sft": False,
         "is_kd": False,
         "exp_name": None,
@@ -81,15 +95,27 @@ def parse_run_name(run_name: str) -> dict:
         result["is_sft"] = True
         name = name[4:]  # Remove sft_ prefix
 
-    # Check for vanilla
-    if "vanilla" in name.lower():
-        result["is_vanilla"] = True
-        # Pattern: llama3.1-1b-finewebedu-vanilla-s42-50b
-        match = re.match(r"(llama[\d.]+-([\d]+b)).*vanilla.*s(\d+)-(\d+)b", name, re.IGNORECASE)
-        if match:
-            result["model_arch"] = match.group(1)
-            result["student_seed"] = int(match.group(3))
-            result["teacher_tokens"] = f"{match.group(4)}B"  # For consistency, tokens trained
+    # Check for teacher model pattern: llama{size}-vanilla-{tokens}-s{seed}
+    # Example: llama05b-vanilla-100B-s42, llama8b-vanilla-300B-s42
+    teacher_pattern = r"llama(\d+b)-vanilla-(\d+B)-s(\d+)"
+    match = re.match(teacher_pattern, name, re.IGNORECASE)
+    if match:
+        result["is_teacher"] = True
+        size = match.group(1).lower()
+        result["model_arch"] = f"llama3.1-{size}"
+        result["teacher_arch"] = size
+        result["teacher_tokens"] = match.group(2).upper()
+        result["teacher_seed"] = int(match.group(3))
+        return result
+
+    # Check for baseline pattern: llama3.1-1b-finewebedu-vanilla-s43-50b
+    baseline_pattern = r"(llama[\d.]+-(\d+b))-finewebedu-vanilla-s(\d+)-(\d+b)"
+    match = re.match(baseline_pattern, name, re.IGNORECASE)
+    if match:
+        result["is_baseline"] = True
+        result["model_arch"] = match.group(1)
+        result["student_seed"] = int(match.group(3))
+        result["teacher_tokens"] = match.group(4).upper()
         return result
 
     # Check for KD experiment pattern: exp1_llama3.1-1b-A05BT50BS42-a04-s43
@@ -203,19 +229,69 @@ def extract_metrics(data: dict, eval_type: str) -> dict:
     return metrics
 
 
-def analyze_directory(results_dir: Path, eval_type: str = "auto") -> pd.DataFrame:
+def parse_gcs_path(gcs_path: str) -> tuple[str, str]:
+    """Parse gs://bucket/path into (bucket, path)."""
+    if not gcs_path.startswith("gs://"):
+        raise ValueError(f"Not a GCS path: {gcs_path}")
+    path = gcs_path[5:]  # Remove gs://
+    parts = path.split("/", 1)
+    bucket = parts[0]
+    prefix = parts[1] if len(parts) > 1 else ""
+    return bucket, prefix
+
+
+def list_gcs_json_files(bucket_name: str, prefix: str) -> list[str]:
+    """List all JSON files in a GCS path."""
+    if not HAS_GCS:
+        raise ImportError("google-cloud-storage not installed. Run: pip install google-cloud-storage")
+
+    client = storage.Client()
+    bucket = client.bucket(bucket_name)
+    blobs = bucket.list_blobs(prefix=prefix)
+
+    json_files = []
+    for blob in blobs:
+        if blob.name.endswith(".json"):
+            json_files.append(blob.name)
+
+    return json_files
+
+
+def load_gcs_json(bucket_name: str, blob_name: str) -> dict:
+    """Load a JSON file directly from GCS."""
+    if not HAS_GCS:
+        raise ImportError("google-cloud-storage not installed. Run: pip install google-cloud-storage")
+
+    client = storage.Client()
+    bucket = client.bucket(bucket_name)
+    blob = bucket.blob(blob_name)
+
+    content = blob.download_as_text()
+    return json.loads(content)
+
+
+def analyze_directory(results_dir: Union[str, Path], eval_type: str = "auto") -> pd.DataFrame:
     """
     Analyze all JSON files in a directory.
 
     Args:
-        results_dir: Path to directory containing JSON files
+        results_dir: Path to directory containing JSON files, or GCS path (gs://bucket/path)
         eval_type: 'ppl', 'base_acc', 'sft_acc', or 'auto' (detect from path)
 
     Returns DataFrame with parsed results.
     """
+    results_dir_str = str(results_dir)
+    is_gcs = results_dir_str.startswith("gs://")
+
+    # Get directory name for auto-detection and display
+    if is_gcs:
+        dir_name = results_dir_str.rstrip("/").split("/")[-1].lower()
+    else:
+        results_dir = Path(results_dir)
+        dir_name = results_dir.name.lower()
+
     # Auto-detect eval type from directory name
     if eval_type == "auto":
-        dir_name = results_dir.name.lower()
         if "ppl" in dir_name:
             eval_type = "ppl"
         elif "sft" in dir_name or "acc" in dir_name:
@@ -227,34 +303,72 @@ def analyze_directory(results_dir: Path, eval_type: str = "auto") -> pd.DataFram
             eval_type = "unknown"
 
     rows = []
-    json_files = list(results_dir.glob("*.json"))
 
-    print(f"Found {len(json_files)} JSON files in {results_dir}")
+    # List JSON files (GCS or local)
+    if is_gcs:
+        bucket_name, prefix = parse_gcs_path(results_dir_str)
+        # Ensure prefix ends with /
+        if prefix and not prefix.endswith("/"):
+            prefix += "/"
+        json_blobs = list_gcs_json_files(bucket_name, prefix)
+        print(f"Found {len(json_blobs)} JSON files in {results_dir_str}")
 
-    for json_path in tqdm(json_files, desc=f"Loading {results_dir.name}", unit="file"):
-        # Parse filename
-        file_info = parse_filename(json_path.name)
+        for blob_name in tqdm(json_blobs, desc=f"Loading {dir_name} (GCS)", unit="file"):
+            # Parse filename
+            filename = blob_name.split("/")[-1]
+            file_info = parse_filename(filename)
 
-        # Parse run name
-        run_info = parse_run_name(file_info["run_name"])
+            # Parse run name
+            run_info = parse_run_name(file_info["run_name"])
 
-        # Load JSON
-        data = load_json_results(json_path)
-        if data is None:
-            continue
+            # Load JSON from GCS
+            try:
+                data = load_gcs_json(bucket_name, blob_name)
+            except Exception as e:
+                print(f"Error loading {blob_name}: {e}")
+                continue
 
-        # Extract metrics
-        metrics = extract_metrics(data, eval_type)
+            # Extract metrics
+            metrics = extract_metrics(data, eval_type)
 
-        # Combine all info
-        row = {
-            **file_info,
-            **run_info,
-            "eval_type": eval_type,
-            "source_dir": str(results_dir),
-            **metrics,
-        }
-        rows.append(row)
+            # Build row
+            row = {
+                "run_name": file_info["run_name"],
+                "step": file_info["step"],
+                "source_dir": results_dir_str,
+                "eval_type": eval_type,
+                **run_info,
+                **metrics,
+            }
+            rows.append(row)
+    else:
+        json_files = list(results_dir.glob("*.json"))
+        print(f"Found {len(json_files)} JSON files in {results_dir}")
+
+        for json_path in tqdm(json_files, desc=f"Loading {results_dir.name}", unit="file"):
+            # Parse filename
+            file_info = parse_filename(json_path.name)
+
+            # Parse run name
+            run_info = parse_run_name(file_info["run_name"])
+
+            # Load JSON
+            data = load_json_results(json_path)
+            if data is None:
+                continue
+
+            # Extract metrics
+            metrics = extract_metrics(data, eval_type)
+
+            # Combine all info
+            row = {
+                **file_info,
+                **run_info,
+                "eval_type": eval_type,
+                "source_dir": str(results_dir),
+                **metrics,
+            }
+            rows.append(row)
 
     if not rows:
         print(f"No valid results found in {results_dir}")
@@ -266,7 +380,11 @@ def analyze_directory(results_dir: Path, eval_type: str = "auto") -> pd.DataFram
 
 def merge_results(dfs: list[pd.DataFrame]) -> pd.DataFrame:
     """
-    Merge multiple result DataFrames, combining PPL and ACC results for same runs.
+    Merge multiple result DataFrames, combining PPL and ACC results for same experiment config.
+
+    PPL results come from base models, ACC results come from SFT models.
+    We merge by experiment configuration (exp_name, teacher_arch, alpha, etc.)
+    rather than run_name, since SFT runs have different names and steps.
     """
     if not dfs:
         return pd.DataFrame()
@@ -277,21 +395,47 @@ def merge_results(dfs: list[pd.DataFrame]) -> pd.DataFrame:
     # Concatenate all
     combined = pd.concat(dfs, ignore_index=True)
 
-    # Group by run_name and step, merge metrics
+    # Define the experiment config columns to group by
+    # These identify the same experiment across base/SFT evaluations
+    exp_config_cols = ["exp_name", "teacher_arch", "alpha", "teacher_tokens", "student_seed",
+                       "is_baseline", "is_teacher", "is_kd"]
+
+    # Filter to only columns that exist
+    exp_config_cols = [c for c in exp_config_cols if c in combined.columns]
+
     # Identify metric columns (ppl_* and acc_*)
     metric_cols = [c for c in combined.columns if c.startswith("ppl_") or c.startswith("acc_")]
-    info_cols = [c for c in combined.columns if c not in metric_cols and c not in ["eval_type", "source_dir", "_incomplete"]]
 
-    # For each unique (run_name, step), merge all metrics
-    grouped = combined.groupby(["run_name", "step"], dropna=False)
+    # Info columns that should be carried over (prefer non-SFT run_name for display)
+    info_cols = [c for c in combined.columns if c not in metric_cols
+                 and c not in ["eval_type", "source_dir", "_incomplete", "is_sft", "run_name", "step"]
+                 and c not in exp_config_cols]
+
+    # For each unique experiment config, merge all metrics
+    grouped = combined.groupby(exp_config_cols, dropna=False)
 
     merged_rows = []
-    for (run_name, step), group in grouped:
-        row = {}
-        # Take first non-null value for info columns
+    for config_vals, group in grouped:
+        row = dict(zip(exp_config_cols, config_vals if isinstance(config_vals, tuple) else [config_vals]))
+
+        # Prefer non-SFT run_name for display (base model name)
+        is_sft_col = group["is_sft"] if "is_sft" in group.columns else pd.Series([False] * len(group))
+        non_sft = group[~is_sft_col.fillna(False)]
+        if len(non_sft) > 0:
+            row["run_name"] = non_sft["run_name"].iloc[0]
+            row["step"] = non_sft["step"].iloc[0]
+        else:
+            # Fall back to SFT run_name (strip sft_ prefix for display)
+            row["run_name"] = group["run_name"].iloc[0]
+            if row["run_name"] and row["run_name"].startswith("sft_"):
+                row["run_name"] = row["run_name"][4:]  # Strip sft_ prefix
+            row["step"] = group["step"].iloc[0]
+
+        # Take first non-null value for other info columns
         for col in info_cols:
-            vals = group[col].dropna()
-            row[col] = vals.iloc[0] if len(vals) > 0 else None
+            if col in group.columns:
+                vals = group[col].dropna()
+                row[col] = vals.iloc[0] if len(vals) > 0 else None
 
         # Merge metrics (take first non-null for each)
         for col in metric_cols:
@@ -319,7 +463,7 @@ def create_summary(df: pd.DataFrame) -> pd.DataFrame:
 
     # Define column order
     info_cols = [
-        "run_name", "is_vanilla", "is_kd", "is_sft",
+        "run_name", "is_baseline", "is_teacher", "is_kd", "is_sft",
         "exp_name", "model_arch", "teacher_arch", "teacher_tokens",
         "alpha", "student_seed", "step", "_incomplete"
     ]
@@ -346,19 +490,27 @@ def create_summary(df: pd.DataFrame) -> pd.DataFrame:
     # Reorder and sort
     result = df[[c for c in final_cols if c in df.columns]].copy()
 
-    # Sort by: is_vanilla (vanilla first), exp_name, teacher_arch, alpha
+    # Sort by: is_baseline (first), is_teacher, exp_name, teacher_arch, alpha
     sort_cols = []
-    if "is_vanilla" in result.columns:
-        sort_cols.append("is_vanilla")
+    ascending = []
+    if "is_baseline" in result.columns:
+        sort_cols.append("is_baseline")
+        ascending.append(False)  # baseline first
+    if "is_teacher" in result.columns:
+        sort_cols.append("is_teacher")
+        ascending.append(False)  # teacher second
     if "exp_name" in result.columns:
         sort_cols.append("exp_name")
+        ascending.append(True)
     if "teacher_arch" in result.columns:
         sort_cols.append("teacher_arch")
+        ascending.append(True)
     if "alpha" in result.columns:
         sort_cols.append("alpha")
+        ascending.append(True)
 
     if sort_cols:
-        result = result.sort_values(sort_cols, ascending=[False] + [True] * (len(sort_cols) - 1))
+        result = result.sort_values(sort_cols, ascending=ascending)
 
     return result
 
@@ -377,9 +529,13 @@ def print_summary_stats(df: pd.DataFrame):
     print(f"  Complete: {complete}")
     print(f"  Incomplete: {incomplete}")
 
-    if "is_vanilla" in df.columns:
-        vanilla = df["is_vanilla"].sum()
-        print(f"  Vanilla: {vanilla}")
+    if "is_baseline" in df.columns:
+        baseline = df["is_baseline"].sum()
+        print(f"  Baseline: {baseline}")
+
+    if "is_teacher" in df.columns:
+        teacher = df["is_teacher"].sum()
+        print(f"  Teacher: {teacher}")
 
     if "is_kd" in df.columns:
         kd = df["is_kd"].sum()
@@ -433,7 +589,8 @@ def print_summary_stats(df: pd.DataFrame):
 
 def main():
     # Hardcoded base path for results
-    BASE_RESULTS_DIR = Path("/home/terry/gcs-bucket/eval_new11")
+    # Default to GCS path for fresh reads (bypasses gcsfuse cache)
+    BASE_RESULTS_DIR = "gs://taiming_us_central1/eval_1218"
 
     # Available result types and their directory names
     RESULT_TYPES = {
@@ -472,8 +629,8 @@ Examples:
     )
     parser.add_argument(
         "--base-dir",
-        default=str(BASE_RESULTS_DIR),
-        help=f"Base directory for results (default: {BASE_RESULTS_DIR})",
+        default=BASE_RESULTS_DIR,
+        help=f"Base directory for results, supports gs:// paths (default: {BASE_RESULTS_DIR})",
     )
     parser.add_argument(
         "--no-summary",
@@ -493,7 +650,8 @@ Examples:
 
     args = parser.parse_args()
 
-    base_dir = Path(args.base_dir)
+    base_dir = args.base_dir
+    is_gcs = base_dir.startswith("gs://")
 
     # Validate types
     valid_types = ["ppl", "base_acc", "sft_acc", "all"]
@@ -516,15 +674,21 @@ Examples:
             print(f"Warning: Unknown result type: {result_type}")
             continue
 
-        path = base_dir / dir_name
-        if not path.exists():
-            print(f"Warning: Directory not found: {path}")
-            continue
-        if not path.is_dir():
-            print(f"Warning: Not a directory: {path}")
-            continue
+        if is_gcs:
+            # GCS path: just concatenate
+            path = base_dir.rstrip("/") + "/" + dir_name
+            print(f"Analyzing GCS path: {path}")
+        else:
+            # Local path
+            path = Path(base_dir) / dir_name
+            if not path.exists():
+                print(f"Warning: Directory not found: {path}")
+                continue
+            if not path.is_dir():
+                print(f"Warning: Not a directory: {path}")
+                continue
 
-        df = analyze_directory(path)
+        df = analyze_directory(path, result_type)
         if not df.empty:
             dfs.append(df)
 

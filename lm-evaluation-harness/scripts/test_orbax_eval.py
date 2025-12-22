@@ -204,13 +204,13 @@ PPL_TASKS = [
 
 ACC_TASKS = [
     # Commonsense reasoning
-    # {
-    #     "name": "hellaswag",  # uses validation split by default
-    #     "num_fewshot": 0,
-    #     "acc_key": "acc_norm,none",
-    #     "acc_seq_length": 256,
-    #     "acc_batch_size": 64,
-    # },
+    {
+        "name": "hellaswag",  # uses validation split by default
+        "num_fewshot": 0,
+        "acc_key": "acc_norm,none",
+        "acc_seq_length": 256,
+        "acc_batch_size": 64,
+    },
     {
         "name": "winogrande",
         "num_fewshot": 5,
@@ -262,22 +262,70 @@ ACC_TASKS = [
         "acc_seq_length": 2048,
         "acc_batch_size": 8,
     },
-    # # Truthfulness - uses loglikelihood (multiple choice)
-    # {
-    #     "name": "truthfulqa_mc1",
-    #     "num_fewshot": 5,
-    #     "acc_key": "acc,none",
-    #     "acc_seq_length": 1024,
-    #     "acc_batch_size": 16,
-    # },
-    # # NLI - uses loglikelihood
-    # {
-    #     "name": "rte",
-    #     "num_fewshot": 5,
-    #     "acc_key": "acc,none",
-    #     "acc_seq_length": 4096,
-    #     "acc_batch_size": 4,
-    # },
+    # Science reasoning - multiple choice (uses loglikelihood)
+    {
+        "name": "openbookqa",
+        "num_fewshot": 5,
+        "acc_key": "acc_norm,none",
+        "acc_seq_length": 2048,
+        "acc_batch_size": 8,
+    },
+    # Social commonsense reasoning
+    {
+        "name": "siqa",
+        "num_fewshot": 0,
+        "acc_key": "acc,none",
+        "acc_seq_length": 1024,
+        "acc_batch_size": 16,
+    },
+    # General commonsense reasoning
+    {
+        "name": "commonsense_qa",
+        "num_fewshot": 5,
+        "acc_key": "acc,none",
+        "acc_seq_length": 2048,
+        "acc_batch_size": 8,
+    },
+    # Truthfulness - multiple choice (has 6 built-in examples in prompt)
+    {
+        "name": "truthfulqa_mc1",
+        "num_fewshot": 0,
+        "acc_key": "acc,none",
+        "acc_seq_length": 2048,
+        "acc_batch_size": 8,
+    },
+    # Logical reasoning
+    {
+        "name": "logiqa2",
+        "num_fewshot": 0,
+        "acc_key": "acc,none",
+        "acc_seq_length": 1024,
+        "acc_batch_size": 16,
+    },
+    # Reading comprehension (long passages)
+    {
+        "name": "race",
+        "num_fewshot": 0,
+        "acc_key": "acc,none",
+        "acc_seq_length": 4096,
+        "acc_batch_size": 4,
+    },
+    # Medical domain
+    {
+        "name": "medmcqa",
+        "num_fewshot": 5,
+        "acc_key": "acc,none",
+        "acc_seq_length": 2048,
+        "acc_batch_size": 8,
+    },
+    # Adversarial NLI
+    {
+        "name": "anli_r1",
+        "num_fewshot": 0,
+        "acc_key": "acc,none",
+        "acc_seq_length": 1024,
+        "acc_batch_size": 16,
+    },
 ]
     # NOTE: Tasks below require generate_until (text generation), which is not implemented
     # {
