@@ -30,20 +30,20 @@ export WARMUP_RATIO=0.05
 export ASYNC_CHECKPOINTING=false
 
 export USE_KD=true
-export KD_ALPHA=0.2  #KD_ALPHA=0.0 -- pure cross-entropy (no KD), KD_ALPHA=1.0 -- makes purely the KD term
+export KD_ALPHA=1.0  #KD_ALPHA=0.0 -- pure cross-entropy (no KD), KD_ALPHA=1.0 -- makes purely the KD term
 export KD_TEMPERATURE=1.0
-export KD_TEACHER_PARAMETERS_PATH="/home/terry/gcs-bucket/ckpts/pretrain_param_only_v6/llama3b-vanilla-300B-s42/checkpoint_149999/0/items"
+export KD_TEACHER_PARAMETERS_PATH="/home/terry/gcs-bucket/ckpts/pretrain_param_only_v6/llama1b-vanilla-300B-s42/checkpoint_149999/0/items"
 export TEACHER_MODEL_NAME="llama3.1-1b"
 export BASE_OUTPUT_DIRECTORY="gs://$BUCKET_NAME/ckpts/ablate1"
 export DATA_FILES='/home/terry/gcs-data/datasets/fineweb-edu/*.array_record'
 
-export RUN_NAME="ablate1_llama3.1-1b-A3BT300BS42-a02-s43"
-export RUN_ID="ablate1_llama1b_finewebedu_distill_soft_A3BT300BS42_a02_s43"
+export RUN_NAME="ablate1_llama3.1-1b-A1BT300BS42-a1-s43"
+export RUN_ID="ablate1_llama1b_finewebedu_distill_soft_A1BT300BS42_a1_s43"
 
 # Distillation parameters
 
 echo "========================"
-echo "running ablate1_llama1b-A3BT300BS42-a02-s43.sh"
+echo "running ablate1_llama1b-A1BT300BS42-a1-s43.sh"
 echo "parameters:"
 echo "MODEL_NAME: $MODEL_NAME"
 echo "SEQ_LEN: $SEQ_LEN"
