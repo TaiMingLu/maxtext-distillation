@@ -34,7 +34,7 @@ export KD_ALPHA=1.0  #KD_ALPHA=0.0 -- pure cross-entropy (no KD), KD_ALPHA=1.0 -
 export KD_TEMPERATURE=4.0
 export KD_TEACHER_PARAMETERS_PATH="/home/terry/gcs-bucket/ckpts/pretrain_param_only_v6/llama05b-vanilla-50B-s42/checkpoint_24999/0/items"
 export TEACHER_MODEL_NAME="llama3.1-05b"
-export BASE_OUTPUT_DIRECTORY="gs://$BUCKET_NAME/ckpts/distill_pretrain"
+export BASE_OUTPUT_DIRECTORY="gs://$BUCKET_NAME/ckpts/ablate3"
 export DATA_FILES='/home/terry/gcs-data/datasets/fineweb-edu/*.array_record'
 
 export RUN_NAME="exp1_llama3.1-1b-A05BT50BS42-a1-s43-t4"
