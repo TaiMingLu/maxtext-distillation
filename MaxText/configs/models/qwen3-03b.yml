@@ -12,14 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# model config for qwen3-1b (~1B params)
+# model config for qwen3-03b (~300M params)
 
-base_emb_dim: 1536
+base_emb_dim: 768
 base_num_query_heads: 12
 base_num_kv_heads: 4
-base_mlp_dim: 4608
-base_num_decoder_layers: 28
-head_dim: 128
+base_mlp_dim: 2304
+base_num_decoder_layers: 24
+head_dim: 64
 mlp_activations: ["silu", "linear"] # "hidden_act": "silu" implies SwiGLU
 vocab_size: 151936
 
