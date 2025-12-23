@@ -20,7 +20,7 @@ for var in "${required_vars[@]}"; do
 done
 
 export MODEL_NAME='llama3.1-1b'
-export NUM_STEPS=125000
+export NUM_STEPS=75000
 export SEQ_LEN=8192
 export BATCH_SIZE=4
 export GRAD_ACCUM=1
@@ -33,13 +33,13 @@ export USE_KD=false
 export BASE_OUTPUT_DIRECTORY="gs://$BUCKET_NAME/ckpts/ablate1"
 export DATA_FILES='/home/terry/gcs-data/datasets/fineweb-edu/*.array_record'
 
-export RUN_NAME="ablate1_llama1b-finewebedu-vanilla-s42-500b"
-export RUN_ID="ablate1_llama1b_finewebedu_vanilla_s42_500b"
+export RUN_NAME="ablate1_llama1b-finewebedu-vanilla-s42-300b"
+export RUN_ID="ablate1_llama1b_finewebedu_vanilla_s42_300b"
 
 # Distillation parameters
 
 echo "========================"
-echo "running ablate1_llama1b-A05BT300BS42-a05-s43.sh"
+echo "running ablate1_llama1b-finewebedu-vanilla-s43-300b.sh"
 echo "parameters:"
 echo "MODEL_NAME: $MODEL_NAME"
 echo "SEQ_LEN: $SEQ_LEN"
