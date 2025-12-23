@@ -15,11 +15,11 @@
 # model config for qwen3-015b (~150M params)
 
 base_emb_dim: 512
-base_num_query_heads: 8
-base_num_kv_heads: 4
+base_num_query_heads: 4
+base_num_kv_heads: 2
 base_mlp_dim: 1536
 base_num_decoder_layers: 20
-head_dim: 64
+head_dim: 128
 mlp_activations: ["silu", "linear"] # "hidden_act": "silu" implies SwiGLU
 vocab_size: 128256
 
