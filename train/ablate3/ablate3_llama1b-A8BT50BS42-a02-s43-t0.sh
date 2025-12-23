@@ -20,7 +20,7 @@ for var in "${required_vars[@]}"; do
 done
 
 export MODEL_NAME='llama3.1-1b'
-export NUM_STEPS=150000
+export NUM_STEPS=25000
 export SEQ_LEN=8192
 export BATCH_SIZE=4
 export GRAD_ACCUM=1
@@ -30,20 +30,21 @@ export WARMUP_RATIO=0.05
 export ASYNC_CHECKPOINTING=false
 
 export USE_KD=true
-export KD_ALPHA=1.0  #KD_ALPHA=0.0 -- pure cross-entropy (no KD), KD_ALPHA=1.0 -- makes purely the KD term
+export KD_ALPHA=0.2  #KD_ALPHA=0.0 -- pure cross-entropy (no KD), KD_ALPHA=1.0 -- makes purely the KD term
 export KD_TEMPERATURE=1.0
-export KD_TEACHER_PARAMETERS_PATH="/home/terry/gcs-bucket/ckpts/pretrain_param_only_v6/llama1b-vanilla-300B-s42/checkpoint_149999/0/items"
-export TEACHER_MODEL_NAME="llama3.1-1b"
-export BASE_OUTPUT_DIRECTORY="gs://$BUCKET_NAME/ckpts/ablate1"
+export KD_TEACHER_PARAMETERS_PATH="/home/terry/gcs-bucket/ckpts/pretrain_param_only_v6/llama8b-vanilla-50B-s42/checkpoint_24999/0/items"
+export TEACHER_MODEL_NAME="llama3.1-8b"
+export BASE_OUTPUT_DIRECTORY="gs://$BUCKET_NAME/ckpts/distill_pretrain"
 export DATA_FILES='/home/terry/gcs-data/datasets/fineweb-edu/*.array_record'
+export KD_USE_HARD_LABELS=true
 
-export RUN_NAME="ablate1_llama3.1-1b-A1BT300BS42-a1-s43"
-export RUN_ID="ablate1_llama1b_finewebedu_distill_soft_A1BT300BS42_a1_s43"
+export RUN_NAME="exp1_llama3.1-1b-A8BT50BS42-a02-s43-t0"
+export RUN_ID="exp1_llama1b_finewebedu_distill_soft_A8BT50BS42_a02_s43-t0"
 
 # Distillation parameters
 
 echo "========================"
-echo "running ablate1_llama1b-A1BT300BS42-a1-s43.sh"
+echo "running exp1_llama1b-A8BT50BS42-a02-s43-t0.sh"
 echo "parameters:"
 echo "MODEL_NAME: $MODEL_NAME"
 echo "SEQ_LEN: $SEQ_LEN"
@@ -97,7 +98,7 @@ python -u multihost_runner_orig.py \
         cosine_learning_rate_final_fraction=${MIN_LR_RATIO} \
         warmup_steps_fraction=${WARMUP_RATIO} \
         checkpoint_period=2500 \
-        checkpoint_max_to_keep=2 \
+        checkpoint_max_to_keep=10 \
         gcs_metrics=True \
         use_wandb=True \
         wandb_project=maxtext_1b \
@@ -113,5 +114,6 @@ python -u multihost_runner_orig.py \
         kd_alpha=${KD_ALPHA} \
         kd_temperature=${KD_TEMPERATURE} \
         kd_teacher_parameters_path=${KD_TEACHER_PARAMETERS_PATH} \
+        kd_use_hard_labels=${KD_USE_HARD_LABELS} \
         kd_teacher_model_name=${TEACHER_MODEL_NAME}
     "
