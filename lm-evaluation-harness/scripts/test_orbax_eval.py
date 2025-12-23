@@ -281,26 +281,26 @@ ACC_TASKS = [
     # General commonsense reasoning
     {
         "name": "commonsense_qa",
-        "num_fewshot": 5,
+        "num_fewshot": 10,
         "acc_key": "acc,none",
-        "acc_seq_length": 2048,
-        "acc_batch_size": 8,
+        "acc_seq_length": 4096,
+        "acc_batch_size": 4,
     },
-    # Truthfulness - multiple choice (has 6 built-in examples in prompt)
+    # Truthfulness - multiple choice (has 10 built-in examples in prompt)
     {
         "name": "truthfulqa_mc1",
         "num_fewshot": 0,
         "acc_key": "acc,none",
-        "acc_seq_length": 2048,
-        "acc_batch_size": 8,
+        "acc_seq_length": 4096,
+        "acc_batch_size": 4,
     },
     # Logical reasoning
     {
         "name": "logiqa2",
-        "num_fewshot": 0,
+        "num_fewshot": 10,
         "acc_key": "acc,none",
-        "acc_seq_length": 1024,
-        "acc_batch_size": 16,
+        "acc_seq_length": 4096,
+        "acc_batch_size": 4,
     },
     # Reading comprehension (long passages)
     {
@@ -313,18 +313,18 @@ ACC_TASKS = [
     # Medical domain
     {
         "name": "medmcqa",
-        "num_fewshot": 5,
+        "num_fewshot": 10,
         "acc_key": "acc,none",
-        "acc_seq_length": 2048,
-        "acc_batch_size": 8,
+        "acc_seq_length": 4096,
+        "acc_batch_size": 4,
     },
     # Adversarial NLI
     {
         "name": "anli_r1",
-        "num_fewshot": 0,
+        "num_fewshot": 10,
         "acc_key": "acc,none",
-        "acc_seq_length": 1024,
-        "acc_batch_size": 16,
+        "acc_seq_length": 4096,
+        "acc_batch_size": 4,
     },
 ]
     # NOTE: Tasks below require generate_until (text generation), which is not implemented
