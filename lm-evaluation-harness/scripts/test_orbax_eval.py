@@ -272,7 +272,7 @@ ACC_TASKS = [
     },
     # Social commonsense reasoning
     {
-        "name": "siqa",
+        "name": "social_iqa",
         "num_fewshot": 0,
         "acc_key": "acc,none",
         "acc_seq_length": 1024,
