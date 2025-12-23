@@ -21,7 +21,7 @@ base_mlp_dim: 4608
 base_num_decoder_layers: 28
 head_dim: 128
 mlp_activations: ["silu", "linear"] # "hidden_act": "silu" implies SwiGLU
-vocab_size: 151936
+vocab_size: 128256
 
 decoder_block: "qwen3"
 
@@ -34,4 +34,3 @@ logits_via_embedding: True # from "tie_word_embeddings": true
 normalize_embedding_logits: False
 enable_dropout: False # deterministic for testing
 
-tokenizer_type: "sentencepiece"
