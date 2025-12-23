@@ -84,8 +84,8 @@ python -u multihost_runner_orig.py \
         learning_rate=${LR} \
         cosine_learning_rate_final_fraction=${MIN_LR_RATIO} \
         warmup_steps_fraction=${WARMUP_RATIO} \
-        checkpoint_period=10000 \
-        checkpoint_max_to_keep=50 \
+        checkpoint_period=2500 \
+        checkpoint_max_to_keep=2 \
         gcs_metrics=True \
         use_wandb=True \
         wandb_project=maxtext_1b \
