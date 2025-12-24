@@ -94,6 +94,7 @@ python -u multihost_runner_orig.py \
         packing=true \
         enable_data_shuffling=true \
         data_shuffle_seed=42 \
+        num_epoch=4 \
         init_weights_seed=42 \
         wandb_resume=relog \
         wandb_relog_source=auto \
