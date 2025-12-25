@@ -1,0 +1,97 @@
+tasks:
+  # ============== A05BT50BS42-a02 ==============
+  - id: ablate4_llama1b_A05BT50BS42_a02_s43
+    run: bash train/ablate4/ablate4_llama1b-A05BT50BS42-a02-s43.sh
+  - id: ablate4_llama1b_A05BT50BS42_a02_s43_k001
+    run: bash train/ablate4/ablate4_llama1b-A05BT50BS42-a02-s43-k001.sh
+  - id: ablate4_llama1b_A05BT50BS42_a02_s43_k005
+    run: bash train/ablate4/ablate4_llama1b-A05BT50BS42-a02-s43-k005.sh
+  - id: ablate4_llama1b_A05BT50BS42_a02_s43_k02
+    run: bash train/ablate4/ablate4_llama1b-A05BT50BS42-a02-s43-k02.sh
+  - id: ablate4_llama1b_A05BT50BS42_a02_s43_k05
+    run: bash train/ablate4/ablate4_llama1b-A05BT50BS42-a02-s43-k05.sh
+
+  # ============== A05BT50BS42-a1 ==============
+  - id: ablate4_llama1b_A05BT50BS42_a1_s43
+    run: bash train/ablate4/ablate4_llama1b-A05BT50BS42-a1-s43.sh
+  - id: ablate4_llama1b_A05BT50BS42_a1_s43_k001
+    run: bash train/ablate4/ablate4_llama1b-A05BT50BS42-a1-s43-k001.sh
+  - id: ablate4_llama1b_A05BT50BS42_a1_s43_k005
+    run: bash train/ablate4/ablate4_llama1b-A05BT50BS42-a1-s43-k005.sh
+  - id: ablate4_llama1b_A05BT50BS42_a1_s43_k02
+    run: bash train/ablate4/ablate4_llama1b-A05BT50BS42-a1-s43-k02.sh
+  - id: ablate4_llama1b_A05BT50BS42_a1_s43_k05
+    run: bash train/ablate4/ablate4_llama1b-A05BT50BS42-a1-s43-k05.sh
+
+  # ============== A1BT50BS42-a02 ==============
+  - id: ablate4_llama1b_A1BT50BS42_a02_s43
+    run: bash train/ablate4/ablate4_llama1b-A1BT50BS42-a02-s43.sh
+  - id: ablate4_llama1b_A1BT50BS42_a02_s43_k001
+    run: bash train/ablate4/ablate4_llama1b-A1BT50BS42-a02-s43-k001.sh
+  - id: ablate4_llama1b_A1BT50BS42_a02_s43_k005
+    run: bash train/ablate4/ablate4_llama1b-A1BT50BS42-a02-s43-k005.sh
+  - id: ablate4_llama1b_A1BT50BS42_a02_s43_k02
+    run: bash train/ablate4/ablate4_llama1b-A1BT50BS42-a02-s43-k02.sh
+  - id: ablate4_llama1b_A1BT50BS42_a02_s43_k05
+    run: bash train/ablate4/ablate4_llama1b-A1BT50BS42-a02-s43-k05.sh
+
+  # ============== A1BT50BS42-a1 ==============
+  - id: ablate4_llama1b_A1BT50BS42_a1_s43
+    run: bash train/ablate4/ablate4_llama1b-A1BT50BS42-a1-s43.sh
+  - id: ablate4_llama1b_A1BT50BS42_a1_s43_k001
+    run: bash train/ablate4/ablate4_llama1b-A1BT50BS42-a1-s43-k001.sh
+  - id: ablate4_llama1b_A1BT50BS42_a1_s43_k005
+    run: bash train/ablate4/ablate4_llama1b-A1BT50BS42-a1-s43-k005.sh
+  - id: ablate4_llama1b_A1BT50BS42_a1_s43_k02
+    run: bash train/ablate4/ablate4_llama1b-A1BT50BS42-a1-s43-k02.sh
+  - id: ablate4_llama1b_A1BT50BS42_a1_s43_k05
+    run: bash train/ablate4/ablate4_llama1b-A1BT50BS42-a1-s43-k05.sh
+
+  # ============== A3BT50BS42-a02 ==============
+  - id: ablate4_llama1b_A3BT50BS42_a02_s43
+    run: bash train/ablate4/ablate4_llama1b-A3BT50BS42-a02-s43.sh
+  - id: ablate4_llama1b_A3BT50BS42_a02_s43_k001
+    run: bash train/ablate4/ablate4_llama1b-A3BT50BS42-a02-s43-k001.sh
+  - id: ablate4_llama1b_A3BT50BS42_a02_s43_k005
+    run: bash train/ablate4/ablate4_llama1b-A3BT50BS42-a02-s43-k005.sh
+  - id: ablate4_llama1b_A3BT50BS42_a02_s43_k02
+    run: bash train/ablate4/ablate4_llama1b-A3BT50BS42-a02-s43-k02.sh
+  - id: ablate4_llama1b_A3BT50BS42_a02_s43_k05
+    run: bash train/ablate4/ablate4_llama1b-A3BT50BS42-a02-s43-k05.sh
+
+  # ============== A3BT50BS42-a1 ==============
+  - id: ablate4_llama1b_A3BT50BS42_a1_s43
+    run: bash train/ablate4/ablate4_llama1b-A3BT50BS42-a1-s43.sh
+  - id: ablate4_llama1b_A3BT50BS42_a1_s43_k001
+    run: bash train/ablate4/ablate4_llama1b-A3BT50BS42-a1-s43-k001.sh
+  - id: ablate4_llama1b_A3BT50BS42_a1_s43_k005
+    run: bash train/ablate4/ablate4_llama1b-A3BT50BS42-a1-s43-k005.sh
+  - id: ablate4_llama1b_A3BT50BS42_a1_s43_k02
+    run: bash train/ablate4/ablate4_llama1b-A3BT50BS42-a1-s43-k02.sh
+  - id: ablate4_llama1b_A3BT50BS42_a1_s43_k05
+    run: bash train/ablate4/ablate4_llama1b-A3BT50BS42-a1-s43-k05.sh
+
+  # ============== A8BT50BS42-a02 ==============
+  - id: ablate4_llama1b_A8BT50BS42_a02_s43
+    run: bash train/ablate4/ablate4_llama1b-A8BT50BS42-a02-s43.sh
+  - id: ablate4_llama1b_A8BT50BS42_a02_s43_k001
+    run: bash train/ablate4/ablate4_llama1b-A8BT50BS42-a02-s43-k001.sh
+  - id: ablate4_llama1b_A8BT50BS42_a02_s43_k005
+    run: bash train/ablate4/ablate4_llama1b-A8BT50BS42-a02-s43-k005.sh
+  - id: ablate4_llama1b_A8BT50BS42_a02_s43_k02
+    run: bash train/ablate4/ablate4_llama1b-A8BT50BS42-a02-s43-k02.sh
+  - id: ablate4_llama1b_A8BT50BS42_a02_s43_k05
+    run: bash train/ablate4/ablate4_llama1b-A8BT50BS42-a02-s43-k05.sh
+
+  # ============== A8BT50BS42-a1 ==============
+  - id: ablate4_llama1b_A8BT50BS42_a1_s43
+    run: bash train/ablate4/ablate4_llama1b-A8BT50BS42-a1-s43.sh
+  - id: ablate4_llama1b_A8BT50BS42_a1_s43_k001
+    run: bash train/ablate4/ablate4_llama1b-A8BT50BS42-a1-s43-k001.sh
+  - id: ablate4_llama1b_A8BT50BS42_a1_s43_k005
+    run: bash train/ablate4/ablate4_llama1b-A8BT50BS42-a1-s43-k005.sh
+  - id: ablate4_llama1b_A8BT50BS42_a1_s43_k02
+    run: bash train/ablate4/ablate4_llama1b-A8BT50BS42-a1-s43-k02.sh
+  - id: ablate4_llama1b_A8BT50BS42_a1_s43_k05
+    run: bash train/ablate4/ablate4_llama1b-A8BT50BS42-a1-s43-k05.sh
+
