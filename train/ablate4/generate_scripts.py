@@ -199,11 +199,11 @@ def generate_yaml_config(all_scripts):
             section_name = f"{teacher_code}{DATA_SEED}-{alpha_code}"
             yaml_content += f"  # ============== {section_name} ==============\n"
 
-            # Add each top-k variant
+            # Add each top-k variant (skip base case with None)
             for topk_suffix in TOPK_CONFIGS.keys():
-                config_name = f"{teacher_code}{DATA_SEED}-{alpha_code}-s{SEED}"
-                if topk_suffix:
-                    config_name += f"-{topk_suffix}"
+                if topk_suffix is None:
+                    continue  # Skip base case (100% vocab) in YAML
+                config_name = f"{teacher_code}{DATA_SEED}-{alpha_code}-s{SEED}-{topk_suffix}"
 
                 task_id = f"{EXPERIMENT_NAME}_llama1b_{config_name.replace('-', '_')}"
                 script_name = f"{EXPERIMENT_NAME}_llama1b-{config_name}.sh"
