@@ -42,14 +42,14 @@ EXP1_CONFIG = {
 # exp2: varying tokens, fewer alphas
 EXP2_CONFIG = {
     "teacher_archs": ["05b", "1b", "3b", "8b"],
-    "tokens": ["30B", "50B", "100B", "300B"],
+    "tokens": ["5B", "10B", "30B", "50B", "80B", "100B", "300B"],
     "alphas": [0.5, 1.0],
 }
 
 # Teacher models - all size/token combinations
 TEACHER_CONFIG = {
     "sizes": ["05b", "1b", "3b", "8b"],
-    "tokens": ["30b", "50b", "100b", "300b"],
+    "tokens": ["5B", "10B", "30B", "50B", "80B", "100B", "300B"],
     "seed": 42,
 }
 
@@ -67,6 +67,7 @@ TOKEN_TO_CHECKPOINT_STEP = {
     "10b": 4999,
     "30b": 14999,
     "50b": 24999,
+    "80b": 39999,
     "100b": 49999,
     "300b": 149999,
     "1000b": 499999,
