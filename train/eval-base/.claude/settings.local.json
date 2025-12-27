@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "WebSearch",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:www.lesswrong.com)",
+      "WebFetch(domain:evalscope.readthedocs.io)",
+      "Bash(grep:*)",
+      "Bash(xargs:*)",
+      "Bash(cat:*)",
+      "Bash(for task in arc_challenge siqa commonsense_qa logiqa truthfulqa_mc1 anli_r1 swag race lambada_openai wsc273 copa storycloze_2016)",
+      "Bash(do echo '=== $task ===' find /scratch/gpfs/ZHUANGL/tl0463/language/maxtext_distillation/lm-evaluation-harness/lm_eval/tasks -name *.yaml -exec grep -l 'task: $task' {})",
+      "Bash(for task in arc_challenge siqa commonsense_qa logiqa truthfulqa_mc1 anli_r1 swag race lambada_openai wsc273)",
+      "Bash(do echo '=== $task ===')",
+      "Bash(done)"
+    ]
+  }
+}
