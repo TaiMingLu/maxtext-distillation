@@ -86,7 +86,7 @@ python -u multihost_runner_orig.py \
     export TPU_LOG_DIR=/home/terry/tpu_logs
     source ~/maxtext_env/bin/activate
     export WANDB_API_KEY='01126ae90da25bae0d86704140ac978cb9fd9c73'
-    export WANDB_PROJECT=maxtext_sft_experiment
+    export WANDB_PROJECT=maxtext_sft_experiment1227
     export WANDB_NAME=${RUN_NAME}
     python3.10 -u -m MaxText.sft_trainer MaxText/configs/sft.yml \
         run_name=${RUN_NAME} \
