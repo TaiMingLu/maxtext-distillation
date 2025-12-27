@@ -30,7 +30,7 @@ done
 # Model configuration
 export MODEL_NAME='llama3.1-1b'
 export SEQ_LEN=4096
-export BATCH_SIZE=2  # per-device batch size
+export BATCH_SIZE=4  # per-device batch size
 export GRAD_ACCUM=1
 
 # SFT training hyperparameters

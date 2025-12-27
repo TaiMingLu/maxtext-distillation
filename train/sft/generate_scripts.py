@@ -21,10 +21,10 @@ from itertools import product
 # BEST HYPERPARAMETERS (from sweep)
 # =============================================================================
 SFT_HYPERPARAMS = {
-    "lr": "5e-5",
+    "lr": "1e-5",
     "min_lr_ratio": 0.1,      # Cosine decay to 1/10
     "warmup_ratio": 0.01,     # 1% warmup
-    "batch_size": 4,
+    "batch_size": 2,
     "steps": 4000,
 }
 
