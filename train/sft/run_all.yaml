@@ -71,6 +71,18 @@ tasks:
   - id: sft_exp1_llama3.1_1b_A8BT50BS42_a1_s43
     run: bash train/sft/sft_exp1_llama3.1-1b-A8BT50BS42-a1-s43.sh
     hide: true
+  - id: sft_exp2_llama3.1_1b_A05BT5BS42_a05_s43
+    run: bash train/sft/sft_exp2_llama3.1-1b-A05BT5BS42-a05-s43.sh
+    hide: true
+  - id: sft_exp2_llama3.1_1b_A05BT5BS42_a1_s43
+    run: bash train/sft/sft_exp2_llama3.1-1b-A05BT5BS42-a1-s43.sh
+    hide: true
+  - id: sft_exp2_llama3.1_1b_A05BT10BS42_a05_s43
+    run: bash train/sft/sft_exp2_llama3.1-1b-A05BT10BS42-a05-s43.sh
+    hide: true
+  - id: sft_exp2_llama3.1_1b_A05BT10BS42_a1_s43
+    run: bash train/sft/sft_exp2_llama3.1-1b-A05BT10BS42-a1-s43.sh
+    hide: true
   - id: sft_exp2_llama3.1_1b_A05BT30BS42_a05_s43
     run: bash train/sft/sft_exp2_llama3.1-1b-A05BT30BS42-a05-s43.sh
     hide: true
@@ -82,6 +94,12 @@ tasks:
     hide: true
   - id: sft_exp2_llama3.1_1b_A05BT50BS42_a1_s43
     run: bash train/sft/sft_exp2_llama3.1-1b-A05BT50BS42-a1-s43.sh
+    hide: true
+  - id: sft_exp2_llama3.1_1b_A05BT80BS42_a05_s43
+    run: bash train/sft/sft_exp2_llama3.1-1b-A05BT80BS42-a05-s43.sh
+    hide: true
+  - id: sft_exp2_llama3.1_1b_A05BT80BS42_a1_s43
+    run: bash train/sft/sft_exp2_llama3.1-1b-A05BT80BS42-a1-s43.sh
     hide: true
   - id: sft_exp2_llama3.1_1b_A05BT100BS42_a05_s43
     run: bash train/sft/sft_exp2_llama3.1-1b-A05BT100BS42-a05-s43.sh
@@ -95,6 +113,18 @@ tasks:
   - id: sft_exp2_llama3.1_1b_A05BT300BS42_a1_s43
     run: bash train/sft/sft_exp2_llama3.1-1b-A05BT300BS42-a1-s43.sh
     hide: true
+  - id: sft_exp2_llama3.1_1b_A1BT5BS42_a05_s43
+    run: bash train/sft/sft_exp2_llama3.1-1b-A1BT5BS42-a05-s43.sh
+    hide: true
+  - id: sft_exp2_llama3.1_1b_A1BT5BS42_a1_s43
+    run: bash train/sft/sft_exp2_llama3.1-1b-A1BT5BS42-a1-s43.sh
+    hide: true
+  - id: sft_exp2_llama3.1_1b_A1BT10BS42_a05_s43
+    run: bash train/sft/sft_exp2_llama3.1-1b-A1BT10BS42-a05-s43.sh
+    hide: true
+  - id: sft_exp2_llama3.1_1b_A1BT10BS42_a1_s43
+    run: bash train/sft/sft_exp2_llama3.1-1b-A1BT10BS42-a1-s43.sh
+    hide: true
   - id: sft_exp2_llama3.1_1b_A1BT30BS42_a05_s43
     run: bash train/sft/sft_exp2_llama3.1-1b-A1BT30BS42-a05-s43.sh
     hide: true
@@ -106,6 +136,12 @@ tasks:
     hide: true
   - id: sft_exp2_llama3.1_1b_A1BT50BS42_a1_s43
     run: bash train/sft/sft_exp2_llama3.1-1b-A1BT50BS42-a1-s43.sh
+    hide: true
+  - id: sft_exp2_llama3.1_1b_A1BT80BS42_a05_s43
+    run: bash train/sft/sft_exp2_llama3.1-1b-A1BT80BS42-a05-s43.sh
+    hide: true
+  - id: sft_exp2_llama3.1_1b_A1BT80BS42_a1_s43
+    run: bash train/sft/sft_exp2_llama3.1-1b-A1BT80BS42-a1-s43.sh
     hide: true
   - id: sft_exp2_llama3.1_1b_A1BT100BS42_a05_s43
     run: bash train/sft/sft_exp2_llama3.1-1b-A1BT100BS42-a05-s43.sh
@@ -119,6 +155,18 @@ tasks:
   - id: sft_exp2_llama3.1_1b_A1BT300BS42_a1_s43
     run: bash train/sft/sft_exp2_llama3.1-1b-A1BT300BS42-a1-s43.sh
     hide: true
+  - id: sft_exp2_llama3.1_1b_A3BT5BS42_a05_s43
+    run: bash train/sft/sft_exp2_llama3.1-1b-A3BT5BS42-a05-s43.sh
+    hide: true
+  - id: sft_exp2_llama3.1_1b_A3BT5BS42_a1_s43
+    run: bash train/sft/sft_exp2_llama3.1-1b-A3BT5BS42-a1-s43.sh
+    hide: true
+  - id: sft_exp2_llama3.1_1b_A3BT10BS42_a05_s43
+    run: bash train/sft/sft_exp2_llama3.1-1b-A3BT10BS42-a05-s43.sh
+    hide: true
+  - id: sft_exp2_llama3.1_1b_A3BT10BS42_a1_s43
+    run: bash train/sft/sft_exp2_llama3.1-1b-A3BT10BS42-a1-s43.sh
+    hide: true
   - id: sft_exp2_llama3.1_1b_A3BT30BS42_a05_s43
     run: bash train/sft/sft_exp2_llama3.1-1b-A3BT30BS42-a05-s43.sh
     hide: true
@@ -130,6 +178,12 @@ tasks:
     hide: true
   - id: sft_exp2_llama3.1_1b_A3BT50BS42_a1_s43
     run: bash train/sft/sft_exp2_llama3.1-1b-A3BT50BS42-a1-s43.sh
+    hide: true
+  - id: sft_exp2_llama3.1_1b_A3BT80BS42_a05_s43
+    run: bash train/sft/sft_exp2_llama3.1-1b-A3BT80BS42-a05-s43.sh
+    hide: true
+  - id: sft_exp2_llama3.1_1b_A3BT80BS42_a1_s43
+    run: bash train/sft/sft_exp2_llama3.1-1b-A3BT80BS42-a1-s43.sh
     hide: true
   - id: sft_exp2_llama3.1_1b_A3BT100BS42_a05_s43
     run: bash train/sft/sft_exp2_llama3.1-1b-A3BT100BS42-a05-s43.sh
@@ -143,6 +197,18 @@ tasks:
   - id: sft_exp2_llama3.1_1b_A3BT300BS42_a1_s43
     run: bash train/sft/sft_exp2_llama3.1-1b-A3BT300BS42-a1-s43.sh
     hide: true
+  - id: sft_exp2_llama3.1_1b_A8BT5BS42_a05_s43
+    run: bash train/sft/sft_exp2_llama3.1-1b-A8BT5BS42-a05-s43.sh
+    hide: true
+  - id: sft_exp2_llama3.1_1b_A8BT5BS42_a1_s43
+    run: bash train/sft/sft_exp2_llama3.1-1b-A8BT5BS42-a1-s43.sh
+    hide: true
+  - id: sft_exp2_llama3.1_1b_A8BT10BS42_a05_s43
+    run: bash train/sft/sft_exp2_llama3.1-1b-A8BT10BS42-a05-s43.sh
+    hide: true
+  - id: sft_exp2_llama3.1_1b_A8BT10BS42_a1_s43
+    run: bash train/sft/sft_exp2_llama3.1-1b-A8BT10BS42-a1-s43.sh
+    hide: true
   - id: sft_exp2_llama3.1_1b_A8BT30BS42_a05_s43
     run: bash train/sft/sft_exp2_llama3.1-1b-A8BT30BS42-a05-s43.sh
     hide: true
@@ -154,6 +220,12 @@ tasks:
     hide: true
   - id: sft_exp2_llama3.1_1b_A8BT50BS42_a1_s43
     run: bash train/sft/sft_exp2_llama3.1-1b-A8BT50BS42-a1-s43.sh
+    hide: true
+  - id: sft_exp2_llama3.1_1b_A8BT80BS42_a05_s43
+    run: bash train/sft/sft_exp2_llama3.1-1b-A8BT80BS42-a05-s43.sh
+    hide: true
+  - id: sft_exp2_llama3.1_1b_A8BT80BS42_a1_s43
+    run: bash train/sft/sft_exp2_llama3.1-1b-A8BT80BS42-a1-s43.sh
     hide: true
   - id: sft_exp2_llama3.1_1b_A8BT100BS42_a05_s43
     run: bash train/sft/sft_exp2_llama3.1-1b-A8BT100BS42-a05-s43.sh
@@ -167,11 +239,20 @@ tasks:
   - id: sft_exp2_llama3.1_1b_A8BT300BS42_a1_s43
     run: bash train/sft/sft_exp2_llama3.1-1b-A8BT300BS42-a1-s43.sh
     hide: true
+  - id: sft_teacher_llama05b_vanilla_5B_s42
+    run: bash train/sft/sft_teacher_llama05b-vanilla-5B-s42.sh
+    hide: true
+  - id: sft_teacher_llama05b_vanilla_10B_s42
+    run: bash train/sft/sft_teacher_llama05b-vanilla-10B-s42.sh
+    hide: true
   - id: sft_teacher_llama05b_vanilla_30B_s42
     run: bash train/sft/sft_teacher_llama05b-vanilla-30B-s42.sh
     hide: true
   - id: sft_teacher_llama05b_vanilla_50B_s42
     run: bash train/sft/sft_teacher_llama05b-vanilla-50B-s42.sh
+    hide: true
+  - id: sft_teacher_llama05b_vanilla_80B_s42
+    run: bash train/sft/sft_teacher_llama05b-vanilla-80B-s42.sh
     hide: true
   - id: sft_teacher_llama05b_vanilla_100B_s42
     run: bash train/sft/sft_teacher_llama05b-vanilla-100B-s42.sh
@@ -179,11 +260,20 @@ tasks:
   - id: sft_teacher_llama05b_vanilla_300B_s42
     run: bash train/sft/sft_teacher_llama05b-vanilla-300B-s42.sh
     hide: true
+  - id: sft_teacher_llama1b_vanilla_5B_s42
+    run: bash train/sft/sft_teacher_llama1b-vanilla-5B-s42.sh
+    hide: true
+  - id: sft_teacher_llama1b_vanilla_10B_s42
+    run: bash train/sft/sft_teacher_llama1b-vanilla-10B-s42.sh
+    hide: true
   - id: sft_teacher_llama1b_vanilla_30B_s42
     run: bash train/sft/sft_teacher_llama1b-vanilla-30B-s42.sh
     hide: true
   - id: sft_teacher_llama1b_vanilla_50B_s42
     run: bash train/sft/sft_teacher_llama1b-vanilla-50B-s42.sh
+    hide: true
+  - id: sft_teacher_llama1b_vanilla_80B_s42
+    run: bash train/sft/sft_teacher_llama1b-vanilla-80B-s42.sh
     hide: true
   - id: sft_teacher_llama1b_vanilla_100B_s42
     run: bash train/sft/sft_teacher_llama1b-vanilla-100B-s42.sh
@@ -191,11 +281,20 @@ tasks:
   - id: sft_teacher_llama1b_vanilla_300B_s42
     run: bash train/sft/sft_teacher_llama1b-vanilla-300B-s42.sh
     hide: true
+  - id: sft_teacher_llama3b_vanilla_5B_s42
+    run: bash train/sft/sft_teacher_llama3b-vanilla-5B-s42.sh
+    hide: true
+  - id: sft_teacher_llama3b_vanilla_10B_s42
+    run: bash train/sft/sft_teacher_llama3b-vanilla-10B-s42.sh
+    hide: true
   - id: sft_teacher_llama3b_vanilla_30B_s42
     run: bash train/sft/sft_teacher_llama3b-vanilla-30B-s42.sh
     hide: true
   - id: sft_teacher_llama3b_vanilla_50B_s42
     run: bash train/sft/sft_teacher_llama3b-vanilla-50B-s42.sh
+    hide: true
+  - id: sft_teacher_llama3b_vanilla_80B_s42
+    run: bash train/sft/sft_teacher_llama3b-vanilla-80B-s42.sh
     hide: true
   - id: sft_teacher_llama3b_vanilla_100B_s42
     run: bash train/sft/sft_teacher_llama3b-vanilla-100B-s42.sh
@@ -203,11 +302,20 @@ tasks:
   - id: sft_teacher_llama3b_vanilla_300B_s42
     run: bash train/sft/sft_teacher_llama3b-vanilla-300B-s42.sh
     hide: true
+  - id: sft_teacher_llama8b_vanilla_5B_s42
+    run: bash train/sft/sft_teacher_llama8b-vanilla-5B-s42.sh
+    hide: true
+  - id: sft_teacher_llama8b_vanilla_10B_s42
+    run: bash train/sft/sft_teacher_llama8b-vanilla-10B-s42.sh
+    hide: true
   - id: sft_teacher_llama8b_vanilla_30B_s42
     run: bash train/sft/sft_teacher_llama8b-vanilla-30B-s42.sh
     hide: true
   - id: sft_teacher_llama8b_vanilla_50B_s42
     run: bash train/sft/sft_teacher_llama8b-vanilla-50B-s42.sh
+    hide: true
+  - id: sft_teacher_llama8b_vanilla_80B_s42
+    run: bash train/sft/sft_teacher_llama8b-vanilla-80B-s42.sh
     hide: true
   - id: sft_teacher_llama8b_vanilla_100B_s42
     run: bash train/sft/sft_teacher_llama8b-vanilla-100B-s42.sh
