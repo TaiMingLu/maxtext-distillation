@@ -163,10 +163,6 @@ class OrbaxLM(LM):
         # Store tokenizer name for chat template support
         self._tokenizer_name = getattr(tokenizer, "name_or_path", None) or "unknown"
 
-        # Get proper data sharding for inputs (same as training uses)
-        # This shards the batch dimension across the fsdp axis for data parallelism
-        self.data_sharding = maxtext_utils.get_input_data_sharding(config, mesh)
-
         self._compiled_forward = self._create_fast_forward()
 
     @property
@@ -227,14 +223,9 @@ class OrbaxLM(LM):
             return None
         params_shardings = jax.tree_util.tree_map(extract_sharding, self.state.params)
 
-        # Use proper data sharding for inputs (shards batch across fsdp axis)
-        # This enables data parallelism - each device processes a portion of the batch
-        # Previously used None (replicated), which meant all devices got the full batch
-        data_sharding = self.data_sharding
-
         @partial(pjit,
-                 in_shardings=(params_shardings, data_sharding, data_sharding, data_sharding),
-                 out_shardings=None)  # Let JAX infer output sharding (logits are 3D, not 2D)
+                 in_shardings=(params_shardings, None, None, None),
+                 out_shardings=None)
         def fast_forward(params, input_ids, positions, segment_ids):
             return self.model.apply(
                 params,
