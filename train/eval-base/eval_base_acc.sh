@@ -126,7 +126,7 @@ TPU_SIZE=$(echo "${TPU_PREFIX}" | grep -oP 'v[0-9]+e?-\K[0-9]+' || echo "0")
 
 # Calculate batch scale factor relative to v6e-8 (8 chips) baseline
 # e.g., v6e-16 -> scale=2, v6e-32 -> scale=4
-BASE_CHIPS=8
+BASE_CHIPS=4
 if [[ "${TPU_SIZE}" -gt 0 ]]; then
   BATCH_SCALE_FACTOR=$((TPU_SIZE / BASE_CHIPS))
   if [[ "${BATCH_SCALE_FACTOR}" -lt 1 ]]; then
