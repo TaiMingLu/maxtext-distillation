@@ -400,7 +400,7 @@ def generate_run_all_yaml(script_infos: list, output_dir: str) -> str:
     for info in script_infos:
         lines.append(f"  - id: {info['run_id']}")
         lines.append(f"    run: bash train/sft/{info['script_name']}")
-        lines.append(f"    hide: true")
+        # lines.append(f"    hide: true")
 
     content = '\n'.join(lines) + '\n'
 
@@ -425,7 +425,7 @@ def generate_eval_all_yaml(script_infos: list, output_dir: str) -> str:
         lines.append(f"  - id: eval_{run_name.replace('-', '_')}")
         lines.append(f"    run: bash train/eval-base/eval_base_acc.sh {run_name} {model_name} {ckpt_step} sft --resume")
         lines.append(f"    depends_on: {sft_task_id}")
-        lines.append(f"    hide: true")
+        # lines.append(f"    hide: true")
 
     content = '\n'.join(lines) + '\n'
 
