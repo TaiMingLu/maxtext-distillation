@@ -1213,13 +1213,19 @@ def main(config, test_args):
         except Exception as e:
             print(f"  Warning: Failed to save intermediate results: {e}")
 
+    # Get batch scale factor (for scaling to larger TPU configs)
+    scale_factor = getattr(test_args, 'batch_scale_factor', 1)
+    if scale_factor != 1:
+        print(f"Using batch_scale_factor={scale_factor}")
+
     # Run PPL evaluation if mode is 'ppl' or 'all'
     if test_args.eval_mode in ["ppl", "all"]:
         print_device_memory("before PPL eval")
+        scaled_ppl_batch_size = test_args.ppl_batch_size * scale_factor
         ppl_res, ppl_times = get_ppl(
             model,
             tokenizer,
-            batch_size=test_args.ppl_batch_size,
+            batch_size=scaled_ppl_batch_size,
             calib_size=min(256, test_args.limit),
             max_length=config.max_target_length,
             tasks=PPL_TASKS,
@@ -1235,13 +1241,29 @@ def main(config, test_args):
     # Run ACC evaluation if mode is 'acc' or 'all'
     if test_args.eval_mode in ["acc", "all"]:
         print_device_memory("before ACC eval")
+
+        # Apply batch scale factor to per-task batch sizes
+        if scale_factor != 1:
+            print(f"Applying batch_scale_factor={scale_factor} to all per-task batch sizes")
+            scaled_acc_tasks = []
+            for task_cfg in ACC_TASKS:
+                scaled_cfg = dict(task_cfg)
+                if "acc_batch_size" in scaled_cfg:
+                    scaled_cfg["acc_batch_size"] = scaled_cfg["acc_batch_size"] * scale_factor
+                scaled_acc_tasks.append(scaled_cfg)
+        else:
+            scaled_acc_tasks = ACC_TASKS
+
+        # Also scale the default batch_size fallback
+        scaled_default_batch_size = test_args.acc_batch_size * scale_factor
+
         acc_res, acc_full, acc_times = get_acc(
             model,
             tokenizer,
-            tasks=ACC_TASKS,
+            tasks=scaled_acc_tasks,
             task_range=test_args.tasks,
             limit=test_args.limit,
-            batch_size=test_args.acc_batch_size,
+            batch_size=scaled_default_batch_size,
             per_task_limit=test_args.acc_limit,
             task_limit_overrides=task_limit_overrides,
             task_seq_overrides=task_seq_overrides,
@@ -1343,6 +1365,7 @@ if __name__ == "__main__":
     parser.add_argument("--apply_chat_template", type=str2bool, default=False, help="Apply chat template for ACC evaluation (use True for SFT models, False for pretrained)")
     parser.add_argument("--fewshot_as_multiturn", type=str2bool, default=True, help="Format few-shot examples as multi-turn conversation (recommended for SFT models)")
     parser.add_argument("--resume", type=str2bool, default=False, help="Resume from existing JSON results file, skipping already completed tasks")
+    parser.add_argument("--batch_scale_factor", type=int, default=1, help="Scale factor for batch sizes (e.g., 2 for v6e-16 vs v6e-8 baseline)")
     test_args, _ = parser.parse_known_args()
 
     # Remove args defined in this test file to avoid error from pyconfig
@@ -1372,6 +1395,7 @@ if __name__ == "__main__":
         "--apply_chat_template",
         "--fewshot_as_multiturn",
         "--resume",
+        "--batch_scale_factor",
     ]
     for arg in to_remove_args:
         model_args = [s for s in model_args if not s.startswith(arg)]

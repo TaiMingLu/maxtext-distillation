@@ -24,7 +24,7 @@ SFT_HYPERPARAMS = {
     "lr": "1e-5",
     "min_lr_ratio": 0.1,      # Cosine decay to 1/10
     "warmup_ratio": 0.01,     # 1% warmup
-    "batch_size": 2,
+    "batch_size": 4,
     "steps": 4000,
 }
 

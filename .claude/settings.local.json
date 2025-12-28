@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "WebSearch",
+      "WebFetch(domain:docs.cloud.google.com)",
+      "WebFetch(domain:fig.io)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:groups.google.com)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

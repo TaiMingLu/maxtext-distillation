@@ -121,8 +121,22 @@ echo "Evaluating BASE model ACC (no chat template): ${RUN_NAME}"
 echo "Checkpoint: ${CHECKPOINT_PATH}"
 echo "------------------------------------------------------------------"
 
-# Detect if single-host TPU (v*-8 or smaller) or multi-host
+# Detect TPU size and calculate batch scale factor
 TPU_SIZE=$(echo "${TPU_PREFIX}" | grep -oP 'v[0-9]+e?-\K[0-9]+' || echo "0")
+
+# Calculate batch scale factor relative to v6e-8 (8 chips) baseline
+# e.g., v6e-16 -> scale=2, v6e-32 -> scale=4
+BASE_CHIPS=8
+if [[ "${TPU_SIZE}" -gt 0 ]]; then
+  BATCH_SCALE_FACTOR=$((TPU_SIZE / BASE_CHIPS))
+  if [[ "${BATCH_SCALE_FACTOR}" -lt 1 ]]; then
+    BATCH_SCALE_FACTOR=1
+  fi
+else
+  BATCH_SCALE_FACTOR=1
+fi
+echo "TPU size=${TPU_SIZE}, batch_scale_factor=${BATCH_SCALE_FACTOR}"
+
 if [[ "${TPU_SIZE}" -le 8 ]]; then
   echo "Single-host TPU detected (size=${TPU_SIZE}), running directly..."
   cd lm-evaluation-harness
@@ -141,7 +155,8 @@ if [[ "${TPU_SIZE}" -le 8 ]]; then
       --acc_batch_size=16 \
       --acc_seq_length=4096 \
       --apply_chat_template=false \
-      --resume=${RESUME_FLAG}
+      --resume=${RESUME_FLAG} \
+      --batch_scale_factor=${BATCH_SCALE_FACTOR}
 else
   echo "Multi-host TPU detected (size=${TPU_SIZE}), using multihost_runner..."
   python -u multihost_runner_orig.py \
@@ -169,7 +184,8 @@ python3.10 -u scripts/test_orbax_eval.py ../MaxText/configs/base.yml \
     --acc_batch_size=16 \
     --acc_seq_length=4096 \
     --apply_chat_template=false \
-    --resume=${RESUME_FLAG}
+    --resume=${RESUME_FLAG} \
+    --batch_scale_factor=${BATCH_SCALE_FACTOR}
 "
 fi
 
