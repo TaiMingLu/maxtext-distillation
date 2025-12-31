@@ -22,8 +22,8 @@ done
 export MODEL_NAME='qwen3-1b'
 export NUM_STEPS=12500
 export SEQ_LEN=8192
-export BATCH_SIZE=8
-export GRAD_ACCUM=1
+export BATCH_SIZE=4
+export GRAD_ACCUM=2
 export LR=5.e-4
 export MIN_LR_RATIO=0.1
 export WARMUP_RATIO=0.05
