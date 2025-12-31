@@ -6,8 +6,7 @@
       "WebFetch(domain:docs.cloud.google.com)",
       "WebFetch(domain:fig.io)",
       "WebFetch(domain:github.com)",
-      "WebFetch(domain:groups.google.com)",
-      "Bash(grep:*)"
+      "WebFetch(domain:groups.google.com)"
     ],
     "deny": [],
     "ask": []
