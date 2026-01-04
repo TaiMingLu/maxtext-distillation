@@ -77,7 +77,7 @@ DEFAULT_OUTPUT_DIR = "."
 DEFAULT_TEACHER_ARCHS = None  # None = use experiment config, or e.g. ["05b", "1b"]
 DEFAULT_TOKENS = None  # None = use experiment config, or e.g. ["50B", "100B"]
 DEFAULT_ALPHAS = None  # None = use experiment config, or e.g. [0.5, 1.0]
-DEFAULT_ENABLE_DEPENDS_ON = False  # Set to True to enable depends_on for task dependencies
+DEFAULT_ENABLE_DEPENDS_ON = True  # Set to True to enable depends_on for task dependencies
 DEFAULT_HIDE = False  # Set to False to make tasks visible by default
 
 # Models that have NO training dependency (already trained)
