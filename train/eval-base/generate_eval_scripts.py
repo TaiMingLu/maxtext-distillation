@@ -28,7 +28,8 @@ EXP1_CONFIG = {
 
 EXP2_CONFIG = {
     "teacher_archs": ["05b", "1b", "3b", "8b"],
-    "tokens": ["30B", "50B", "80B", "100B", "300B"],
+    # "tokens": ["30B", "50B", "80B", "100B", "300B"],
+    "tokens": ["10B"],
     # "tokens": ["5B", "10B", "80B"],
     # "alphas": [0.5, 1.0],
     "alphas": [0.2, 0.4, 0.6, 0.8],
