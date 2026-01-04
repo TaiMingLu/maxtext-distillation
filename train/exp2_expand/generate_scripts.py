@@ -13,8 +13,8 @@ from itertools import product
 
 # Default configurations
 DEFAULT_TEACHER_ARCHS = ["05b", "1b", "3b", "8b"]
-# DEFAULT_TOKENS = ["300B"] 
-DEFAULT_TOKENS = ["30B", "50B", "80B", "100B", "300B"] 
+DEFAULT_TOKENS = ["10B"] 
+# DEFAULT_TOKENS = ["30B", "50B", "80B", "100B", "300B"] 
 DEFAULT_TEACHER_SEED = 42
 DEFAULT_ALPHAS = [0.2, 0.8, 0.6, 0.4]
 DEFAULT_STUDENT_SEED = 43
