@@ -15,8 +15,8 @@ import os
 DEFAULT_TEACHER_ARCHS = ["05b", "1b", "3b", "8b"]
 DEFAULT_TOKENS = ["50B"]
 DEFAULT_TEACHER_SEED = 42
-# DEFAULT_STUDENT_ARCHS = ["3b", "05b"]
-DEFAULT_STUDENT_ARCHS = ["8b"]
+DEFAULT_STUDENT_ARCHS = ["8b","3b", "05b"]
+# DEFAULT_STUDENT_ARCHS = ["8b"]
 DEFAULT_ALPHAS = [0.2, 0.4, 0.5, 0.6, 0.8, 1.0]
 # DEFAULT_ALPHAS = [0.2, 0.4, 0.6, 0.8]
 DEFAULT_STUDENT_SEED = 43
@@ -135,7 +135,7 @@ python -u multihost_runner_orig.py \\
         cosine_learning_rate_final_fraction=${{MIN_LR_RATIO}} \\
         warmup_steps_fraction=${{WARMUP_RATIO}} \\
         checkpoint_period=2500 \\
-        checkpoint_max_to_keep=10 \\
+        checkpoint_max_to_keep=1 \\
         gcs_metrics=True \\
         use_wandb=True \\
         wandb_project=maxtext_exp \\
