@@ -13,8 +13,8 @@ from itertools import product
 
 # Default configurations
 DEFAULT_TEACHER_ARCHS = ["05b", "1b", "3b", "8b"]
-DEFAULT_TOKENS = ["10B"] 
-# DEFAULT_TOKENS = ["30B", "50B", "80B", "100B", "300B"] 
+# DEFAULT_TOKENS = ["10B"] 
+DEFAULT_TOKENS = ["10B", "30B", "50B", "80B", "100B", "300B"] 
 DEFAULT_TEACHER_SEED = 42
 DEFAULT_ALPHAS = [0.2, 0.8, 0.6, 0.4]
 DEFAULT_STUDENT_SEED = 43
@@ -137,7 +137,7 @@ python -u multihost_runner_orig.py \\
         cosine_learning_rate_final_fraction=${{MIN_LR_RATIO}} \\
         warmup_steps_fraction=${{WARMUP_RATIO}} \\
         checkpoint_period=2500 \\
-        checkpoint_max_to_keep=2 \\
+        checkpoint_max_to_keep=1 \\
         gcs_metrics=True \\
         use_wandb=True \\
         wandb_project=maxtext_1b \\
