@@ -19,7 +19,7 @@ for var in "${required_vars[@]}"; do
   fi
 done
 
-export MODEL_NAME='qwen3-06b'
+export MODEL_NAME='qwen3-03b'
 export NUM_STEPS=12500
 export SEQ_LEN=8192
 export BATCH_SIZE=4
@@ -30,20 +30,20 @@ export WARMUP_RATIO=0.05
 export ASYNC_CHECKPOINTING=false
 
 export USE_KD=true
-export KD_ALPHA=0.2  #KD_ALPHA=0.0 -- pure cross-entropy (no KD), KD_ALPHA=1.0 -- makes purely the KD term
+export KD_ALPHA=0.4  #KD_ALPHA=0.0 -- pure cross-entropy (no KD), KD_ALPHA=1.0 -- makes purely the KD term
 export KD_TEMPERATURE=1.0
 export KD_TEACHER_PARAMETERS_PATH="/home/terry/gcs-bucket/ckpts/ablate2_param_only/qwen015b-vanilla-50B-s42/checkpoint_12499/0/items"
 export TEACHER_MODEL_NAME="qwen3-015b"
 export BASE_OUTPUT_DIRECTORY="gs://$BUCKET_NAME/ckpts/ablate2"
 export DATA_FILES='/home/terry/gcs-data/datasets/fineweb-edu/*.array_record'
 
-export RUN_NAME="ablate2_qwen06b_A015BT50BS42_a02_s43"
-export RUN_ID="ablate2_qwen06b_A015BT50BS42_a02_s43"
+export RUN_NAME="ablate2_qwen03b_A015BT50BS42_a04_s43"
+export RUN_ID="ablate2_qwen03b_A015BT50BS42_a04_s43"
 
 # Distillation parameters
 
 echo "========================"
-echo "running ablate2_qwen06b_A015BT50BS42_a02_s43"
+echo "running ablate2_qwen03b_A015BT50BS42_a04_s43"
 echo "parameters:"
 echo "MODEL_NAME: $MODEL_NAME"
 echo "SEQ_LEN: $SEQ_LEN"

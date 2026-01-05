@@ -19,7 +19,7 @@ for var in "${required_vars[@]}"; do
   fi
 done
 
-export MODEL_NAME='qwen3-06b'
+export MODEL_NAME='qwen3-03b'
 export NUM_STEPS=12500
 export SEQ_LEN=8192
 export BATCH_SIZE=4
@@ -75,7 +75,7 @@ python -u multihost_runner_orig.py \
     export TPU_LOG_DIR=/home/terry/tpu_logs
     source ~/maxtext_env/bin/activate
     export WANDB_API_KEY='01126ae90da25bae0d86704140ac978cb9fd9c73'
-    export WANDB_PROJECT=maxtext_1b
+    export WANDB_PROJECT=maxtext_qwen
     export WANDB_NAME=${RUN_NAME}
     python3.10 -u -m MaxText.train MaxText/configs/base.yml \
         run_name=${RUN_NAME} \
@@ -97,10 +97,10 @@ python -u multihost_runner_orig.py \
         cosine_learning_rate_final_fraction=${MIN_LR_RATIO} \
         warmup_steps_fraction=${WARMUP_RATIO} \
         checkpoint_period=2500 \
-        checkpoint_max_to_keep=2 \
+        checkpoint_max_to_keep=1 \
         gcs_metrics=True \
         use_wandb=True \
-        wandb_project=maxtext_1b \
+        wandb_project=maxtext_qwen \
         wandb_run_name=${RUN_NAME} \
         wandb_run_id=${RUN_ID} \
         packing=true \

@@ -27,8 +27,8 @@ python -u multihost_runner_orig.py \
     export TPU_LOG_DIR=/home/terry/tpu_logs
     source ~/maxtext_env/bin/activate
     python3.10 -u -m MaxText.generate_param_only_checkpoint MaxText/configs/base.yml \
-      load_full_state_path=gs://taiming_us_central1/ckpts/ablate2/qwen06b_finewebedu_vanilla_s42_50b/checkpoints/12499/items \
-      checkpoint_dir=gs://taiming_us_central1/ckpts/ablate2_param_only/qwen06b-vanilla-50B-s42/checkpoint_12499 \
+      load_full_state_path=gs://${BUCKET_NAME}/ckpts/ablate2/qwen06b_finewebedu_vanilla_s42_50b/checkpoints/12499/items \
+      checkpoint_dir=gs://${BUCKET_NAME}/ckpts/ablate2_param_only/qwen06b-vanilla-50B-s42/checkpoint_12499 \
       enable_checkpointing=True async_checkpointing=False \
       model_name=qwen3-06b
     "
