@@ -32,7 +32,7 @@ export LR=3.e-4
 export MIN_LR_RATIO=0.1
 export WARMUP_RATIO=0.05
 export ASYNC_CHECKPOINTING=false
-export BASE_OUTPUT_DIRECTORY="gs://$BUCKET_NAME/ckpts/pretrain"
+export BASE_OUTPUT_DIRECTORY="gs://$BUCKET_NAME/ckpts/vanilla"
 export DATA_FILES='/home/terry/gcs-bucket/datasets/fineweb-edu/*.array_record'
 
 export RUN_NAME="${MODEL_NAME}-finewebedu-vanilla-s43-50b"
