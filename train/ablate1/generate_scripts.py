@@ -305,9 +305,9 @@ def generate_distill_script(
     # Script filename
     script_name = f"ablate1_llama1b-{teacher_naming}-{alpha_str}-s{student_seed}.sh"
 
-    # Run name and ID
+    # Run name and ID (simplified run_id matches script name without .sh)
     run_name = f"ablate1_llama3.1-1b-{teacher_naming}-{alpha_str}-s{student_seed}"
-    run_id = f"ablate1_llama1b_finewebedu_distill_soft_{teacher_naming}_{alpha_str}_s{student_seed}"
+    run_id = f"ablate1_llama1b-{teacher_naming}-{alpha_str}-s{student_seed}"
 
     # Model names
     teacher_model = ARCH_TO_MODEL[teacher_arch]
@@ -351,7 +351,7 @@ def generate_vanilla_script(
 
     script_name = f"ablate1_llama1b-finewebedu-vanilla-s{student_seed}-{tokens_lower}.sh"
     run_name = f"ablate1_llama1b-finewebedu-vanilla-s{student_seed}-{tokens_lower}"
-    run_id = f"ablate1_llama1b_finewebedu_vanilla_s{student_seed}_{tokens_lower}"
+    run_id = f"ablate1_llama1b-finewebedu-vanilla-s{student_seed}-{tokens_lower}"
 
     content = VANILLA_SCRIPT_TEMPLATE.format(
         student_model=student_model,
@@ -378,7 +378,7 @@ def generate_run_all_yaml(script_infos: list, output_dir: str) -> str:
     """Generate a run_all.yaml file that lists all generated tasks."""
     # Sort by teacher arch, then alpha descending
     def sort_key(info):
-        parts = info['run_id'].split('_')
+        parts = info['run_id'].split('-')
         # Find the teacher part (A1BT300BS42) and alpha part
         for i, p in enumerate(parts):
             if p.startswith('A') and 'T' in p:
@@ -405,7 +405,7 @@ def generate_run_all_yaml(script_infos: list, output_dir: str) -> str:
 
     for info in sorted_infos:
         # Determine teacher from run_id
-        parts = info['run_id'].split('_')
+        parts = info['run_id'].split('-')
         teacher_part = None
         for p in parts:
             if p.startswith('A') and 'T' in p:

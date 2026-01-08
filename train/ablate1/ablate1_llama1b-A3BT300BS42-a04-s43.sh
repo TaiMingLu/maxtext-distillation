@@ -38,7 +38,7 @@ export BASE_OUTPUT_DIRECTORY="gs://$BUCKET_NAME/ckpts/ablate1"
 export DATA_FILES='/home/terry/gcs-data/datasets/fineweb-edu/*.array_record'
 
 export RUN_NAME="ablate1_llama3.1-1b-A3BT300BS42-a04-s43"
-export RUN_ID="ablate1_llama1b_finewebedu_distill_soft_A3BT300BS42_a04_s43"
+export RUN_ID="ablate1_llama1b-A3BT300BS42-a04-s43"
 
 # Distillation parameters
 
