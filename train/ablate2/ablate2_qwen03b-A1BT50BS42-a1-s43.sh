@@ -32,7 +32,7 @@ export ASYNC_CHECKPOINTING=false
 export USE_KD=true
 export KD_ALPHA=1.0  #KD_ALPHA=0.0 -- pure cross-entropy (no KD), KD_ALPHA=1.0 -- makes purely the KD term
 export KD_TEMPERATURE=1.0
-export KD_TEACHER_PARAMETERS_PATH="/home/terry/gcs-bucket/ckpts/ablate2_param_only/qwen1b-vanilla-50B-s42/checkpoint_12499/0/items"
+export KD_TEACHER_PARAMETERS_PATH="/home/terry/gcs-bucket/ckpts/ablate2_param_only/qwen1b-vanilla-50B-s42/checkpoint_24999/0/items"
 export TEACHER_MODEL_NAME="qwen3-1b"
 export BASE_OUTPUT_DIRECTORY="gs://$BUCKET_NAME/ckpts/ablate2"
 export DATA_FILES='/home/terry/gcs-bucket/datasets/fineweb-edu/*.array_record'

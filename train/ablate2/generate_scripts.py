@@ -29,7 +29,7 @@ ARCH_TO_MODEL = {
 
 # Mapping from tokens to checkpoint step
 TOKENS_TO_STEP = {
-    "50B": 12499,
+    "50B": 24999,
 }
 
 SCRIPT_TEMPLATE = '''#!/bin/bash
