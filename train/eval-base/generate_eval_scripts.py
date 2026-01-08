@@ -21,6 +21,8 @@ from itertools import product
 
 # Experiment configurations (same as SFT generate_scripts.py)
 EXP1_CONFIG = {
+    # "student_archs": ["05b", "1b", "3b", "8b"],  # Student architecture matches teacher
+    "student_archs": ["05b", "3b", "8b"],  # Student architecture matches teacher
     "teacher_archs": ["05b", "1b", "3b", "8b"],
     "tokens": ["50B"],
     "alphas": [0.2, 0.4, 0.5, 0.6, 0.8, 1.0],
@@ -60,11 +62,11 @@ TEACHER_CONFIG = {
     "ckpt_dir": "pretrain_param_only_v6",
 }
 
-# Baseline - single 1B model trained from scratch
+# Baseline - models trained from scratch (no distillation)
 BASELINE_CONFIG = {
-    "run_name": "llama3.1-1b-finewebedu-vanilla-s43-50b",
-    "model_name": "llama3.1-1b",
-    "checkpoint_step": 24999,
+    "sizes": ["05b", "1b", "3b", "8b"],
+    "tokens": "50B",  # Token budget for baselines
+    "seed": 43,
     "ckpt_dir": "vanilla",
 }
 
@@ -73,7 +75,7 @@ DEFAULT_STUDENT_SEED = 43
 
 # Default CLI parameters (edit these instead of using command-line args)
 DEFAULT_EXPERIMENTS = ["exp1", "exp2", "teacher", "baseline"]  # Options: "exp1", "exp2", "teacher", "baseline"
-DEFAULT_EVAL_TYPE = "ppl"  # Options: "all", "base", "ppl", "base_acc", "sft"
+DEFAULT_EVAL_TYPE = "base"  # Options: "all", "base" (ppl+base_acc), "ppl", "base_acc", "sft"
 DEFAULT_OUTPUT_DIR = "."
 DEFAULT_TEACHER_ARCHS = None  # None = use experiment config, or e.g. ["05b", "1b"]
 DEFAULT_TOKENS = None  # None = use experiment config, or e.g. ["50B", "100B"]
@@ -112,40 +114,41 @@ def get_teacher_naming(arch: str, tokens: str, seed: int) -> str:
     return f"A{arch_upper}T{tokens_num}BS{seed}"
 
 
-def get_pretrain_run_name(exp_name: str, teacher_arch: str, tokens: str,
+def get_pretrain_run_name(exp_name: str, student_arch: str, teacher_arch: str, tokens: str,
                           teacher_seed: int, alpha: float, student_seed: int) -> str:
-    """Get pretrain run name like exp1_llama3.1-1b-A1BT50BS42-a1-s43."""
+    """Get pretrain run name like exp1_llama3.1-3b-A3BT50BS42-a1-s43."""
     teacher_naming = get_teacher_naming(teacher_arch, tokens, teacher_seed)
     alpha_str = alpha_to_str(alpha)
-    return f"{exp_name}_llama3.1-1b-{teacher_naming}-{alpha_str}-s{student_seed}"
+    return f"{exp_name}_llama3.1-{student_arch}-{teacher_naming}-{alpha_str}-s{student_seed}"
 
 
-def get_sft_run_name(exp_name: str, teacher_arch: str, tokens: str,
+def get_sft_run_name(exp_name: str, student_arch: str, teacher_arch: str, tokens: str,
                      teacher_seed: int, alpha: float, student_seed: int) -> str:
-    """Get SFT run name like sft_exp1_llama3.1-1b-A1BT50BS42-a1-s43."""
-    pretrain_name = get_pretrain_run_name(exp_name, teacher_arch, tokens,
+    """Get SFT run name like sft_exp1_llama3.1-3b-A3BT50BS42-a1-s43."""
+    pretrain_name = get_pretrain_run_name(exp_name, student_arch, teacher_arch, tokens,
                                            teacher_seed, alpha, student_seed)
     return f"sft_{pretrain_name}"
 
 
-def get_pretrain_training_task_id(exp_name: str, teacher_arch: str, tokens: str,
+def get_pretrain_training_task_id(exp_name: str, student_arch: str, teacher_arch: str, tokens: str,
                                    teacher_seed: int, alpha: float, student_seed: int) -> str:
     """Get the training task ID for pretrain (for depends_on)."""
     teacher_naming = get_teacher_naming(teacher_arch, tokens, teacher_seed)
     alpha_str = alpha_to_str(alpha)
-    return f"{exp_name}_llama1b_finewebedu_distill_soft_{teacher_naming}_{alpha_str}_s{student_seed}"
+    return f"{exp_name}_llama{student_arch}_finewebedu_distill_soft_{teacher_naming}_{alpha_str}_s{student_seed}"
 
 
-def get_sft_training_task_id(exp_name: str, teacher_arch: str, tokens: str,
+def get_sft_training_task_id(exp_name: str, student_arch: str, teacher_arch: str, tokens: str,
                               teacher_seed: int, alpha: float, student_seed: int) -> str:
     """Get the training task ID for SFT (for depends_on)."""
     teacher_naming = get_teacher_naming(teacher_arch, tokens, teacher_seed)
     alpha_str = alpha_to_str(alpha)
-    return f"sft_{exp_name}_llama3.1_1b_{teacher_naming}_{alpha_str}_s{student_seed}"
+    return f"sft_{exp_name}_llama3.1_{student_arch}_{teacher_naming}_{alpha_str}_s{student_seed}"
 
 
 def generate_pretrain_ppl_task(
     exp_name: str,
+    student_arch: str,
     teacher_arch: str,
     tokens: str,
     teacher_seed: int,
@@ -154,7 +157,7 @@ def generate_pretrain_ppl_task(
     checkpoint_step: int,
 ) -> dict:
     """Generate a pretrain PPL evaluation task."""
-    run_name = get_pretrain_run_name(exp_name, teacher_arch, tokens,
+    run_name = get_pretrain_run_name(exp_name, student_arch, teacher_arch, tokens,
                                       teacher_seed, alpha, student_seed)
 
     # Task ID for eval (use underscores)
@@ -163,7 +166,7 @@ def generate_pretrain_ppl_task(
     # Depends on training task (only if enabled and not in no-dependency list)
     depends_on = None
     if DEFAULT_ENABLE_DEPENDS_ON and teacher_arch not in NO_DEPENDENCY_TEACHERS:
-        depends_on = get_pretrain_training_task_id(exp_name, teacher_arch, tokens,
+        depends_on = get_pretrain_training_task_id(exp_name, student_arch, teacher_arch, tokens,
                                                     teacher_seed, alpha, student_seed)
 
     return {
@@ -171,6 +174,7 @@ def generate_pretrain_ppl_task(
         "run_name": run_name,
         "checkpoint_step": checkpoint_step,
         "ckpt_dir": exp_name,  # exp1 or exp2
+        "model_name": size_to_model_name(student_arch),
         "eval_type": "ppl",
         "depends_on": depends_on,
     }
@@ -178,6 +182,7 @@ def generate_pretrain_ppl_task(
 
 def generate_sft_acc_task(
     exp_name: str,
+    student_arch: str,
     teacher_arch: str,
     tokens: str,
     teacher_seed: int,
@@ -186,7 +191,7 @@ def generate_sft_acc_task(
     checkpoint_step: int,
 ) -> dict:
     """Generate an SFT ACC evaluation task."""
-    run_name = get_sft_run_name(exp_name, teacher_arch, tokens,
+    run_name = get_sft_run_name(exp_name, student_arch, teacher_arch, tokens,
                                  teacher_seed, alpha, student_seed)
 
     # Task ID for eval (use underscores)
@@ -195,7 +200,7 @@ def generate_sft_acc_task(
     # Depends on SFT training task (only if enabled)
     depends_on = None
     if DEFAULT_ENABLE_DEPENDS_ON:
-        depends_on = get_sft_training_task_id(exp_name, teacher_arch, tokens,
+        depends_on = get_sft_training_task_id(exp_name, student_arch, teacher_arch, tokens,
                                                teacher_seed, alpha, student_seed)
 
     return {
@@ -203,6 +208,7 @@ def generate_sft_acc_task(
         "run_name": run_name,
         "checkpoint_step": checkpoint_step,
         "ckpt_dir": "sft",
+        "model_name": size_to_model_name(student_arch),
         "eval_type": "acc",
         "depends_on": depends_on,
     }
@@ -210,6 +216,7 @@ def generate_sft_acc_task(
 
 def generate_base_acc_task(
     exp_name: str,
+    student_arch: str,
     teacher_arch: str,
     tokens: str,
     teacher_seed: int,
@@ -218,7 +225,7 @@ def generate_base_acc_task(
     checkpoint_step: int,
 ) -> dict:
     """Generate a BASE model ACC evaluation task (no chat template)."""
-    run_name = get_pretrain_run_name(exp_name, teacher_arch, tokens,
+    run_name = get_pretrain_run_name(exp_name, student_arch, teacher_arch, tokens,
                                       teacher_seed, alpha, student_seed)
 
     # Task ID for eval (use underscores)
@@ -227,7 +234,7 @@ def generate_base_acc_task(
     # Depends on pretrain training task (only if enabled and not in no-dependency list)
     depends_on = None
     if DEFAULT_ENABLE_DEPENDS_ON and teacher_arch not in NO_DEPENDENCY_TEACHERS:
-        depends_on = get_pretrain_training_task_id(exp_name, teacher_arch, tokens,
+        depends_on = get_pretrain_training_task_id(exp_name, student_arch, teacher_arch, tokens,
                                                     teacher_seed, alpha, student_seed)
 
     return {
@@ -235,6 +242,7 @@ def generate_base_acc_task(
         "run_name": run_name,
         "checkpoint_step": checkpoint_step,
         "ckpt_dir": exp_name,  # exp1 or exp2
+        "model_name": size_to_model_name(student_arch),
         "eval_type": "base_acc",
         "depends_on": depends_on,
     }
@@ -317,51 +325,63 @@ def generate_teacher_tasks(checkpoint_step_sft: int) -> list:
     return tasks
 
 
+def get_baseline_run_name(size: str, tokens: str, seed: int) -> str:
+    """Get baseline run name like llama3.1-1b-finewebedu-vanilla-s43-50b."""
+    return f"llama3.1-{size}-finewebedu-vanilla-s{seed}-{tokens.lower()}"
+
+
 def generate_baseline_tasks(checkpoint_step_sft: int) -> list:
-    """Generate eval tasks for the baseline model (single 1B model)."""
+    """Generate eval tasks for baseline models (multiple sizes, no distillation)."""
     tasks = []
 
-    name = BASELINE_CONFIG["run_name"]
-    model_name = BASELINE_CONFIG["model_name"]
-    checkpoint_step = BASELINE_CONFIG["checkpoint_step"]
+    sizes = BASELINE_CONFIG["sizes"]
+    tokens = BASELINE_CONFIG["tokens"]
+    seed = BASELINE_CONFIG["seed"]
     ckpt_dir = BASELINE_CONFIG["ckpt_dir"]
 
-    # PPL eval for baseline pretrain
-    ppl_task_id = f"eval_ppl_baseline_{name.replace('-', '_').replace('.', '_')}"
-    tasks.append({
-        "task_id": ppl_task_id,
-        "run_name": name,
-        "checkpoint_step": checkpoint_step,
-        "ckpt_dir": ckpt_dir,
-        "model_name": model_name,
-        "eval_type": "ppl",
-        "depends_on": None,
-    })
+    # Get checkpoint step based on tokens
+    checkpoint_step = get_checkpoint_step_for_tokens(tokens)
 
-    # Base ACC eval for baseline pretrain (no chat template)
-    base_acc_task_id = f"eval_base_acc_baseline_{name.replace('-', '_').replace('.', '_')}"
-    tasks.append({
-        "task_id": base_acc_task_id,
-        "run_name": name,
-        "checkpoint_step": checkpoint_step,
-        "ckpt_dir": ckpt_dir,
-        "model_name": model_name,
-        "eval_type": "base_acc",
-        "depends_on": None,
-    })
+    for size in sizes:
+        name = get_baseline_run_name(size, tokens, seed)
+        model_name = size_to_model_name(size)
 
-    # ACC eval for baseline SFT (with chat template)
-    sft_name = f"sft_{name}"
-    acc_task_id = f"eval_acc_sft_baseline_{name.replace('-', '_').replace('.', '_')}"
-    tasks.append({
-        "task_id": acc_task_id,
-        "run_name": sft_name,
-        "checkpoint_step": checkpoint_step_sft,
-        "ckpt_dir": "sft",
-        "model_name": model_name,
-        "eval_type": "acc",
-        "depends_on": None,
-    })
+        # PPL eval for baseline pretrain
+        ppl_task_id = f"eval_ppl_baseline_{name.replace('-', '_').replace('.', '_')}"
+        tasks.append({
+            "task_id": ppl_task_id,
+            "run_name": name,
+            "checkpoint_step": checkpoint_step,
+            "ckpt_dir": ckpt_dir,
+            "model_name": model_name,
+            "eval_type": "ppl",
+            "depends_on": None,
+        })
+
+        # Base ACC eval for baseline pretrain (no chat template)
+        base_acc_task_id = f"eval_base_acc_baseline_{name.replace('-', '_').replace('.', '_')}"
+        tasks.append({
+            "task_id": base_acc_task_id,
+            "run_name": name,
+            "checkpoint_step": checkpoint_step,
+            "ckpt_dir": ckpt_dir,
+            "model_name": model_name,
+            "eval_type": "base_acc",
+            "depends_on": None,
+        })
+
+        # ACC eval for baseline SFT (with chat template)
+        sft_name = f"sft_{name}"
+        acc_task_id = f"eval_acc_sft_baseline_{name.replace('-', '_').replace('.', '_')}"
+        tasks.append({
+            "task_id": acc_task_id,
+            "run_name": sft_name,
+            "checkpoint_step": checkpoint_step_sft,
+            "ckpt_dir": "sft",
+            "model_name": model_name,
+            "eval_type": "acc",
+            "depends_on": None,
+        })
 
     return tasks
 
@@ -529,15 +549,18 @@ def main():
         else:
             config = EXP2_CONFIG
 
+        # exp1 has student_archs, exp2 only uses 1b student
+        student_archs = config.get("student_archs", ["1b"])
         teacher_archs = args.teacher_archs or config["teacher_archs"]
         tokens_list = args.tokens or config["tokens"]
         alphas = args.alphas or config["alphas"]
 
-        for teacher_arch, tokens, alpha in product(teacher_archs, tokens_list, alphas):
+        for student_arch, teacher_arch, tokens, alpha in product(student_archs, teacher_archs, tokens_list, alphas):
             # Generate PPL eval for pretrain
             if args.eval_type in ["all", "base", "ppl"]:
                 ppl_task = generate_pretrain_ppl_task(
                     exp_name=exp_name,
+                    student_arch=student_arch,
                     teacher_arch=teacher_arch,
                     tokens=tokens,
                     teacher_seed=args.teacher_seed,
@@ -557,6 +580,7 @@ def main():
             if args.eval_type in ["all", "base", "base_acc"]:
                 base_acc_task = generate_base_acc_task(
                     exp_name=exp_name,
+                    student_arch=student_arch,
                     teacher_arch=teacher_arch,
                     tokens=tokens,
                     teacher_seed=args.teacher_seed,
@@ -576,6 +600,7 @@ def main():
             if args.eval_type in ["all", "sft"]:
                 acc_task = generate_sft_acc_task(
                     exp_name=exp_name,
+                    student_arch=student_arch,
                     teacher_arch=teacher_arch,
                     tokens=tokens,
                     teacher_seed=args.teacher_seed,
