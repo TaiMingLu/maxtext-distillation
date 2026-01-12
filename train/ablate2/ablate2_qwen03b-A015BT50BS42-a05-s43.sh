@@ -35,7 +35,7 @@ export KD_TEMPERATURE=1.0
 export KD_TEACHER_PARAMETERS_PATH="/home/terry/gcs-bucket/ckpts/ablate2_param_only/qwen015b-vanilla-50B-s42/checkpoint_24999/0/items"
 export TEACHER_MODEL_NAME="qwen3-015b"
 export BASE_OUTPUT_DIRECTORY="gs://$BUCKET_NAME/ckpts/ablate2"
-export DATA_FILES='/home/terry/gcs-data/datasets/fineweb-edu/*.array_record'
+export DATA_FILES='/home/terry/gcs-bucket/datasets/fineweb-edu/*.array_record'
 
 export RUN_NAME="ablate2_qwen03b_A015BT50BS42_a05_s43"
 export RUN_ID="ablate2_qwen03b_A015BT50BS42_a05_s43"
