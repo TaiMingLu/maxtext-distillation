@@ -37,10 +37,11 @@ TEACHER_CONFIG = {
 }
 
 # Baseline - models trained from scratch (no distillation)
+# Only qwen03b with seed 43
 BASELINE_CONFIG = {
-    "sizes": ["015b", "03b", "06b", "1b"],
+    "sizes": ["03b"],
     "tokens": "50B",
-    "seeds": [42, 43],  # Both seeds for baseline
+    "seeds": [43],
     "ckpt_dir": "ablate2",
 }
 

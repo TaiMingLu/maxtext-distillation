@@ -1,52 +1,10 @@
 tasks:
-  - id: eval_ppl_baseline_qwen015b_finewebedu_vanilla_s42_50b
-    run: bash train/ablate2-eval/eval_pretrain_ppl.sh qwen015b_finewebedu_vanilla_s42_50b qwen3-015b 24999 ablate2 --resume
-    depends_on: ablate2_qwen015b_finewebedu_vanilla_s42_50b
-  - id: eval_base_acc_baseline_qwen015b_finewebedu_vanilla_s42_50b
-    run: bash train/ablate2-eval/eval_base_acc.sh qwen015b_finewebedu_vanilla_s42_50b qwen3-015b 24999 ablate2 --resume
-    depends_on: ablate2_qwen015b_finewebedu_vanilla_s42_50b
-  - id: eval_ppl_baseline_qwen015b_finewebedu_vanilla_s43_50b
-    run: bash train/ablate2-eval/eval_pretrain_ppl.sh qwen015b_finewebedu_vanilla_s43_50b qwen3-015b 24999 ablate2 --resume
-    depends_on: ablate2_qwen015b_finewebedu_vanilla_s43_50b
-  - id: eval_base_acc_baseline_qwen015b_finewebedu_vanilla_s43_50b
-    run: bash train/ablate2-eval/eval_base_acc.sh qwen015b_finewebedu_vanilla_s43_50b qwen3-015b 24999 ablate2 --resume
-    depends_on: ablate2_qwen015b_finewebedu_vanilla_s43_50b
-  - id: eval_ppl_baseline_qwen03b_finewebedu_vanilla_s42_50b
-    run: bash train/ablate2-eval/eval_pretrain_ppl.sh qwen03b_finewebedu_vanilla_s42_50b qwen3-03b 24999 ablate2 --resume
-    depends_on: ablate2_qwen03b_finewebedu_vanilla_s42_50b
-  - id: eval_base_acc_baseline_qwen03b_finewebedu_vanilla_s42_50b
-    run: bash train/ablate2-eval/eval_base_acc.sh qwen03b_finewebedu_vanilla_s42_50b qwen3-03b 24999 ablate2 --resume
-    depends_on: ablate2_qwen03b_finewebedu_vanilla_s42_50b
   - id: eval_ppl_baseline_qwen03b_finewebedu_vanilla_s43_50b
     run: bash train/ablate2-eval/eval_pretrain_ppl.sh qwen03b_finewebedu_vanilla_s43_50b qwen3-03b 24999 ablate2 --resume
     depends_on: ablate2_qwen03b_finewebedu_vanilla_s43_50b
   - id: eval_base_acc_baseline_qwen03b_finewebedu_vanilla_s43_50b
     run: bash train/ablate2-eval/eval_base_acc.sh qwen03b_finewebedu_vanilla_s43_50b qwen3-03b 24999 ablate2 --resume
     depends_on: ablate2_qwen03b_finewebedu_vanilla_s43_50b
-  - id: eval_ppl_baseline_qwen06b_finewebedu_vanilla_s42_50b
-    run: bash train/ablate2-eval/eval_pretrain_ppl.sh qwen06b_finewebedu_vanilla_s42_50b qwen3-06b 24999 ablate2 --resume
-    depends_on: ablate2_qwen06b_finewebedu_vanilla_s42_50b
-  - id: eval_base_acc_baseline_qwen06b_finewebedu_vanilla_s42_50b
-    run: bash train/ablate2-eval/eval_base_acc.sh qwen06b_finewebedu_vanilla_s42_50b qwen3-06b 24999 ablate2 --resume
-    depends_on: ablate2_qwen06b_finewebedu_vanilla_s42_50b
-  - id: eval_ppl_baseline_qwen06b_finewebedu_vanilla_s43_50b
-    run: bash train/ablate2-eval/eval_pretrain_ppl.sh qwen06b_finewebedu_vanilla_s43_50b qwen3-06b 24999 ablate2 --resume
-    depends_on: ablate2_qwen06b_finewebedu_vanilla_s43_50b
-  - id: eval_base_acc_baseline_qwen06b_finewebedu_vanilla_s43_50b
-    run: bash train/ablate2-eval/eval_base_acc.sh qwen06b_finewebedu_vanilla_s43_50b qwen3-06b 24999 ablate2 --resume
-    depends_on: ablate2_qwen06b_finewebedu_vanilla_s43_50b
-  - id: eval_ppl_baseline_qwen1b_finewebedu_vanilla_s42_50b
-    run: bash train/ablate2-eval/eval_pretrain_ppl.sh qwen1b_finewebedu_vanilla_s42_50b qwen3-1b 24999 ablate2 --resume
-    depends_on: ablate2_qwen1b_finewebedu_vanilla_s42_50b
-  - id: eval_base_acc_baseline_qwen1b_finewebedu_vanilla_s42_50b
-    run: bash train/ablate2-eval/eval_base_acc.sh qwen1b_finewebedu_vanilla_s42_50b qwen3-1b 24999 ablate2 --resume
-    depends_on: ablate2_qwen1b_finewebedu_vanilla_s42_50b
-  - id: eval_ppl_baseline_qwen1b_finewebedu_vanilla_s43_50b
-    run: bash train/ablate2-eval/eval_pretrain_ppl.sh qwen1b_finewebedu_vanilla_s43_50b qwen3-1b 24999 ablate2 --resume
-    depends_on: ablate2_qwen1b_finewebedu_vanilla_s43_50b
-  - id: eval_base_acc_baseline_qwen1b_finewebedu_vanilla_s43_50b
-    run: bash train/ablate2-eval/eval_base_acc.sh qwen1b_finewebedu_vanilla_s43_50b qwen3-1b 24999 ablate2 --resume
-    depends_on: ablate2_qwen1b_finewebedu_vanilla_s43_50b
   - id: eval_ppl_teacher_qwen015b_vanilla_50B_s42
     run: bash train/ablate2-eval/eval_pretrain_ppl.sh qwen015b-vanilla-50B-s42 qwen3-015b 24999 ablate2_param_only --resume --param_only
     depends_on: convert_ablate2_qwen015b_finewebedu_vanilla_s42_50b

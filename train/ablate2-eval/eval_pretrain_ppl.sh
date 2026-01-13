@@ -67,8 +67,8 @@ else
   CHECKPOINT_PATH="gs://${BUCKET_NAME}/ckpts/${CKPT_DIR}/${RUN_NAME}/checkpoints/${CHECKPOINT_STEP}/items"
 fi
 # Use Qwen3 tokenizer for evaluation
-HF_MODEL_PATH="/home/terry/gcs-bucket/HF_HOME/Qwen3-0.6B"
-EVAL_RESULTS_DIR="/home/terry/gcs-bucket/eval_ablate2/ppl_results"
+HF_MODEL_PATH="/home/terry/gcs-bucket/HF_HOME/Llama-3.1-8B"
+EVAL_RESULTS_DIR="/home/terry/gcs-bucket/eval_1229/base_acc_results"
 RESULT_JSON_PATH="${EVAL_RESULTS_DIR}/${RUN_NAME}_step${CHECKPOINT_STEP}.json"
 
 export XLA_PYTHON_CLIENT_MEM_FRACTION=0.9
