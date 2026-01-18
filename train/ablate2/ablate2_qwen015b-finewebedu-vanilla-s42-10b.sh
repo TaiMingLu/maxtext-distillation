@@ -31,7 +31,7 @@ export ASYNC_CHECKPOINTING=false
 
 export USE_KD=false
 export BASE_OUTPUT_DIRECTORY="gs://$BUCKET_NAME/ckpts/ablate2"
-export DATA_FILES='/home/terry/gcs-bucket/datasets/fineweb-edu/*.array_record'
+export DATA_FILES='/home/terry/gcs-data/datasets/fineweb-edu/*.array_record'
 
 export RUN_NAME="qwen015b_finewebedu_vanilla_s42_10b"
 export RUN_ID="qwen015b_finewebedu_vanilla_s42_10b"
