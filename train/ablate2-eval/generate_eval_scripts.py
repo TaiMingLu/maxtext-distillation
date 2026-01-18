@@ -19,19 +19,19 @@ from itertools import product
 KD_CONFIG = {
     "student_arch": "03b",  # Only qwen03b student
     "teacher_archs": ["015b", "03b", "06b", "1b"],
-    "tokens": "50B",
+    "tokens": "10B",
     "alphas": [0.2, 0.4, 0.5, 0.6, 0.8, 1.0],
     "teacher_seed": 42,
     "student_seed": 43,
 }
 
 # Checkpoint steps
-PRETRAIN_CHECKPOINT_STEP = 24999  # For 50B tokens
+PRETRAIN_CHECKPOINT_STEP = 4999  # For 10B tokens
 
 # Teacher baselines - trained vanilla models used as teachers
 TEACHER_CONFIG = {
     "sizes": ["015b", "03b", "06b", "1b"],
-    "tokens": "50B",
+    "tokens": "10B",
     "seed": 42,
     "ckpt_dir": "ablate2_param_only",
 }
@@ -40,7 +40,7 @@ TEACHER_CONFIG = {
 # Only qwen03b with seed 43
 BASELINE_CONFIG = {
     "sizes": ["03b"],
-    "tokens": "50B",
+    "tokens": "10B",
     "seeds": [43],
     "ckpt_dir": "ablate2",
 }
@@ -63,7 +63,7 @@ def alpha_to_str(alpha: float) -> str:
 
 
 def get_teacher_naming(arch: str, tokens: str, seed: int) -> str:
-    """Generate teacher naming like A015BT50BS42."""
+    """Generate teacher naming like A015BT10BS42."""
     tokens_num = tokens.replace("B", "")
     arch_upper = arch.upper()
     return f"A{arch_upper}T{tokens_num}BS{seed}"
@@ -76,19 +76,19 @@ def size_to_model_name(size: str) -> str:
 
 def get_kd_run_name(student_arch: str, teacher_arch: str, tokens: str,
                     teacher_seed: int, alpha: float, student_seed: int) -> str:
-    """Get KD run name like ablate2_qwen03b_A015BT50BS42_a02_s43."""
+    """Get KD run name like ablate2_qwen03b_A015BT10BS42_a02_s43."""
     teacher_naming = get_teacher_naming(teacher_arch, tokens, teacher_seed)
     alpha_str = alpha_to_str(alpha)
     return f"ablate2_qwen{student_arch}_{teacher_naming}_{alpha_str}_s{student_seed}"
 
 
 def get_teacher_run_name(size: str, tokens: str, seed: int) -> str:
-    """Get teacher run name like qwen015b-vanilla-50B-s42."""
+    """Get teacher run name like qwen015b-vanilla-10B-s42."""
     return f"qwen{size}-vanilla-{tokens}-s{seed}"
 
 
 def get_baseline_run_name(size: str, tokens: str, seed: int) -> str:
-    """Get baseline run name like qwen03b_finewebedu_vanilla_s42_50b."""
+    """Get baseline run name like qwen03b_finewebedu_vanilla_s42_10b."""
     return f"qwen{size}_finewebedu_vanilla_s{seed}_{tokens.lower()}"
 
 
@@ -99,7 +99,7 @@ def get_kd_training_task_id(student_arch: str, teacher_arch: str, tokens: str,
 
 
 def get_baseline_training_task_id(size: str, tokens: str, seed: int) -> str:
-    """Get the training task ID for baseline like ablate2_qwen03b_finewebedu_vanilla_s42_50b."""
+    """Get the training task ID for baseline like ablate2_qwen03b_finewebedu_vanilla_s42_10b."""
     return f"ablate2_qwen{size}_finewebedu_vanilla_s{seed}_{tokens.lower()}"
 
 
@@ -130,7 +130,7 @@ def generate_kd_tasks() -> list:
         ) if DEFAULT_ENABLE_DEPENDS_ON else None
 
         # PPL eval
-        ppl_task_id = f"eval_ppl_kd_{run_name.replace('-', '_')}"
+        ppl_task_id = f"ablate2_eval_ppl_kd_{run_name.replace('-', '_')}"
         tasks.append({
             "task_id": ppl_task_id,
             "run_name": run_name,
@@ -143,7 +143,7 @@ def generate_kd_tasks() -> list:
         })
 
         # Base ACC eval
-        base_acc_task_id = f"eval_base_acc_kd_{run_name.replace('-', '_')}"
+        base_acc_task_id = f"ablate2_eval_base_acc_kd_{run_name.replace('-', '_')}"
         tasks.append({
             "task_id": base_acc_task_id,
             "run_name": run_name,
@@ -175,7 +175,7 @@ def generate_teacher_tasks() -> list:
         training_task_id = get_teacher_training_task_id(size, tokens, seed) if DEFAULT_ENABLE_DEPENDS_ON else None
 
         # PPL eval
-        ppl_task_id = f"eval_ppl_teacher_{run_name.replace('-', '_')}"
+        ppl_task_id = f"ablate2_eval_ppl_teacher_{run_name.replace('-', '_')}"
         tasks.append({
             "task_id": ppl_task_id,
             "run_name": run_name,
@@ -188,7 +188,7 @@ def generate_teacher_tasks() -> list:
         })
 
         # Base ACC eval
-        base_acc_task_id = f"eval_base_acc_teacher_{run_name.replace('-', '_')}"
+        base_acc_task_id = f"ablate2_eval_base_acc_teacher_{run_name.replace('-', '_')}"
         tasks.append({
             "task_id": base_acc_task_id,
             "run_name": run_name,
@@ -220,7 +220,7 @@ def generate_baseline_tasks() -> list:
         training_task_id = get_baseline_training_task_id(size, tokens, seed) if DEFAULT_ENABLE_DEPENDS_ON else None
 
         # PPL eval
-        ppl_task_id = f"eval_ppl_baseline_{run_name.replace('-', '_').replace('.', '_')}"
+        ppl_task_id = f"ablate2_eval_ppl_baseline_{run_name.replace('-', '_').replace('.', '_')}"
         tasks.append({
             "task_id": ppl_task_id,
             "run_name": run_name,
@@ -233,7 +233,7 @@ def generate_baseline_tasks() -> list:
         })
 
         # Base ACC eval
-        base_acc_task_id = f"eval_base_acc_baseline_{run_name.replace('-', '_').replace('.', '_')}"
+        base_acc_task_id = f"ablate2_eval_base_acc_baseline_{run_name.replace('-', '_').replace('.', '_')}"
         tasks.append({
             "task_id": base_acc_task_id,
             "run_name": run_name,

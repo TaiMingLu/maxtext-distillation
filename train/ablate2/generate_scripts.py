@@ -14,7 +14,7 @@ from itertools import product
 # Default configurations
 DEFAULT_STUDENT_ARCHS = ["03b"]
 DEFAULT_TEACHER_ARCHS = ["015b", "03b", "06b", "1b"]
-DEFAULT_TOKENS = ["50B"]
+DEFAULT_TOKENS = ["10B"]
 DEFAULT_TEACHER_SEED = 42
 DEFAULT_ALPHAS = [0.2, 0.4, 0.5, 0.6, 0.8, 1.0]
 DEFAULT_STUDENT_SEED = 43
@@ -29,7 +29,7 @@ ARCH_TO_MODEL = {
 
 # Mapping from tokens to checkpoint step
 TOKENS_TO_STEP = {
-    "50B": 24999,
+    "10B": 4999,
 }
 
 SCRIPT_TEMPLATE = '''#!/bin/bash
@@ -54,7 +54,7 @@ for var in "${{required_vars[@]}}"; do
 done
 
 export MODEL_NAME='{student_model_name}'
-export NUM_STEPS=25000
+export NUM_STEPS=5000
 export SEQ_LEN=8192
 export BATCH_SIZE=4
 export GRAD_ACCUM=1
@@ -164,7 +164,7 @@ def alpha_to_str(alpha: float) -> str:
 
 
 def get_teacher_naming(arch: str, tokens: str, seed: int) -> str:
-    """Generate teacher naming like A015BT50BS42."""
+    """Generate teacher naming like A015BT10BS42."""
     # Remove 'B' suffix from tokens for naming
     tokens_num = tokens.replace("B", "")
     # Uppercase the arch (015b -> 015B, 03b -> 03B, etc.)
@@ -173,13 +173,13 @@ def get_teacher_naming(arch: str, tokens: str, seed: int) -> str:
 
 
 def get_teacher_ckpt_name(arch: str, tokens: str, seed: int) -> str:
-    """Generate teacher checkpoint directory name like qwen015b-vanilla-50B-s42."""
+    """Generate teacher checkpoint directory name like qwen015b-vanilla-10B-s42."""
     return f"qwen{arch}-vanilla-{tokens}-s{seed}"
 
 
 def get_convert_task_id(teacher_arch: str, tokens: str, teacher_seed: int) -> str:
     """Generate the conversion task ID that this distill run depends on."""
-    tokens_lower = tokens.lower()  # 50B -> 50b
+    tokens_lower = tokens.lower()  # 10B -> 10b
     return f"convert_ablate2_qwen{teacher_arch}_finewebedu_vanilla_s{teacher_seed}_{tokens_lower}"
 
 
@@ -244,10 +244,10 @@ def generate_run_all_yaml(script_infos: list, output_dir: str) -> str:
     # Sort: by student_arch, then teacher_arch, then alpha descending (1.0 before 0.2)
     def sort_key(info):
         # Extract student_arch, teacher_arch, alpha from run_id
-        # e.g., ablate2_qwen03b_A015BT50BS42_a1_s43
+        # e.g., ablate2_qwen03b_A015BT10BS42_a1_s43
         parts = info['run_id'].split('_')
         student = parts[1]  # qwen03b
-        teacher_part = parts[2]  # A015BT50BS42
+        teacher_part = parts[2]  # A015BT10BS42
         alpha_part = parts[3]  # a1 or a02
         # Convert alpha for sorting (a1 -> 1.0, a02 -> 0.2)
         if alpha_part == 'a1':
@@ -265,8 +265,8 @@ def generate_run_all_yaml(script_infos: list, output_dir: str) -> str:
     for info in sorted_infos:
         parts = info['run_id'].split('_')
         student = parts[1]  # qwen03b
-        teacher_part = parts[2]  # A015BT50BS42
-        # Extract teacher arch from teacher_part (A015BT50BS42 -> qwen015b)
+        teacher_part = parts[2]  # A015BT10BS42
+        # Extract teacher arch from teacher_part (A015BT10BS42 -> qwen015b)
         teacher_arch = teacher_part.split('T')[0][1:].lower()  # A015B -> 015b
         teacher_name = f"qwen{teacher_arch}"
 

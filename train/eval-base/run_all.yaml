@@ -1,4 +1,20 @@
 tasks:
+  - id: eval_ppl_baseline_llama3_1_05b_finewebedu_vanilla_s43_50b
+    run: bash train/eval-base/eval_pretrain_ppl.sh llama3.1-05b-finewebedu-vanilla-s43-50b llama3.1-05b 24999 vanilla --resume
+  - id: eval_base_acc_baseline_llama3_1_05b_finewebedu_vanilla_s43_50b
+    run: bash train/eval-base/eval_base_acc.sh llama3.1-05b-finewebedu-vanilla-s43-50b llama3.1-05b 24999 vanilla --resume
+  - id: eval_ppl_baseline_llama3_1_1b_finewebedu_vanilla_s43_50b
+    run: bash train/eval-base/eval_pretrain_ppl.sh llama3.1-1b-finewebedu-vanilla-s43-50b llama3.1-1b 24999 vanilla --resume
+  - id: eval_base_acc_baseline_llama3_1_1b_finewebedu_vanilla_s43_50b
+    run: bash train/eval-base/eval_base_acc.sh llama3.1-1b-finewebedu-vanilla-s43-50b llama3.1-1b 24999 vanilla --resume
+  - id: eval_ppl_baseline_llama3_1_3b_finewebedu_vanilla_s43_50b
+    run: bash train/eval-base/eval_pretrain_ppl.sh llama3.1-3b-finewebedu-vanilla-s43-50b llama3.1-3b 24999 vanilla --resume
+  - id: eval_base_acc_baseline_llama3_1_3b_finewebedu_vanilla_s43_50b
+    run: bash train/eval-base/eval_base_acc.sh llama3.1-3b-finewebedu-vanilla-s43-50b llama3.1-3b 24999 vanilla --resume
+  - id: eval_ppl_baseline_llama3_1_8b_finewebedu_vanilla_s43_50b
+    run: bash train/eval-base/eval_pretrain_ppl.sh llama3.1-8b-finewebedu-vanilla-s43-50b llama3.1-8b 24999 vanilla --resume
+  - id: eval_base_acc_baseline_llama3_1_8b_finewebedu_vanilla_s43_50b
+    run: bash train/eval-base/eval_base_acc.sh llama3.1-8b-finewebedu-vanilla-s43-50b llama3.1-8b 24999 vanilla --resume
   - id: eval_ppl_exp1_llama3.1_05b_A05BT50BS42_a02_s43
     run: bash train/eval-base/eval_pretrain_ppl.sh exp1_llama3.1-05b-A05BT50BS42-a02-s43 llama3.1-05b 24999 exp1 --resume
     depends_on: exp1_llama05b_finewebedu_distill_soft_A05BT50BS42_a02_s43
@@ -287,3 +303,1179 @@ tasks:
   - id: eval_base_acc_exp1_llama3.1_3b_A8BT50BS42_a1_s43
     run: bash train/eval-base/eval_base_acc.sh exp1_llama3.1-3b-A8BT50BS42-a1-s43 llama3.1-3b 24999 exp1 --resume
     depends_on: exp1_llama3b_finewebedu_distill_soft_A8BT50BS42_a1_s43
+  - id: eval_ppl_exp1_llama3.1_8b_A05BT50BS42_a02_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp1_llama3.1-8b-A05BT50BS42-a02-s43 llama3.1-8b 24999 exp1 --resume
+    depends_on: exp1_llama8b_finewebedu_distill_soft_A05BT50BS42_a02_s43
+  - id: eval_base_acc_exp1_llama3.1_8b_A05BT50BS42_a02_s43
+    run: bash train/eval-base/eval_base_acc.sh exp1_llama3.1-8b-A05BT50BS42-a02-s43 llama3.1-8b 24999 exp1 --resume
+    depends_on: exp1_llama8b_finewebedu_distill_soft_A05BT50BS42_a02_s43
+  - id: eval_ppl_exp1_llama3.1_8b_A05BT50BS42_a04_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp1_llama3.1-8b-A05BT50BS42-a04-s43 llama3.1-8b 24999 exp1 --resume
+    depends_on: exp1_llama8b_finewebedu_distill_soft_A05BT50BS42_a04_s43
+  - id: eval_base_acc_exp1_llama3.1_8b_A05BT50BS42_a04_s43
+    run: bash train/eval-base/eval_base_acc.sh exp1_llama3.1-8b-A05BT50BS42-a04-s43 llama3.1-8b 24999 exp1 --resume
+    depends_on: exp1_llama8b_finewebedu_distill_soft_A05BT50BS42_a04_s43
+  - id: eval_ppl_exp1_llama3.1_8b_A05BT50BS42_a05_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp1_llama3.1-8b-A05BT50BS42-a05-s43 llama3.1-8b 24999 exp1 --resume
+    depends_on: exp1_llama8b_finewebedu_distill_soft_A05BT50BS42_a05_s43
+  - id: eval_base_acc_exp1_llama3.1_8b_A05BT50BS42_a05_s43
+    run: bash train/eval-base/eval_base_acc.sh exp1_llama3.1-8b-A05BT50BS42-a05-s43 llama3.1-8b 24999 exp1 --resume
+    depends_on: exp1_llama8b_finewebedu_distill_soft_A05BT50BS42_a05_s43
+  - id: eval_ppl_exp1_llama3.1_8b_A05BT50BS42_a06_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp1_llama3.1-8b-A05BT50BS42-a06-s43 llama3.1-8b 24999 exp1 --resume
+    depends_on: exp1_llama8b_finewebedu_distill_soft_A05BT50BS42_a06_s43
+  - id: eval_base_acc_exp1_llama3.1_8b_A05BT50BS42_a06_s43
+    run: bash train/eval-base/eval_base_acc.sh exp1_llama3.1-8b-A05BT50BS42-a06-s43 llama3.1-8b 24999 exp1 --resume
+    depends_on: exp1_llama8b_finewebedu_distill_soft_A05BT50BS42_a06_s43
+  - id: eval_ppl_exp1_llama3.1_8b_A05BT50BS42_a08_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp1_llama3.1-8b-A05BT50BS42-a08-s43 llama3.1-8b 24999 exp1 --resume
+    depends_on: exp1_llama8b_finewebedu_distill_soft_A05BT50BS42_a08_s43
+  - id: eval_base_acc_exp1_llama3.1_8b_A05BT50BS42_a08_s43
+    run: bash train/eval-base/eval_base_acc.sh exp1_llama3.1-8b-A05BT50BS42-a08-s43 llama3.1-8b 24999 exp1 --resume
+    depends_on: exp1_llama8b_finewebedu_distill_soft_A05BT50BS42_a08_s43
+  - id: eval_ppl_exp1_llama3.1_8b_A05BT50BS42_a1_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp1_llama3.1-8b-A05BT50BS42-a1-s43 llama3.1-8b 24999 exp1 --resume
+    depends_on: exp1_llama8b_finewebedu_distill_soft_A05BT50BS42_a1_s43
+  - id: eval_base_acc_exp1_llama3.1_8b_A05BT50BS42_a1_s43
+    run: bash train/eval-base/eval_base_acc.sh exp1_llama3.1-8b-A05BT50BS42-a1-s43 llama3.1-8b 24999 exp1 --resume
+    depends_on: exp1_llama8b_finewebedu_distill_soft_A05BT50BS42_a1_s43
+  - id: eval_ppl_exp1_llama3.1_8b_A1BT50BS42_a02_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp1_llama3.1-8b-A1BT50BS42-a02-s43 llama3.1-8b 24999 exp1 --resume
+    depends_on: exp1_llama8b_finewebedu_distill_soft_A1BT50BS42_a02_s43
+  - id: eval_base_acc_exp1_llama3.1_8b_A1BT50BS42_a02_s43
+    run: bash train/eval-base/eval_base_acc.sh exp1_llama3.1-8b-A1BT50BS42-a02-s43 llama3.1-8b 24999 exp1 --resume
+    depends_on: exp1_llama8b_finewebedu_distill_soft_A1BT50BS42_a02_s43
+  - id: eval_ppl_exp1_llama3.1_8b_A1BT50BS42_a04_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp1_llama3.1-8b-A1BT50BS42-a04-s43 llama3.1-8b 24999 exp1 --resume
+    depends_on: exp1_llama8b_finewebedu_distill_soft_A1BT50BS42_a04_s43
+  - id: eval_base_acc_exp1_llama3.1_8b_A1BT50BS42_a04_s43
+    run: bash train/eval-base/eval_base_acc.sh exp1_llama3.1-8b-A1BT50BS42-a04-s43 llama3.1-8b 24999 exp1 --resume
+    depends_on: exp1_llama8b_finewebedu_distill_soft_A1BT50BS42_a04_s43
+  - id: eval_ppl_exp1_llama3.1_8b_A1BT50BS42_a05_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp1_llama3.1-8b-A1BT50BS42-a05-s43 llama3.1-8b 24999 exp1 --resume
+    depends_on: exp1_llama8b_finewebedu_distill_soft_A1BT50BS42_a05_s43
+  - id: eval_base_acc_exp1_llama3.1_8b_A1BT50BS42_a05_s43
+    run: bash train/eval-base/eval_base_acc.sh exp1_llama3.1-8b-A1BT50BS42-a05-s43 llama3.1-8b 24999 exp1 --resume
+    depends_on: exp1_llama8b_finewebedu_distill_soft_A1BT50BS42_a05_s43
+  - id: eval_ppl_exp1_llama3.1_8b_A1BT50BS42_a06_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp1_llama3.1-8b-A1BT50BS42-a06-s43 llama3.1-8b 24999 exp1 --resume
+    depends_on: exp1_llama8b_finewebedu_distill_soft_A1BT50BS42_a06_s43
+  - id: eval_base_acc_exp1_llama3.1_8b_A1BT50BS42_a06_s43
+    run: bash train/eval-base/eval_base_acc.sh exp1_llama3.1-8b-A1BT50BS42-a06-s43 llama3.1-8b 24999 exp1 --resume
+    depends_on: exp1_llama8b_finewebedu_distill_soft_A1BT50BS42_a06_s43
+  - id: eval_ppl_exp1_llama3.1_8b_A1BT50BS42_a08_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp1_llama3.1-8b-A1BT50BS42-a08-s43 llama3.1-8b 24999 exp1 --resume
+    depends_on: exp1_llama8b_finewebedu_distill_soft_A1BT50BS42_a08_s43
+  - id: eval_base_acc_exp1_llama3.1_8b_A1BT50BS42_a08_s43
+    run: bash train/eval-base/eval_base_acc.sh exp1_llama3.1-8b-A1BT50BS42-a08-s43 llama3.1-8b 24999 exp1 --resume
+    depends_on: exp1_llama8b_finewebedu_distill_soft_A1BT50BS42_a08_s43
+  - id: eval_ppl_exp1_llama3.1_8b_A1BT50BS42_a1_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp1_llama3.1-8b-A1BT50BS42-a1-s43 llama3.1-8b 24999 exp1 --resume
+    depends_on: exp1_llama8b_finewebedu_distill_soft_A1BT50BS42_a1_s43
+  - id: eval_base_acc_exp1_llama3.1_8b_A1BT50BS42_a1_s43
+    run: bash train/eval-base/eval_base_acc.sh exp1_llama3.1-8b-A1BT50BS42-a1-s43 llama3.1-8b 24999 exp1 --resume
+    depends_on: exp1_llama8b_finewebedu_distill_soft_A1BT50BS42_a1_s43
+  - id: eval_ppl_exp1_llama3.1_8b_A3BT50BS42_a02_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp1_llama3.1-8b-A3BT50BS42-a02-s43 llama3.1-8b 24999 exp1 --resume
+    depends_on: exp1_llama8b_finewebedu_distill_soft_A3BT50BS42_a02_s43
+  - id: eval_base_acc_exp1_llama3.1_8b_A3BT50BS42_a02_s43
+    run: bash train/eval-base/eval_base_acc.sh exp1_llama3.1-8b-A3BT50BS42-a02-s43 llama3.1-8b 24999 exp1 --resume
+    depends_on: exp1_llama8b_finewebedu_distill_soft_A3BT50BS42_a02_s43
+  - id: eval_ppl_exp1_llama3.1_8b_A3BT50BS42_a04_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp1_llama3.1-8b-A3BT50BS42-a04-s43 llama3.1-8b 24999 exp1 --resume
+    depends_on: exp1_llama8b_finewebedu_distill_soft_A3BT50BS42_a04_s43
+  - id: eval_base_acc_exp1_llama3.1_8b_A3BT50BS42_a04_s43
+    run: bash train/eval-base/eval_base_acc.sh exp1_llama3.1-8b-A3BT50BS42-a04-s43 llama3.1-8b 24999 exp1 --resume
+    depends_on: exp1_llama8b_finewebedu_distill_soft_A3BT50BS42_a04_s43
+  - id: eval_ppl_exp1_llama3.1_8b_A3BT50BS42_a05_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp1_llama3.1-8b-A3BT50BS42-a05-s43 llama3.1-8b 24999 exp1 --resume
+    depends_on: exp1_llama8b_finewebedu_distill_soft_A3BT50BS42_a05_s43
+  - id: eval_base_acc_exp1_llama3.1_8b_A3BT50BS42_a05_s43
+    run: bash train/eval-base/eval_base_acc.sh exp1_llama3.1-8b-A3BT50BS42-a05-s43 llama3.1-8b 24999 exp1 --resume
+    depends_on: exp1_llama8b_finewebedu_distill_soft_A3BT50BS42_a05_s43
+  - id: eval_ppl_exp1_llama3.1_8b_A3BT50BS42_a06_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp1_llama3.1-8b-A3BT50BS42-a06-s43 llama3.1-8b 24999 exp1 --resume
+    depends_on: exp1_llama8b_finewebedu_distill_soft_A3BT50BS42_a06_s43
+  - id: eval_base_acc_exp1_llama3.1_8b_A3BT50BS42_a06_s43
+    run: bash train/eval-base/eval_base_acc.sh exp1_llama3.1-8b-A3BT50BS42-a06-s43 llama3.1-8b 24999 exp1 --resume
+    depends_on: exp1_llama8b_finewebedu_distill_soft_A3BT50BS42_a06_s43
+  - id: eval_ppl_exp1_llama3.1_8b_A3BT50BS42_a08_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp1_llama3.1-8b-A3BT50BS42-a08-s43 llama3.1-8b 24999 exp1 --resume
+    depends_on: exp1_llama8b_finewebedu_distill_soft_A3BT50BS42_a08_s43
+  - id: eval_base_acc_exp1_llama3.1_8b_A3BT50BS42_a08_s43
+    run: bash train/eval-base/eval_base_acc.sh exp1_llama3.1-8b-A3BT50BS42-a08-s43 llama3.1-8b 24999 exp1 --resume
+    depends_on: exp1_llama8b_finewebedu_distill_soft_A3BT50BS42_a08_s43
+  - id: eval_ppl_exp1_llama3.1_8b_A3BT50BS42_a1_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp1_llama3.1-8b-A3BT50BS42-a1-s43 llama3.1-8b 24999 exp1 --resume
+    depends_on: exp1_llama8b_finewebedu_distill_soft_A3BT50BS42_a1_s43
+  - id: eval_base_acc_exp1_llama3.1_8b_A3BT50BS42_a1_s43
+    run: bash train/eval-base/eval_base_acc.sh exp1_llama3.1-8b-A3BT50BS42-a1-s43 llama3.1-8b 24999 exp1 --resume
+    depends_on: exp1_llama8b_finewebedu_distill_soft_A3BT50BS42_a1_s43
+  - id: eval_ppl_exp1_llama3.1_8b_A8BT50BS42_a02_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp1_llama3.1-8b-A8BT50BS42-a02-s43 llama3.1-8b 24999 exp1 --resume
+    depends_on: exp1_llama8b_finewebedu_distill_soft_A8BT50BS42_a02_s43
+  - id: eval_base_acc_exp1_llama3.1_8b_A8BT50BS42_a02_s43
+    run: bash train/eval-base/eval_base_acc.sh exp1_llama3.1-8b-A8BT50BS42-a02-s43 llama3.1-8b 24999 exp1 --resume
+    depends_on: exp1_llama8b_finewebedu_distill_soft_A8BT50BS42_a02_s43
+  - id: eval_ppl_exp1_llama3.1_8b_A8BT50BS42_a04_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp1_llama3.1-8b-A8BT50BS42-a04-s43 llama3.1-8b 24999 exp1 --resume
+    depends_on: exp1_llama8b_finewebedu_distill_soft_A8BT50BS42_a04_s43
+  - id: eval_base_acc_exp1_llama3.1_8b_A8BT50BS42_a04_s43
+    run: bash train/eval-base/eval_base_acc.sh exp1_llama3.1-8b-A8BT50BS42-a04-s43 llama3.1-8b 24999 exp1 --resume
+    depends_on: exp1_llama8b_finewebedu_distill_soft_A8BT50BS42_a04_s43
+  - id: eval_ppl_exp1_llama3.1_8b_A8BT50BS42_a05_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp1_llama3.1-8b-A8BT50BS42-a05-s43 llama3.1-8b 24999 exp1 --resume
+    depends_on: exp1_llama8b_finewebedu_distill_soft_A8BT50BS42_a05_s43
+  - id: eval_base_acc_exp1_llama3.1_8b_A8BT50BS42_a05_s43
+    run: bash train/eval-base/eval_base_acc.sh exp1_llama3.1-8b-A8BT50BS42-a05-s43 llama3.1-8b 24999 exp1 --resume
+    depends_on: exp1_llama8b_finewebedu_distill_soft_A8BT50BS42_a05_s43
+  - id: eval_ppl_exp1_llama3.1_8b_A8BT50BS42_a06_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp1_llama3.1-8b-A8BT50BS42-a06-s43 llama3.1-8b 24999 exp1 --resume
+    depends_on: exp1_llama8b_finewebedu_distill_soft_A8BT50BS42_a06_s43
+  - id: eval_base_acc_exp1_llama3.1_8b_A8BT50BS42_a06_s43
+    run: bash train/eval-base/eval_base_acc.sh exp1_llama3.1-8b-A8BT50BS42-a06-s43 llama3.1-8b 24999 exp1 --resume
+    depends_on: exp1_llama8b_finewebedu_distill_soft_A8BT50BS42_a06_s43
+  - id: eval_ppl_exp1_llama3.1_8b_A8BT50BS42_a08_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp1_llama3.1-8b-A8BT50BS42-a08-s43 llama3.1-8b 24999 exp1 --resume
+    depends_on: exp1_llama8b_finewebedu_distill_soft_A8BT50BS42_a08_s43
+  - id: eval_base_acc_exp1_llama3.1_8b_A8BT50BS42_a08_s43
+    run: bash train/eval-base/eval_base_acc.sh exp1_llama3.1-8b-A8BT50BS42-a08-s43 llama3.1-8b 24999 exp1 --resume
+    depends_on: exp1_llama8b_finewebedu_distill_soft_A8BT50BS42_a08_s43
+  - id: eval_ppl_exp1_llama3.1_8b_A8BT50BS42_a1_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp1_llama3.1-8b-A8BT50BS42-a1-s43 llama3.1-8b 24999 exp1 --resume
+    depends_on: exp1_llama8b_finewebedu_distill_soft_A8BT50BS42_a1_s43
+  - id: eval_base_acc_exp1_llama3.1_8b_A8BT50BS42_a1_s43
+    run: bash train/eval-base/eval_base_acc.sh exp1_llama3.1-8b-A8BT50BS42-a1-s43 llama3.1-8b 24999 exp1 --resume
+    depends_on: exp1_llama8b_finewebedu_distill_soft_A8BT50BS42_a1_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A05BT10BS42_a02_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp2_llama3.1-1b-A05BT10BS42-a02-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A05BT10BS42_a02_s43
+  - id: eval_base_acc_exp2_llama3.1_1b_A05BT10BS42_a02_s43
+    run: bash train/eval-base/eval_base_acc.sh exp2_llama3.1-1b-A05BT10BS42-a02-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A05BT10BS42_a02_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A05BT10BS42_a04_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp2_llama3.1-1b-A05BT10BS42-a04-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A05BT10BS42_a04_s43
+  - id: eval_base_acc_exp2_llama3.1_1b_A05BT10BS42_a04_s43
+    run: bash train/eval-base/eval_base_acc.sh exp2_llama3.1-1b-A05BT10BS42-a04-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A05BT10BS42_a04_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A05BT10BS42_a05_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp2_llama3.1-1b-A05BT10BS42-a05-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A05BT10BS42_a05_s43
+  - id: eval_base_acc_exp2_llama3.1_1b_A05BT10BS42_a05_s43
+    run: bash train/eval-base/eval_base_acc.sh exp2_llama3.1-1b-A05BT10BS42-a05-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A05BT10BS42_a05_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A05BT10BS42_a06_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp2_llama3.1-1b-A05BT10BS42-a06-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A05BT10BS42_a06_s43
+  - id: eval_base_acc_exp2_llama3.1_1b_A05BT10BS42_a06_s43
+    run: bash train/eval-base/eval_base_acc.sh exp2_llama3.1-1b-A05BT10BS42-a06-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A05BT10BS42_a06_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A05BT10BS42_a08_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp2_llama3.1-1b-A05BT10BS42-a08-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A05BT10BS42_a08_s43
+  - id: eval_base_acc_exp2_llama3.1_1b_A05BT10BS42_a08_s43
+    run: bash train/eval-base/eval_base_acc.sh exp2_llama3.1-1b-A05BT10BS42-a08-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A05BT10BS42_a08_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A05BT10BS42_a1_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp2_llama3.1-1b-A05BT10BS42-a1-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A05BT10BS42_a1_s43
+  - id: eval_base_acc_exp2_llama3.1_1b_A05BT10BS42_a1_s43
+    run: bash train/eval-base/eval_base_acc.sh exp2_llama3.1-1b-A05BT10BS42-a1-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A05BT10BS42_a1_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A05BT30BS42_a02_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp2_llama3.1-1b-A05BT30BS42-a02-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A05BT30BS42_a02_s43
+  - id: eval_base_acc_exp2_llama3.1_1b_A05BT30BS42_a02_s43
+    run: bash train/eval-base/eval_base_acc.sh exp2_llama3.1-1b-A05BT30BS42-a02-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A05BT30BS42_a02_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A05BT30BS42_a04_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp2_llama3.1-1b-A05BT30BS42-a04-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A05BT30BS42_a04_s43
+  - id: eval_base_acc_exp2_llama3.1_1b_A05BT30BS42_a04_s43
+    run: bash train/eval-base/eval_base_acc.sh exp2_llama3.1-1b-A05BT30BS42-a04-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A05BT30BS42_a04_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A05BT30BS42_a05_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp2_llama3.1-1b-A05BT30BS42-a05-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A05BT30BS42_a05_s43
+  - id: eval_base_acc_exp2_llama3.1_1b_A05BT30BS42_a05_s43
+    run: bash train/eval-base/eval_base_acc.sh exp2_llama3.1-1b-A05BT30BS42-a05-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A05BT30BS42_a05_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A05BT30BS42_a06_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp2_llama3.1-1b-A05BT30BS42-a06-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A05BT30BS42_a06_s43
+  - id: eval_base_acc_exp2_llama3.1_1b_A05BT30BS42_a06_s43
+    run: bash train/eval-base/eval_base_acc.sh exp2_llama3.1-1b-A05BT30BS42-a06-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A05BT30BS42_a06_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A05BT30BS42_a08_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp2_llama3.1-1b-A05BT30BS42-a08-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A05BT30BS42_a08_s43
+  - id: eval_base_acc_exp2_llama3.1_1b_A05BT30BS42_a08_s43
+    run: bash train/eval-base/eval_base_acc.sh exp2_llama3.1-1b-A05BT30BS42-a08-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A05BT30BS42_a08_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A05BT30BS42_a1_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp2_llama3.1-1b-A05BT30BS42-a1-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A05BT30BS42_a1_s43
+  - id: eval_base_acc_exp2_llama3.1_1b_A05BT30BS42_a1_s43
+    run: bash train/eval-base/eval_base_acc.sh exp2_llama3.1-1b-A05BT30BS42-a1-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A05BT30BS42_a1_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A05BT50BS42_a02_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp2_llama3.1-1b-A05BT50BS42-a02-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A05BT50BS42_a02_s43
+  - id: eval_base_acc_exp2_llama3.1_1b_A05BT50BS42_a02_s43
+    run: bash train/eval-base/eval_base_acc.sh exp2_llama3.1-1b-A05BT50BS42-a02-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A05BT50BS42_a02_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A05BT50BS42_a04_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp2_llama3.1-1b-A05BT50BS42-a04-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A05BT50BS42_a04_s43
+  - id: eval_base_acc_exp2_llama3.1_1b_A05BT50BS42_a04_s43
+    run: bash train/eval-base/eval_base_acc.sh exp2_llama3.1-1b-A05BT50BS42-a04-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A05BT50BS42_a04_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A05BT50BS42_a05_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp2_llama3.1-1b-A05BT50BS42-a05-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A05BT50BS42_a05_s43
+  - id: eval_base_acc_exp2_llama3.1_1b_A05BT50BS42_a05_s43
+    run: bash train/eval-base/eval_base_acc.sh exp2_llama3.1-1b-A05BT50BS42-a05-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A05BT50BS42_a05_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A05BT50BS42_a06_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp2_llama3.1-1b-A05BT50BS42-a06-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A05BT50BS42_a06_s43
+  - id: eval_base_acc_exp2_llama3.1_1b_A05BT50BS42_a06_s43
+    run: bash train/eval-base/eval_base_acc.sh exp2_llama3.1-1b-A05BT50BS42-a06-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A05BT50BS42_a06_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A05BT50BS42_a08_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp2_llama3.1-1b-A05BT50BS42-a08-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A05BT50BS42_a08_s43
+  - id: eval_base_acc_exp2_llama3.1_1b_A05BT50BS42_a08_s43
+    run: bash train/eval-base/eval_base_acc.sh exp2_llama3.1-1b-A05BT50BS42-a08-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A05BT50BS42_a08_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A05BT50BS42_a1_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp2_llama3.1-1b-A05BT50BS42-a1-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A05BT50BS42_a1_s43
+  - id: eval_base_acc_exp2_llama3.1_1b_A05BT50BS42_a1_s43
+    run: bash train/eval-base/eval_base_acc.sh exp2_llama3.1-1b-A05BT50BS42-a1-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A05BT50BS42_a1_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A05BT80BS42_a02_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp2_llama3.1-1b-A05BT80BS42-a02-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A05BT80BS42_a02_s43
+  - id: eval_base_acc_exp2_llama3.1_1b_A05BT80BS42_a02_s43
+    run: bash train/eval-base/eval_base_acc.sh exp2_llama3.1-1b-A05BT80BS42-a02-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A05BT80BS42_a02_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A05BT80BS42_a04_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp2_llama3.1-1b-A05BT80BS42-a04-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A05BT80BS42_a04_s43
+  - id: eval_base_acc_exp2_llama3.1_1b_A05BT80BS42_a04_s43
+    run: bash train/eval-base/eval_base_acc.sh exp2_llama3.1-1b-A05BT80BS42-a04-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A05BT80BS42_a04_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A05BT80BS42_a05_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp2_llama3.1-1b-A05BT80BS42-a05-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A05BT80BS42_a05_s43
+  - id: eval_base_acc_exp2_llama3.1_1b_A05BT80BS42_a05_s43
+    run: bash train/eval-base/eval_base_acc.sh exp2_llama3.1-1b-A05BT80BS42-a05-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A05BT80BS42_a05_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A05BT80BS42_a06_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp2_llama3.1-1b-A05BT80BS42-a06-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A05BT80BS42_a06_s43
+  - id: eval_base_acc_exp2_llama3.1_1b_A05BT80BS42_a06_s43
+    run: bash train/eval-base/eval_base_acc.sh exp2_llama3.1-1b-A05BT80BS42-a06-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A05BT80BS42_a06_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A05BT80BS42_a08_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp2_llama3.1-1b-A05BT80BS42-a08-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A05BT80BS42_a08_s43
+  - id: eval_base_acc_exp2_llama3.1_1b_A05BT80BS42_a08_s43
+    run: bash train/eval-base/eval_base_acc.sh exp2_llama3.1-1b-A05BT80BS42-a08-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A05BT80BS42_a08_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A05BT80BS42_a1_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp2_llama3.1-1b-A05BT80BS42-a1-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A05BT80BS42_a1_s43
+  - id: eval_base_acc_exp2_llama3.1_1b_A05BT80BS42_a1_s43
+    run: bash train/eval-base/eval_base_acc.sh exp2_llama3.1-1b-A05BT80BS42-a1-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A05BT80BS42_a1_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A05BT100BS42_a02_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp2_llama3.1-1b-A05BT100BS42-a02-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A05BT100BS42_a02_s43
+  - id: eval_base_acc_exp2_llama3.1_1b_A05BT100BS42_a02_s43
+    run: bash train/eval-base/eval_base_acc.sh exp2_llama3.1-1b-A05BT100BS42-a02-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A05BT100BS42_a02_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A05BT100BS42_a04_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp2_llama3.1-1b-A05BT100BS42-a04-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A05BT100BS42_a04_s43
+  - id: eval_base_acc_exp2_llama3.1_1b_A05BT100BS42_a04_s43
+    run: bash train/eval-base/eval_base_acc.sh exp2_llama3.1-1b-A05BT100BS42-a04-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A05BT100BS42_a04_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A05BT100BS42_a05_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp2_llama3.1-1b-A05BT100BS42-a05-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A05BT100BS42_a05_s43
+  - id: eval_base_acc_exp2_llama3.1_1b_A05BT100BS42_a05_s43
+    run: bash train/eval-base/eval_base_acc.sh exp2_llama3.1-1b-A05BT100BS42-a05-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A05BT100BS42_a05_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A05BT100BS42_a06_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp2_llama3.1-1b-A05BT100BS42-a06-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A05BT100BS42_a06_s43
+  - id: eval_base_acc_exp2_llama3.1_1b_A05BT100BS42_a06_s43
+    run: bash train/eval-base/eval_base_acc.sh exp2_llama3.1-1b-A05BT100BS42-a06-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A05BT100BS42_a06_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A05BT100BS42_a08_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp2_llama3.1-1b-A05BT100BS42-a08-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A05BT100BS42_a08_s43
+  - id: eval_base_acc_exp2_llama3.1_1b_A05BT100BS42_a08_s43
+    run: bash train/eval-base/eval_base_acc.sh exp2_llama3.1-1b-A05BT100BS42-a08-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A05BT100BS42_a08_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A05BT100BS42_a1_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp2_llama3.1-1b-A05BT100BS42-a1-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A05BT100BS42_a1_s43
+  - id: eval_base_acc_exp2_llama3.1_1b_A05BT100BS42_a1_s43
+    run: bash train/eval-base/eval_base_acc.sh exp2_llama3.1-1b-A05BT100BS42-a1-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A05BT100BS42_a1_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A05BT300BS42_a02_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp2_llama3.1-1b-A05BT300BS42-a02-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A05BT300BS42_a02_s43
+  - id: eval_base_acc_exp2_llama3.1_1b_A05BT300BS42_a02_s43
+    run: bash train/eval-base/eval_base_acc.sh exp2_llama3.1-1b-A05BT300BS42-a02-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A05BT300BS42_a02_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A05BT300BS42_a04_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp2_llama3.1-1b-A05BT300BS42-a04-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A05BT300BS42_a04_s43
+  - id: eval_base_acc_exp2_llama3.1_1b_A05BT300BS42_a04_s43
+    run: bash train/eval-base/eval_base_acc.sh exp2_llama3.1-1b-A05BT300BS42-a04-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A05BT300BS42_a04_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A05BT300BS42_a05_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp2_llama3.1-1b-A05BT300BS42-a05-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A05BT300BS42_a05_s43
+  - id: eval_base_acc_exp2_llama3.1_1b_A05BT300BS42_a05_s43
+    run: bash train/eval-base/eval_base_acc.sh exp2_llama3.1-1b-A05BT300BS42-a05-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A05BT300BS42_a05_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A05BT300BS42_a06_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp2_llama3.1-1b-A05BT300BS42-a06-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A05BT300BS42_a06_s43
+  - id: eval_base_acc_exp2_llama3.1_1b_A05BT300BS42_a06_s43
+    run: bash train/eval-base/eval_base_acc.sh exp2_llama3.1-1b-A05BT300BS42-a06-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A05BT300BS42_a06_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A05BT300BS42_a08_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp2_llama3.1-1b-A05BT300BS42-a08-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A05BT300BS42_a08_s43
+  - id: eval_base_acc_exp2_llama3.1_1b_A05BT300BS42_a08_s43
+    run: bash train/eval-base/eval_base_acc.sh exp2_llama3.1-1b-A05BT300BS42-a08-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A05BT300BS42_a08_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A05BT300BS42_a1_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp2_llama3.1-1b-A05BT300BS42-a1-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A05BT300BS42_a1_s43
+  - id: eval_base_acc_exp2_llama3.1_1b_A05BT300BS42_a1_s43
+    run: bash train/eval-base/eval_base_acc.sh exp2_llama3.1-1b-A05BT300BS42-a1-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A05BT300BS42_a1_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A1BT10BS42_a02_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp2_llama3.1-1b-A1BT10BS42-a02-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A1BT10BS42_a02_s43
+  - id: eval_base_acc_exp2_llama3.1_1b_A1BT10BS42_a02_s43
+    run: bash train/eval-base/eval_base_acc.sh exp2_llama3.1-1b-A1BT10BS42-a02-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A1BT10BS42_a02_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A1BT10BS42_a04_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp2_llama3.1-1b-A1BT10BS42-a04-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A1BT10BS42_a04_s43
+  - id: eval_base_acc_exp2_llama3.1_1b_A1BT10BS42_a04_s43
+    run: bash train/eval-base/eval_base_acc.sh exp2_llama3.1-1b-A1BT10BS42-a04-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A1BT10BS42_a04_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A1BT10BS42_a05_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp2_llama3.1-1b-A1BT10BS42-a05-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A1BT10BS42_a05_s43
+  - id: eval_base_acc_exp2_llama3.1_1b_A1BT10BS42_a05_s43
+    run: bash train/eval-base/eval_base_acc.sh exp2_llama3.1-1b-A1BT10BS42-a05-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A1BT10BS42_a05_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A1BT10BS42_a06_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp2_llama3.1-1b-A1BT10BS42-a06-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A1BT10BS42_a06_s43
+  - id: eval_base_acc_exp2_llama3.1_1b_A1BT10BS42_a06_s43
+    run: bash train/eval-base/eval_base_acc.sh exp2_llama3.1-1b-A1BT10BS42-a06-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A1BT10BS42_a06_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A1BT10BS42_a08_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp2_llama3.1-1b-A1BT10BS42-a08-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A1BT10BS42_a08_s43
+  - id: eval_base_acc_exp2_llama3.1_1b_A1BT10BS42_a08_s43
+    run: bash train/eval-base/eval_base_acc.sh exp2_llama3.1-1b-A1BT10BS42-a08-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A1BT10BS42_a08_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A1BT10BS42_a1_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp2_llama3.1-1b-A1BT10BS42-a1-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A1BT10BS42_a1_s43
+  - id: eval_base_acc_exp2_llama3.1_1b_A1BT10BS42_a1_s43
+    run: bash train/eval-base/eval_base_acc.sh exp2_llama3.1-1b-A1BT10BS42-a1-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A1BT10BS42_a1_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A1BT30BS42_a02_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp2_llama3.1-1b-A1BT30BS42-a02-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A1BT30BS42_a02_s43
+  - id: eval_base_acc_exp2_llama3.1_1b_A1BT30BS42_a02_s43
+    run: bash train/eval-base/eval_base_acc.sh exp2_llama3.1-1b-A1BT30BS42-a02-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A1BT30BS42_a02_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A1BT30BS42_a04_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp2_llama3.1-1b-A1BT30BS42-a04-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A1BT30BS42_a04_s43
+  - id: eval_base_acc_exp2_llama3.1_1b_A1BT30BS42_a04_s43
+    run: bash train/eval-base/eval_base_acc.sh exp2_llama3.1-1b-A1BT30BS42-a04-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A1BT30BS42_a04_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A1BT30BS42_a05_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp2_llama3.1-1b-A1BT30BS42-a05-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A1BT30BS42_a05_s43
+  - id: eval_base_acc_exp2_llama3.1_1b_A1BT30BS42_a05_s43
+    run: bash train/eval-base/eval_base_acc.sh exp2_llama3.1-1b-A1BT30BS42-a05-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A1BT30BS42_a05_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A1BT30BS42_a06_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp2_llama3.1-1b-A1BT30BS42-a06-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A1BT30BS42_a06_s43
+  - id: eval_base_acc_exp2_llama3.1_1b_A1BT30BS42_a06_s43
+    run: bash train/eval-base/eval_base_acc.sh exp2_llama3.1-1b-A1BT30BS42-a06-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A1BT30BS42_a06_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A1BT30BS42_a08_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp2_llama3.1-1b-A1BT30BS42-a08-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A1BT30BS42_a08_s43
+  - id: eval_base_acc_exp2_llama3.1_1b_A1BT30BS42_a08_s43
+    run: bash train/eval-base/eval_base_acc.sh exp2_llama3.1-1b-A1BT30BS42-a08-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A1BT30BS42_a08_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A1BT30BS42_a1_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp2_llama3.1-1b-A1BT30BS42-a1-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A1BT30BS42_a1_s43
+  - id: eval_base_acc_exp2_llama3.1_1b_A1BT30BS42_a1_s43
+    run: bash train/eval-base/eval_base_acc.sh exp2_llama3.1-1b-A1BT30BS42-a1-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A1BT30BS42_a1_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A1BT50BS42_a02_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp2_llama3.1-1b-A1BT50BS42-a02-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A1BT50BS42_a02_s43
+  - id: eval_base_acc_exp2_llama3.1_1b_A1BT50BS42_a02_s43
+    run: bash train/eval-base/eval_base_acc.sh exp2_llama3.1-1b-A1BT50BS42-a02-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A1BT50BS42_a02_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A1BT50BS42_a04_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp2_llama3.1-1b-A1BT50BS42-a04-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A1BT50BS42_a04_s43
+  - id: eval_base_acc_exp2_llama3.1_1b_A1BT50BS42_a04_s43
+    run: bash train/eval-base/eval_base_acc.sh exp2_llama3.1-1b-A1BT50BS42-a04-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A1BT50BS42_a04_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A1BT50BS42_a05_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp2_llama3.1-1b-A1BT50BS42-a05-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A1BT50BS42_a05_s43
+  - id: eval_base_acc_exp2_llama3.1_1b_A1BT50BS42_a05_s43
+    run: bash train/eval-base/eval_base_acc.sh exp2_llama3.1-1b-A1BT50BS42-a05-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A1BT50BS42_a05_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A1BT50BS42_a06_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp2_llama3.1-1b-A1BT50BS42-a06-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A1BT50BS42_a06_s43
+  - id: eval_base_acc_exp2_llama3.1_1b_A1BT50BS42_a06_s43
+    run: bash train/eval-base/eval_base_acc.sh exp2_llama3.1-1b-A1BT50BS42-a06-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A1BT50BS42_a06_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A1BT50BS42_a08_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp2_llama3.1-1b-A1BT50BS42-a08-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A1BT50BS42_a08_s43
+  - id: eval_base_acc_exp2_llama3.1_1b_A1BT50BS42_a08_s43
+    run: bash train/eval-base/eval_base_acc.sh exp2_llama3.1-1b-A1BT50BS42-a08-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A1BT50BS42_a08_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A1BT50BS42_a1_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp2_llama3.1-1b-A1BT50BS42-a1-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A1BT50BS42_a1_s43
+  - id: eval_base_acc_exp2_llama3.1_1b_A1BT50BS42_a1_s43
+    run: bash train/eval-base/eval_base_acc.sh exp2_llama3.1-1b-A1BT50BS42-a1-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A1BT50BS42_a1_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A1BT80BS42_a02_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp2_llama3.1-1b-A1BT80BS42-a02-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A1BT80BS42_a02_s43
+  - id: eval_base_acc_exp2_llama3.1_1b_A1BT80BS42_a02_s43
+    run: bash train/eval-base/eval_base_acc.sh exp2_llama3.1-1b-A1BT80BS42-a02-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A1BT80BS42_a02_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A1BT80BS42_a04_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp2_llama3.1-1b-A1BT80BS42-a04-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A1BT80BS42_a04_s43
+  - id: eval_base_acc_exp2_llama3.1_1b_A1BT80BS42_a04_s43
+    run: bash train/eval-base/eval_base_acc.sh exp2_llama3.1-1b-A1BT80BS42-a04-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A1BT80BS42_a04_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A1BT80BS42_a05_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp2_llama3.1-1b-A1BT80BS42-a05-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A1BT80BS42_a05_s43
+  - id: eval_base_acc_exp2_llama3.1_1b_A1BT80BS42_a05_s43
+    run: bash train/eval-base/eval_base_acc.sh exp2_llama3.1-1b-A1BT80BS42-a05-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A1BT80BS42_a05_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A1BT80BS42_a06_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp2_llama3.1-1b-A1BT80BS42-a06-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A1BT80BS42_a06_s43
+  - id: eval_base_acc_exp2_llama3.1_1b_A1BT80BS42_a06_s43
+    run: bash train/eval-base/eval_base_acc.sh exp2_llama3.1-1b-A1BT80BS42-a06-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A1BT80BS42_a06_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A1BT80BS42_a08_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp2_llama3.1-1b-A1BT80BS42-a08-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A1BT80BS42_a08_s43
+  - id: eval_base_acc_exp2_llama3.1_1b_A1BT80BS42_a08_s43
+    run: bash train/eval-base/eval_base_acc.sh exp2_llama3.1-1b-A1BT80BS42-a08-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A1BT80BS42_a08_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A1BT80BS42_a1_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp2_llama3.1-1b-A1BT80BS42-a1-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A1BT80BS42_a1_s43
+  - id: eval_base_acc_exp2_llama3.1_1b_A1BT80BS42_a1_s43
+    run: bash train/eval-base/eval_base_acc.sh exp2_llama3.1-1b-A1BT80BS42-a1-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A1BT80BS42_a1_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A1BT100BS42_a02_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp2_llama3.1-1b-A1BT100BS42-a02-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A1BT100BS42_a02_s43
+  - id: eval_base_acc_exp2_llama3.1_1b_A1BT100BS42_a02_s43
+    run: bash train/eval-base/eval_base_acc.sh exp2_llama3.1-1b-A1BT100BS42-a02-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A1BT100BS42_a02_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A1BT100BS42_a04_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp2_llama3.1-1b-A1BT100BS42-a04-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A1BT100BS42_a04_s43
+  - id: eval_base_acc_exp2_llama3.1_1b_A1BT100BS42_a04_s43
+    run: bash train/eval-base/eval_base_acc.sh exp2_llama3.1-1b-A1BT100BS42-a04-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A1BT100BS42_a04_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A1BT100BS42_a05_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp2_llama3.1-1b-A1BT100BS42-a05-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A1BT100BS42_a05_s43
+  - id: eval_base_acc_exp2_llama3.1_1b_A1BT100BS42_a05_s43
+    run: bash train/eval-base/eval_base_acc.sh exp2_llama3.1-1b-A1BT100BS42-a05-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A1BT100BS42_a05_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A1BT100BS42_a06_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp2_llama3.1-1b-A1BT100BS42-a06-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A1BT100BS42_a06_s43
+  - id: eval_base_acc_exp2_llama3.1_1b_A1BT100BS42_a06_s43
+    run: bash train/eval-base/eval_base_acc.sh exp2_llama3.1-1b-A1BT100BS42-a06-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A1BT100BS42_a06_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A1BT100BS42_a08_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp2_llama3.1-1b-A1BT100BS42-a08-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A1BT100BS42_a08_s43
+  - id: eval_base_acc_exp2_llama3.1_1b_A1BT100BS42_a08_s43
+    run: bash train/eval-base/eval_base_acc.sh exp2_llama3.1-1b-A1BT100BS42-a08-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A1BT100BS42_a08_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A1BT100BS42_a1_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp2_llama3.1-1b-A1BT100BS42-a1-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A1BT100BS42_a1_s43
+  - id: eval_base_acc_exp2_llama3.1_1b_A1BT100BS42_a1_s43
+    run: bash train/eval-base/eval_base_acc.sh exp2_llama3.1-1b-A1BT100BS42-a1-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A1BT100BS42_a1_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A1BT300BS42_a02_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp2_llama3.1-1b-A1BT300BS42-a02-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A1BT300BS42_a02_s43
+  - id: eval_base_acc_exp2_llama3.1_1b_A1BT300BS42_a02_s43
+    run: bash train/eval-base/eval_base_acc.sh exp2_llama3.1-1b-A1BT300BS42-a02-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A1BT300BS42_a02_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A1BT300BS42_a04_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp2_llama3.1-1b-A1BT300BS42-a04-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A1BT300BS42_a04_s43
+  - id: eval_base_acc_exp2_llama3.1_1b_A1BT300BS42_a04_s43
+    run: bash train/eval-base/eval_base_acc.sh exp2_llama3.1-1b-A1BT300BS42-a04-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A1BT300BS42_a04_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A1BT300BS42_a05_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp2_llama3.1-1b-A1BT300BS42-a05-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A1BT300BS42_a05_s43
+  - id: eval_base_acc_exp2_llama3.1_1b_A1BT300BS42_a05_s43
+    run: bash train/eval-base/eval_base_acc.sh exp2_llama3.1-1b-A1BT300BS42-a05-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A1BT300BS42_a05_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A1BT300BS42_a06_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp2_llama3.1-1b-A1BT300BS42-a06-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A1BT300BS42_a06_s43
+  - id: eval_base_acc_exp2_llama3.1_1b_A1BT300BS42_a06_s43
+    run: bash train/eval-base/eval_base_acc.sh exp2_llama3.1-1b-A1BT300BS42-a06-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A1BT300BS42_a06_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A1BT300BS42_a08_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp2_llama3.1-1b-A1BT300BS42-a08-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A1BT300BS42_a08_s43
+  - id: eval_base_acc_exp2_llama3.1_1b_A1BT300BS42_a08_s43
+    run: bash train/eval-base/eval_base_acc.sh exp2_llama3.1-1b-A1BT300BS42-a08-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A1BT300BS42_a08_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A1BT300BS42_a1_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp2_llama3.1-1b-A1BT300BS42-a1-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A1BT300BS42_a1_s43
+  - id: eval_base_acc_exp2_llama3.1_1b_A1BT300BS42_a1_s43
+    run: bash train/eval-base/eval_base_acc.sh exp2_llama3.1-1b-A1BT300BS42-a1-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A1BT300BS42_a1_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A3BT10BS42_a02_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp2_llama3.1-1b-A3BT10BS42-a02-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A3BT10BS42_a02_s43
+  - id: eval_base_acc_exp2_llama3.1_1b_A3BT10BS42_a02_s43
+    run: bash train/eval-base/eval_base_acc.sh exp2_llama3.1-1b-A3BT10BS42-a02-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A3BT10BS42_a02_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A3BT10BS42_a04_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp2_llama3.1-1b-A3BT10BS42-a04-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A3BT10BS42_a04_s43
+  - id: eval_base_acc_exp2_llama3.1_1b_A3BT10BS42_a04_s43
+    run: bash train/eval-base/eval_base_acc.sh exp2_llama3.1-1b-A3BT10BS42-a04-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A3BT10BS42_a04_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A3BT10BS42_a05_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp2_llama3.1-1b-A3BT10BS42-a05-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A3BT10BS42_a05_s43
+  - id: eval_base_acc_exp2_llama3.1_1b_A3BT10BS42_a05_s43
+    run: bash train/eval-base/eval_base_acc.sh exp2_llama3.1-1b-A3BT10BS42-a05-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A3BT10BS42_a05_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A3BT10BS42_a06_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp2_llama3.1-1b-A3BT10BS42-a06-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A3BT10BS42_a06_s43
+  - id: eval_base_acc_exp2_llama3.1_1b_A3BT10BS42_a06_s43
+    run: bash train/eval-base/eval_base_acc.sh exp2_llama3.1-1b-A3BT10BS42-a06-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A3BT10BS42_a06_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A3BT10BS42_a08_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp2_llama3.1-1b-A3BT10BS42-a08-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A3BT10BS42_a08_s43
+  - id: eval_base_acc_exp2_llama3.1_1b_A3BT10BS42_a08_s43
+    run: bash train/eval-base/eval_base_acc.sh exp2_llama3.1-1b-A3BT10BS42-a08-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A3BT10BS42_a08_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A3BT10BS42_a1_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp2_llama3.1-1b-A3BT10BS42-a1-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A3BT10BS42_a1_s43
+  - id: eval_base_acc_exp2_llama3.1_1b_A3BT10BS42_a1_s43
+    run: bash train/eval-base/eval_base_acc.sh exp2_llama3.1-1b-A3BT10BS42-a1-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A3BT10BS42_a1_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A3BT30BS42_a02_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp2_llama3.1-1b-A3BT30BS42-a02-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A3BT30BS42_a02_s43
+  - id: eval_base_acc_exp2_llama3.1_1b_A3BT30BS42_a02_s43
+    run: bash train/eval-base/eval_base_acc.sh exp2_llama3.1-1b-A3BT30BS42-a02-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A3BT30BS42_a02_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A3BT30BS42_a04_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp2_llama3.1-1b-A3BT30BS42-a04-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A3BT30BS42_a04_s43
+  - id: eval_base_acc_exp2_llama3.1_1b_A3BT30BS42_a04_s43
+    run: bash train/eval-base/eval_base_acc.sh exp2_llama3.1-1b-A3BT30BS42-a04-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A3BT30BS42_a04_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A3BT30BS42_a05_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp2_llama3.1-1b-A3BT30BS42-a05-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A3BT30BS42_a05_s43
+  - id: eval_base_acc_exp2_llama3.1_1b_A3BT30BS42_a05_s43
+    run: bash train/eval-base/eval_base_acc.sh exp2_llama3.1-1b-A3BT30BS42-a05-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A3BT30BS42_a05_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A3BT30BS42_a06_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp2_llama3.1-1b-A3BT30BS42-a06-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A3BT30BS42_a06_s43
+  - id: eval_base_acc_exp2_llama3.1_1b_A3BT30BS42_a06_s43
+    run: bash train/eval-base/eval_base_acc.sh exp2_llama3.1-1b-A3BT30BS42-a06-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A3BT30BS42_a06_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A3BT30BS42_a08_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp2_llama3.1-1b-A3BT30BS42-a08-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A3BT30BS42_a08_s43
+  - id: eval_base_acc_exp2_llama3.1_1b_A3BT30BS42_a08_s43
+    run: bash train/eval-base/eval_base_acc.sh exp2_llama3.1-1b-A3BT30BS42-a08-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A3BT30BS42_a08_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A3BT30BS42_a1_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp2_llama3.1-1b-A3BT30BS42-a1-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A3BT30BS42_a1_s43
+  - id: eval_base_acc_exp2_llama3.1_1b_A3BT30BS42_a1_s43
+    run: bash train/eval-base/eval_base_acc.sh exp2_llama3.1-1b-A3BT30BS42-a1-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A3BT30BS42_a1_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A3BT50BS42_a02_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp2_llama3.1-1b-A3BT50BS42-a02-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A3BT50BS42_a02_s43
+  - id: eval_base_acc_exp2_llama3.1_1b_A3BT50BS42_a02_s43
+    run: bash train/eval-base/eval_base_acc.sh exp2_llama3.1-1b-A3BT50BS42-a02-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A3BT50BS42_a02_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A3BT50BS42_a04_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp2_llama3.1-1b-A3BT50BS42-a04-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A3BT50BS42_a04_s43
+  - id: eval_base_acc_exp2_llama3.1_1b_A3BT50BS42_a04_s43
+    run: bash train/eval-base/eval_base_acc.sh exp2_llama3.1-1b-A3BT50BS42-a04-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A3BT50BS42_a04_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A3BT50BS42_a05_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp2_llama3.1-1b-A3BT50BS42-a05-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A3BT50BS42_a05_s43
+  - id: eval_base_acc_exp2_llama3.1_1b_A3BT50BS42_a05_s43
+    run: bash train/eval-base/eval_base_acc.sh exp2_llama3.1-1b-A3BT50BS42-a05-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A3BT50BS42_a05_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A3BT50BS42_a06_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp2_llama3.1-1b-A3BT50BS42-a06-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A3BT50BS42_a06_s43
+  - id: eval_base_acc_exp2_llama3.1_1b_A3BT50BS42_a06_s43
+    run: bash train/eval-base/eval_base_acc.sh exp2_llama3.1-1b-A3BT50BS42-a06-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A3BT50BS42_a06_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A3BT50BS42_a08_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp2_llama3.1-1b-A3BT50BS42-a08-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A3BT50BS42_a08_s43
+  - id: eval_base_acc_exp2_llama3.1_1b_A3BT50BS42_a08_s43
+    run: bash train/eval-base/eval_base_acc.sh exp2_llama3.1-1b-A3BT50BS42-a08-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A3BT50BS42_a08_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A3BT50BS42_a1_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp2_llama3.1-1b-A3BT50BS42-a1-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A3BT50BS42_a1_s43
+  - id: eval_base_acc_exp2_llama3.1_1b_A3BT50BS42_a1_s43
+    run: bash train/eval-base/eval_base_acc.sh exp2_llama3.1-1b-A3BT50BS42-a1-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A3BT50BS42_a1_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A3BT80BS42_a02_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp2_llama3.1-1b-A3BT80BS42-a02-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A3BT80BS42_a02_s43
+  - id: eval_base_acc_exp2_llama3.1_1b_A3BT80BS42_a02_s43
+    run: bash train/eval-base/eval_base_acc.sh exp2_llama3.1-1b-A3BT80BS42-a02-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A3BT80BS42_a02_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A3BT80BS42_a04_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp2_llama3.1-1b-A3BT80BS42-a04-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A3BT80BS42_a04_s43
+  - id: eval_base_acc_exp2_llama3.1_1b_A3BT80BS42_a04_s43
+    run: bash train/eval-base/eval_base_acc.sh exp2_llama3.1-1b-A3BT80BS42-a04-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A3BT80BS42_a04_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A3BT80BS42_a05_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp2_llama3.1-1b-A3BT80BS42-a05-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A3BT80BS42_a05_s43
+  - id: eval_base_acc_exp2_llama3.1_1b_A3BT80BS42_a05_s43
+    run: bash train/eval-base/eval_base_acc.sh exp2_llama3.1-1b-A3BT80BS42-a05-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A3BT80BS42_a05_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A3BT80BS42_a06_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp2_llama3.1-1b-A3BT80BS42-a06-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A3BT80BS42_a06_s43
+  - id: eval_base_acc_exp2_llama3.1_1b_A3BT80BS42_a06_s43
+    run: bash train/eval-base/eval_base_acc.sh exp2_llama3.1-1b-A3BT80BS42-a06-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A3BT80BS42_a06_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A3BT80BS42_a08_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp2_llama3.1-1b-A3BT80BS42-a08-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A3BT80BS42_a08_s43
+  - id: eval_base_acc_exp2_llama3.1_1b_A3BT80BS42_a08_s43
+    run: bash train/eval-base/eval_base_acc.sh exp2_llama3.1-1b-A3BT80BS42-a08-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A3BT80BS42_a08_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A3BT80BS42_a1_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp2_llama3.1-1b-A3BT80BS42-a1-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A3BT80BS42_a1_s43
+  - id: eval_base_acc_exp2_llama3.1_1b_A3BT80BS42_a1_s43
+    run: bash train/eval-base/eval_base_acc.sh exp2_llama3.1-1b-A3BT80BS42-a1-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A3BT80BS42_a1_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A3BT100BS42_a02_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp2_llama3.1-1b-A3BT100BS42-a02-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A3BT100BS42_a02_s43
+  - id: eval_base_acc_exp2_llama3.1_1b_A3BT100BS42_a02_s43
+    run: bash train/eval-base/eval_base_acc.sh exp2_llama3.1-1b-A3BT100BS42-a02-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A3BT100BS42_a02_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A3BT100BS42_a04_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp2_llama3.1-1b-A3BT100BS42-a04-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A3BT100BS42_a04_s43
+  - id: eval_base_acc_exp2_llama3.1_1b_A3BT100BS42_a04_s43
+    run: bash train/eval-base/eval_base_acc.sh exp2_llama3.1-1b-A3BT100BS42-a04-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A3BT100BS42_a04_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A3BT100BS42_a05_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp2_llama3.1-1b-A3BT100BS42-a05-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A3BT100BS42_a05_s43
+  - id: eval_base_acc_exp2_llama3.1_1b_A3BT100BS42_a05_s43
+    run: bash train/eval-base/eval_base_acc.sh exp2_llama3.1-1b-A3BT100BS42-a05-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A3BT100BS42_a05_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A3BT100BS42_a06_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp2_llama3.1-1b-A3BT100BS42-a06-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A3BT100BS42_a06_s43
+  - id: eval_base_acc_exp2_llama3.1_1b_A3BT100BS42_a06_s43
+    run: bash train/eval-base/eval_base_acc.sh exp2_llama3.1-1b-A3BT100BS42-a06-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A3BT100BS42_a06_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A3BT100BS42_a08_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp2_llama3.1-1b-A3BT100BS42-a08-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A3BT100BS42_a08_s43
+  - id: eval_base_acc_exp2_llama3.1_1b_A3BT100BS42_a08_s43
+    run: bash train/eval-base/eval_base_acc.sh exp2_llama3.1-1b-A3BT100BS42-a08-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A3BT100BS42_a08_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A3BT100BS42_a1_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp2_llama3.1-1b-A3BT100BS42-a1-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A3BT100BS42_a1_s43
+  - id: eval_base_acc_exp2_llama3.1_1b_A3BT100BS42_a1_s43
+    run: bash train/eval-base/eval_base_acc.sh exp2_llama3.1-1b-A3BT100BS42-a1-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A3BT100BS42_a1_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A3BT300BS42_a02_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp2_llama3.1-1b-A3BT300BS42-a02-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A3BT300BS42_a02_s43
+  - id: eval_base_acc_exp2_llama3.1_1b_A3BT300BS42_a02_s43
+    run: bash train/eval-base/eval_base_acc.sh exp2_llama3.1-1b-A3BT300BS42-a02-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A3BT300BS42_a02_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A3BT300BS42_a04_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp2_llama3.1-1b-A3BT300BS42-a04-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A3BT300BS42_a04_s43
+  - id: eval_base_acc_exp2_llama3.1_1b_A3BT300BS42_a04_s43
+    run: bash train/eval-base/eval_base_acc.sh exp2_llama3.1-1b-A3BT300BS42-a04-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A3BT300BS42_a04_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A3BT300BS42_a05_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp2_llama3.1-1b-A3BT300BS42-a05-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A3BT300BS42_a05_s43
+  - id: eval_base_acc_exp2_llama3.1_1b_A3BT300BS42_a05_s43
+    run: bash train/eval-base/eval_base_acc.sh exp2_llama3.1-1b-A3BT300BS42-a05-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A3BT300BS42_a05_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A3BT300BS42_a06_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp2_llama3.1-1b-A3BT300BS42-a06-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A3BT300BS42_a06_s43
+  - id: eval_base_acc_exp2_llama3.1_1b_A3BT300BS42_a06_s43
+    run: bash train/eval-base/eval_base_acc.sh exp2_llama3.1-1b-A3BT300BS42-a06-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A3BT300BS42_a06_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A3BT300BS42_a08_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp2_llama3.1-1b-A3BT300BS42-a08-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A3BT300BS42_a08_s43
+  - id: eval_base_acc_exp2_llama3.1_1b_A3BT300BS42_a08_s43
+    run: bash train/eval-base/eval_base_acc.sh exp2_llama3.1-1b-A3BT300BS42-a08-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A3BT300BS42_a08_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A3BT300BS42_a1_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp2_llama3.1-1b-A3BT300BS42-a1-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A3BT300BS42_a1_s43
+  - id: eval_base_acc_exp2_llama3.1_1b_A3BT300BS42_a1_s43
+    run: bash train/eval-base/eval_base_acc.sh exp2_llama3.1-1b-A3BT300BS42-a1-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A3BT300BS42_a1_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A8BT10BS42_a02_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp2_llama3.1-1b-A8BT10BS42-a02-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A8BT10BS42_a02_s43
+  - id: eval_base_acc_exp2_llama3.1_1b_A8BT10BS42_a02_s43
+    run: bash train/eval-base/eval_base_acc.sh exp2_llama3.1-1b-A8BT10BS42-a02-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A8BT10BS42_a02_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A8BT10BS42_a04_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp2_llama3.1-1b-A8BT10BS42-a04-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A8BT10BS42_a04_s43
+  - id: eval_base_acc_exp2_llama3.1_1b_A8BT10BS42_a04_s43
+    run: bash train/eval-base/eval_base_acc.sh exp2_llama3.1-1b-A8BT10BS42-a04-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A8BT10BS42_a04_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A8BT10BS42_a05_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp2_llama3.1-1b-A8BT10BS42-a05-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A8BT10BS42_a05_s43
+  - id: eval_base_acc_exp2_llama3.1_1b_A8BT10BS42_a05_s43
+    run: bash train/eval-base/eval_base_acc.sh exp2_llama3.1-1b-A8BT10BS42-a05-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A8BT10BS42_a05_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A8BT10BS42_a06_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp2_llama3.1-1b-A8BT10BS42-a06-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A8BT10BS42_a06_s43
+  - id: eval_base_acc_exp2_llama3.1_1b_A8BT10BS42_a06_s43
+    run: bash train/eval-base/eval_base_acc.sh exp2_llama3.1-1b-A8BT10BS42-a06-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A8BT10BS42_a06_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A8BT10BS42_a08_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp2_llama3.1-1b-A8BT10BS42-a08-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A8BT10BS42_a08_s43
+  - id: eval_base_acc_exp2_llama3.1_1b_A8BT10BS42_a08_s43
+    run: bash train/eval-base/eval_base_acc.sh exp2_llama3.1-1b-A8BT10BS42-a08-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A8BT10BS42_a08_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A8BT10BS42_a1_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp2_llama3.1-1b-A8BT10BS42-a1-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A8BT10BS42_a1_s43
+  - id: eval_base_acc_exp2_llama3.1_1b_A8BT10BS42_a1_s43
+    run: bash train/eval-base/eval_base_acc.sh exp2_llama3.1-1b-A8BT10BS42-a1-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A8BT10BS42_a1_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A8BT30BS42_a02_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp2_llama3.1-1b-A8BT30BS42-a02-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A8BT30BS42_a02_s43
+  - id: eval_base_acc_exp2_llama3.1_1b_A8BT30BS42_a02_s43
+    run: bash train/eval-base/eval_base_acc.sh exp2_llama3.1-1b-A8BT30BS42-a02-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A8BT30BS42_a02_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A8BT30BS42_a04_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp2_llama3.1-1b-A8BT30BS42-a04-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A8BT30BS42_a04_s43
+  - id: eval_base_acc_exp2_llama3.1_1b_A8BT30BS42_a04_s43
+    run: bash train/eval-base/eval_base_acc.sh exp2_llama3.1-1b-A8BT30BS42-a04-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A8BT30BS42_a04_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A8BT30BS42_a05_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp2_llama3.1-1b-A8BT30BS42-a05-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A8BT30BS42_a05_s43
+  - id: eval_base_acc_exp2_llama3.1_1b_A8BT30BS42_a05_s43
+    run: bash train/eval-base/eval_base_acc.sh exp2_llama3.1-1b-A8BT30BS42-a05-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A8BT30BS42_a05_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A8BT30BS42_a06_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp2_llama3.1-1b-A8BT30BS42-a06-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A8BT30BS42_a06_s43
+  - id: eval_base_acc_exp2_llama3.1_1b_A8BT30BS42_a06_s43
+    run: bash train/eval-base/eval_base_acc.sh exp2_llama3.1-1b-A8BT30BS42-a06-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A8BT30BS42_a06_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A8BT30BS42_a08_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp2_llama3.1-1b-A8BT30BS42-a08-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A8BT30BS42_a08_s43
+  - id: eval_base_acc_exp2_llama3.1_1b_A8BT30BS42_a08_s43
+    run: bash train/eval-base/eval_base_acc.sh exp2_llama3.1-1b-A8BT30BS42-a08-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A8BT30BS42_a08_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A8BT30BS42_a1_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp2_llama3.1-1b-A8BT30BS42-a1-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A8BT30BS42_a1_s43
+  - id: eval_base_acc_exp2_llama3.1_1b_A8BT30BS42_a1_s43
+    run: bash train/eval-base/eval_base_acc.sh exp2_llama3.1-1b-A8BT30BS42-a1-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A8BT30BS42_a1_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A8BT50BS42_a02_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp2_llama3.1-1b-A8BT50BS42-a02-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A8BT50BS42_a02_s43
+  - id: eval_base_acc_exp2_llama3.1_1b_A8BT50BS42_a02_s43
+    run: bash train/eval-base/eval_base_acc.sh exp2_llama3.1-1b-A8BT50BS42-a02-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A8BT50BS42_a02_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A8BT50BS42_a04_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp2_llama3.1-1b-A8BT50BS42-a04-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A8BT50BS42_a04_s43
+  - id: eval_base_acc_exp2_llama3.1_1b_A8BT50BS42_a04_s43
+    run: bash train/eval-base/eval_base_acc.sh exp2_llama3.1-1b-A8BT50BS42-a04-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A8BT50BS42_a04_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A8BT50BS42_a05_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp2_llama3.1-1b-A8BT50BS42-a05-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A8BT50BS42_a05_s43
+  - id: eval_base_acc_exp2_llama3.1_1b_A8BT50BS42_a05_s43
+    run: bash train/eval-base/eval_base_acc.sh exp2_llama3.1-1b-A8BT50BS42-a05-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A8BT50BS42_a05_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A8BT50BS42_a06_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp2_llama3.1-1b-A8BT50BS42-a06-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A8BT50BS42_a06_s43
+  - id: eval_base_acc_exp2_llama3.1_1b_A8BT50BS42_a06_s43
+    run: bash train/eval-base/eval_base_acc.sh exp2_llama3.1-1b-A8BT50BS42-a06-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A8BT50BS42_a06_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A8BT50BS42_a08_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp2_llama3.1-1b-A8BT50BS42-a08-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A8BT50BS42_a08_s43
+  - id: eval_base_acc_exp2_llama3.1_1b_A8BT50BS42_a08_s43
+    run: bash train/eval-base/eval_base_acc.sh exp2_llama3.1-1b-A8BT50BS42-a08-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A8BT50BS42_a08_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A8BT50BS42_a1_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp2_llama3.1-1b-A8BT50BS42-a1-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A8BT50BS42_a1_s43
+  - id: eval_base_acc_exp2_llama3.1_1b_A8BT50BS42_a1_s43
+    run: bash train/eval-base/eval_base_acc.sh exp2_llama3.1-1b-A8BT50BS42-a1-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A8BT50BS42_a1_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A8BT80BS42_a02_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp2_llama3.1-1b-A8BT80BS42-a02-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A8BT80BS42_a02_s43
+  - id: eval_base_acc_exp2_llama3.1_1b_A8BT80BS42_a02_s43
+    run: bash train/eval-base/eval_base_acc.sh exp2_llama3.1-1b-A8BT80BS42-a02-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A8BT80BS42_a02_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A8BT80BS42_a04_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp2_llama3.1-1b-A8BT80BS42-a04-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A8BT80BS42_a04_s43
+  - id: eval_base_acc_exp2_llama3.1_1b_A8BT80BS42_a04_s43
+    run: bash train/eval-base/eval_base_acc.sh exp2_llama3.1-1b-A8BT80BS42-a04-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A8BT80BS42_a04_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A8BT80BS42_a05_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp2_llama3.1-1b-A8BT80BS42-a05-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A8BT80BS42_a05_s43
+  - id: eval_base_acc_exp2_llama3.1_1b_A8BT80BS42_a05_s43
+    run: bash train/eval-base/eval_base_acc.sh exp2_llama3.1-1b-A8BT80BS42-a05-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A8BT80BS42_a05_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A8BT80BS42_a06_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp2_llama3.1-1b-A8BT80BS42-a06-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A8BT80BS42_a06_s43
+  - id: eval_base_acc_exp2_llama3.1_1b_A8BT80BS42_a06_s43
+    run: bash train/eval-base/eval_base_acc.sh exp2_llama3.1-1b-A8BT80BS42-a06-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A8BT80BS42_a06_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A8BT80BS42_a08_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp2_llama3.1-1b-A8BT80BS42-a08-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A8BT80BS42_a08_s43
+  - id: eval_base_acc_exp2_llama3.1_1b_A8BT80BS42_a08_s43
+    run: bash train/eval-base/eval_base_acc.sh exp2_llama3.1-1b-A8BT80BS42-a08-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A8BT80BS42_a08_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A8BT80BS42_a1_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp2_llama3.1-1b-A8BT80BS42-a1-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A8BT80BS42_a1_s43
+  - id: eval_base_acc_exp2_llama3.1_1b_A8BT80BS42_a1_s43
+    run: bash train/eval-base/eval_base_acc.sh exp2_llama3.1-1b-A8BT80BS42-a1-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A8BT80BS42_a1_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A8BT100BS42_a02_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp2_llama3.1-1b-A8BT100BS42-a02-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A8BT100BS42_a02_s43
+  - id: eval_base_acc_exp2_llama3.1_1b_A8BT100BS42_a02_s43
+    run: bash train/eval-base/eval_base_acc.sh exp2_llama3.1-1b-A8BT100BS42-a02-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A8BT100BS42_a02_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A8BT100BS42_a04_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp2_llama3.1-1b-A8BT100BS42-a04-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A8BT100BS42_a04_s43
+  - id: eval_base_acc_exp2_llama3.1_1b_A8BT100BS42_a04_s43
+    run: bash train/eval-base/eval_base_acc.sh exp2_llama3.1-1b-A8BT100BS42-a04-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A8BT100BS42_a04_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A8BT100BS42_a05_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp2_llama3.1-1b-A8BT100BS42-a05-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A8BT100BS42_a05_s43
+  - id: eval_base_acc_exp2_llama3.1_1b_A8BT100BS42_a05_s43
+    run: bash train/eval-base/eval_base_acc.sh exp2_llama3.1-1b-A8BT100BS42-a05-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A8BT100BS42_a05_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A8BT100BS42_a06_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp2_llama3.1-1b-A8BT100BS42-a06-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A8BT100BS42_a06_s43
+  - id: eval_base_acc_exp2_llama3.1_1b_A8BT100BS42_a06_s43
+    run: bash train/eval-base/eval_base_acc.sh exp2_llama3.1-1b-A8BT100BS42-a06-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A8BT100BS42_a06_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A8BT100BS42_a08_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp2_llama3.1-1b-A8BT100BS42-a08-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A8BT100BS42_a08_s43
+  - id: eval_base_acc_exp2_llama3.1_1b_A8BT100BS42_a08_s43
+    run: bash train/eval-base/eval_base_acc.sh exp2_llama3.1-1b-A8BT100BS42-a08-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A8BT100BS42_a08_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A8BT100BS42_a1_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp2_llama3.1-1b-A8BT100BS42-a1-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A8BT100BS42_a1_s43
+  - id: eval_base_acc_exp2_llama3.1_1b_A8BT100BS42_a1_s43
+    run: bash train/eval-base/eval_base_acc.sh exp2_llama3.1-1b-A8BT100BS42-a1-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A8BT100BS42_a1_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A8BT300BS42_a02_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp2_llama3.1-1b-A8BT300BS42-a02-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A8BT300BS42_a02_s43
+  - id: eval_base_acc_exp2_llama3.1_1b_A8BT300BS42_a02_s43
+    run: bash train/eval-base/eval_base_acc.sh exp2_llama3.1-1b-A8BT300BS42-a02-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A8BT300BS42_a02_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A8BT300BS42_a04_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp2_llama3.1-1b-A8BT300BS42-a04-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A8BT300BS42_a04_s43
+  - id: eval_base_acc_exp2_llama3.1_1b_A8BT300BS42_a04_s43
+    run: bash train/eval-base/eval_base_acc.sh exp2_llama3.1-1b-A8BT300BS42-a04-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A8BT300BS42_a04_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A8BT300BS42_a05_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp2_llama3.1-1b-A8BT300BS42-a05-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A8BT300BS42_a05_s43
+  - id: eval_base_acc_exp2_llama3.1_1b_A8BT300BS42_a05_s43
+    run: bash train/eval-base/eval_base_acc.sh exp2_llama3.1-1b-A8BT300BS42-a05-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A8BT300BS42_a05_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A8BT300BS42_a06_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp2_llama3.1-1b-A8BT300BS42-a06-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A8BT300BS42_a06_s43
+  - id: eval_base_acc_exp2_llama3.1_1b_A8BT300BS42_a06_s43
+    run: bash train/eval-base/eval_base_acc.sh exp2_llama3.1-1b-A8BT300BS42-a06-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A8BT300BS42_a06_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A8BT300BS42_a08_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp2_llama3.1-1b-A8BT300BS42-a08-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A8BT300BS42_a08_s43
+  - id: eval_base_acc_exp2_llama3.1_1b_A8BT300BS42_a08_s43
+    run: bash train/eval-base/eval_base_acc.sh exp2_llama3.1-1b-A8BT300BS42-a08-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A8BT300BS42_a08_s43
+  - id: eval_ppl_exp2_llama3.1_1b_A8BT300BS42_a1_s43
+    run: bash train/eval-base/eval_pretrain_ppl.sh exp2_llama3.1-1b-A8BT300BS42-a1-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A8BT300BS42_a1_s43
+  - id: eval_base_acc_exp2_llama3.1_1b_A8BT300BS42_a1_s43
+    run: bash train/eval-base/eval_base_acc.sh exp2_llama3.1-1b-A8BT300BS42-a1-s43 llama3.1-1b 24999 exp2 --resume
+    depends_on: exp2_llama1b_finewebedu_distill_soft_A8BT300BS42_a1_s43
+  - id: eval_ppl_teacher_llama05b_vanilla_5B_s42
+    run: bash train/eval-base/eval_pretrain_ppl.sh llama05b-vanilla-5B-s42 llama3.1-05b 2499 pretrain_param_only_v6 --resume --param_only
+    depends_on: llama05b_finewebedu_teacher_s42_5B
+  - id: eval_base_acc_teacher_llama05b_vanilla_5B_s42
+    run: bash train/eval-base/eval_base_acc.sh llama05b-vanilla-5B-s42 llama3.1-05b 2499 pretrain_param_only_v6 --resume --param_only
+    depends_on: llama05b_finewebedu_teacher_s42_5B
+  - id: eval_ppl_teacher_llama05b_vanilla_10B_s42
+    run: bash train/eval-base/eval_pretrain_ppl.sh llama05b-vanilla-10B-s42 llama3.1-05b 4999 pretrain_param_only_v6 --resume --param_only
+    depends_on: llama05b_finewebedu_teacher_s42_10B
+  - id: eval_base_acc_teacher_llama05b_vanilla_10B_s42
+    run: bash train/eval-base/eval_base_acc.sh llama05b-vanilla-10B-s42 llama3.1-05b 4999 pretrain_param_only_v6 --resume --param_only
+    depends_on: llama05b_finewebedu_teacher_s42_10B
+  - id: eval_ppl_teacher_llama05b_vanilla_30B_s42
+    run: bash train/eval-base/eval_pretrain_ppl.sh llama05b-vanilla-30B-s42 llama3.1-05b 14999 pretrain_param_only_v6 --resume --param_only
+    depends_on: llama05b_finewebedu_teacher_s42_30B
+  - id: eval_base_acc_teacher_llama05b_vanilla_30B_s42
+    run: bash train/eval-base/eval_base_acc.sh llama05b-vanilla-30B-s42 llama3.1-05b 14999 pretrain_param_only_v6 --resume --param_only
+    depends_on: llama05b_finewebedu_teacher_s42_30B
+  - id: eval_ppl_teacher_llama05b_vanilla_50B_s42
+    run: bash train/eval-base/eval_pretrain_ppl.sh llama05b-vanilla-50B-s42 llama3.1-05b 24999 pretrain_param_only_v6 --resume --param_only
+    depends_on: llama05b_finewebedu_teacher_s42_50B
+  - id: eval_base_acc_teacher_llama05b_vanilla_50B_s42
+    run: bash train/eval-base/eval_base_acc.sh llama05b-vanilla-50B-s42 llama3.1-05b 24999 pretrain_param_only_v6 --resume --param_only
+    depends_on: llama05b_finewebedu_teacher_s42_50B
+  - id: eval_ppl_teacher_llama05b_vanilla_80B_s42
+    run: bash train/eval-base/eval_pretrain_ppl.sh llama05b-vanilla-80B-s42 llama3.1-05b 39999 pretrain_param_only_v6 --resume --param_only
+    depends_on: llama05b_finewebedu_teacher_s42_80B
+  - id: eval_base_acc_teacher_llama05b_vanilla_80B_s42
+    run: bash train/eval-base/eval_base_acc.sh llama05b-vanilla-80B-s42 llama3.1-05b 39999 pretrain_param_only_v6 --resume --param_only
+    depends_on: llama05b_finewebedu_teacher_s42_80B
+  - id: eval_ppl_teacher_llama05b_vanilla_100B_s42
+    run: bash train/eval-base/eval_pretrain_ppl.sh llama05b-vanilla-100B-s42 llama3.1-05b 49999 pretrain_param_only_v6 --resume --param_only
+    depends_on: llama05b_finewebedu_teacher_s42_100B
+  - id: eval_base_acc_teacher_llama05b_vanilla_100B_s42
+    run: bash train/eval-base/eval_base_acc.sh llama05b-vanilla-100B-s42 llama3.1-05b 49999 pretrain_param_only_v6 --resume --param_only
+    depends_on: llama05b_finewebedu_teacher_s42_100B
+  - id: eval_ppl_teacher_llama05b_vanilla_300B_s42
+    run: bash train/eval-base/eval_pretrain_ppl.sh llama05b-vanilla-300B-s42 llama3.1-05b 149999 pretrain_param_only_v6 --resume --param_only
+    depends_on: llama05b_finewebedu_teacher_s42_300B
+  - id: eval_base_acc_teacher_llama05b_vanilla_300B_s42
+    run: bash train/eval-base/eval_base_acc.sh llama05b-vanilla-300B-s42 llama3.1-05b 149999 pretrain_param_only_v6 --resume --param_only
+    depends_on: llama05b_finewebedu_teacher_s42_300B
+  - id: eval_ppl_teacher_llama1b_vanilla_5B_s42
+    run: bash train/eval-base/eval_pretrain_ppl.sh llama1b-vanilla-5B-s42 llama3.1-1b 2499 pretrain_param_only_v6 --resume --param_only
+    depends_on: llama1b_finewebedu_teacher_s42_5B
+  - id: eval_base_acc_teacher_llama1b_vanilla_5B_s42
+    run: bash train/eval-base/eval_base_acc.sh llama1b-vanilla-5B-s42 llama3.1-1b 2499 pretrain_param_only_v6 --resume --param_only
+    depends_on: llama1b_finewebedu_teacher_s42_5B
+  - id: eval_ppl_teacher_llama1b_vanilla_10B_s42
+    run: bash train/eval-base/eval_pretrain_ppl.sh llama1b-vanilla-10B-s42 llama3.1-1b 4999 pretrain_param_only_v6 --resume --param_only
+    depends_on: llama1b_finewebedu_teacher_s42_10B
+  - id: eval_base_acc_teacher_llama1b_vanilla_10B_s42
+    run: bash train/eval-base/eval_base_acc.sh llama1b-vanilla-10B-s42 llama3.1-1b 4999 pretrain_param_only_v6 --resume --param_only
+    depends_on: llama1b_finewebedu_teacher_s42_10B
+  - id: eval_ppl_teacher_llama1b_vanilla_30B_s42
+    run: bash train/eval-base/eval_pretrain_ppl.sh llama1b-vanilla-30B-s42 llama3.1-1b 14999 pretrain_param_only_v6 --resume --param_only
+    depends_on: llama1b_finewebedu_teacher_s42_30B
+  - id: eval_base_acc_teacher_llama1b_vanilla_30B_s42
+    run: bash train/eval-base/eval_base_acc.sh llama1b-vanilla-30B-s42 llama3.1-1b 14999 pretrain_param_only_v6 --resume --param_only
+    depends_on: llama1b_finewebedu_teacher_s42_30B
+  - id: eval_ppl_teacher_llama1b_vanilla_50B_s42
+    run: bash train/eval-base/eval_pretrain_ppl.sh llama1b-vanilla-50B-s42 llama3.1-1b 24999 pretrain_param_only_v6 --resume --param_only
+    depends_on: llama1b_finewebedu_teacher_s42_50B
+  - id: eval_base_acc_teacher_llama1b_vanilla_50B_s42
+    run: bash train/eval-base/eval_base_acc.sh llama1b-vanilla-50B-s42 llama3.1-1b 24999 pretrain_param_only_v6 --resume --param_only
+    depends_on: llama1b_finewebedu_teacher_s42_50B
+  - id: eval_ppl_teacher_llama1b_vanilla_80B_s42
+    run: bash train/eval-base/eval_pretrain_ppl.sh llama1b-vanilla-80B-s42 llama3.1-1b 39999 pretrain_param_only_v6 --resume --param_only
+    depends_on: llama1b_finewebedu_teacher_s42_80B
+  - id: eval_base_acc_teacher_llama1b_vanilla_80B_s42
+    run: bash train/eval-base/eval_base_acc.sh llama1b-vanilla-80B-s42 llama3.1-1b 39999 pretrain_param_only_v6 --resume --param_only
+    depends_on: llama1b_finewebedu_teacher_s42_80B
+  - id: eval_ppl_teacher_llama1b_vanilla_100B_s42
+    run: bash train/eval-base/eval_pretrain_ppl.sh llama1b-vanilla-100B-s42 llama3.1-1b 49999 pretrain_param_only_v6 --resume --param_only
+    depends_on: llama1b_finewebedu_teacher_s42_100B
+  - id: eval_base_acc_teacher_llama1b_vanilla_100B_s42
+    run: bash train/eval-base/eval_base_acc.sh llama1b-vanilla-100B-s42 llama3.1-1b 49999 pretrain_param_only_v6 --resume --param_only
+    depends_on: llama1b_finewebedu_teacher_s42_100B
+  - id: eval_ppl_teacher_llama1b_vanilla_300B_s42
+    run: bash train/eval-base/eval_pretrain_ppl.sh llama1b-vanilla-300B-s42 llama3.1-1b 149999 pretrain_param_only_v6 --resume --param_only
+    depends_on: llama1b_finewebedu_teacher_s42_300B
+  - id: eval_base_acc_teacher_llama1b_vanilla_300B_s42
+    run: bash train/eval-base/eval_base_acc.sh llama1b-vanilla-300B-s42 llama3.1-1b 149999 pretrain_param_only_v6 --resume --param_only
+    depends_on: llama1b_finewebedu_teacher_s42_300B
+  - id: eval_ppl_teacher_llama3b_vanilla_5B_s42
+    run: bash train/eval-base/eval_pretrain_ppl.sh llama3b-vanilla-5B-s42 llama3.1-3b 2499 pretrain_param_only_v6 --resume --param_only
+    depends_on: llama3b_finewebedu_teacher_s42_5B
+  - id: eval_base_acc_teacher_llama3b_vanilla_5B_s42
+    run: bash train/eval-base/eval_base_acc.sh llama3b-vanilla-5B-s42 llama3.1-3b 2499 pretrain_param_only_v6 --resume --param_only
+    depends_on: llama3b_finewebedu_teacher_s42_5B
+  - id: eval_ppl_teacher_llama3b_vanilla_10B_s42
+    run: bash train/eval-base/eval_pretrain_ppl.sh llama3b-vanilla-10B-s42 llama3.1-3b 4999 pretrain_param_only_v6 --resume --param_only
+    depends_on: llama3b_finewebedu_teacher_s42_10B
+  - id: eval_base_acc_teacher_llama3b_vanilla_10B_s42
+    run: bash train/eval-base/eval_base_acc.sh llama3b-vanilla-10B-s42 llama3.1-3b 4999 pretrain_param_only_v6 --resume --param_only
+    depends_on: llama3b_finewebedu_teacher_s42_10B
+  - id: eval_ppl_teacher_llama3b_vanilla_30B_s42
+    run: bash train/eval-base/eval_pretrain_ppl.sh llama3b-vanilla-30B-s42 llama3.1-3b 14999 pretrain_param_only_v6 --resume --param_only
+    depends_on: llama3b_finewebedu_teacher_s42_30B
+  - id: eval_base_acc_teacher_llama3b_vanilla_30B_s42
+    run: bash train/eval-base/eval_base_acc.sh llama3b-vanilla-30B-s42 llama3.1-3b 14999 pretrain_param_only_v6 --resume --param_only
+    depends_on: llama3b_finewebedu_teacher_s42_30B
+  - id: eval_ppl_teacher_llama3b_vanilla_50B_s42
+    run: bash train/eval-base/eval_pretrain_ppl.sh llama3b-vanilla-50B-s42 llama3.1-3b 24999 pretrain_param_only_v6 --resume --param_only
+    depends_on: llama3b_finewebedu_teacher_s42_50B
+  - id: eval_base_acc_teacher_llama3b_vanilla_50B_s42
+    run: bash train/eval-base/eval_base_acc.sh llama3b-vanilla-50B-s42 llama3.1-3b 24999 pretrain_param_only_v6 --resume --param_only
+    depends_on: llama3b_finewebedu_teacher_s42_50B
+  - id: eval_ppl_teacher_llama3b_vanilla_80B_s42
+    run: bash train/eval-base/eval_pretrain_ppl.sh llama3b-vanilla-80B-s42 llama3.1-3b 39999 pretrain_param_only_v6 --resume --param_only
+    depends_on: llama3b_finewebedu_teacher_s42_80B
+  - id: eval_base_acc_teacher_llama3b_vanilla_80B_s42
+    run: bash train/eval-base/eval_base_acc.sh llama3b-vanilla-80B-s42 llama3.1-3b 39999 pretrain_param_only_v6 --resume --param_only
+    depends_on: llama3b_finewebedu_teacher_s42_80B
+  - id: eval_ppl_teacher_llama3b_vanilla_100B_s42
+    run: bash train/eval-base/eval_pretrain_ppl.sh llama3b-vanilla-100B-s42 llama3.1-3b 49999 pretrain_param_only_v6 --resume --param_only
+    depends_on: llama3b_finewebedu_teacher_s42_100B
+  - id: eval_base_acc_teacher_llama3b_vanilla_100B_s42
+    run: bash train/eval-base/eval_base_acc.sh llama3b-vanilla-100B-s42 llama3.1-3b 49999 pretrain_param_only_v6 --resume --param_only
+    depends_on: llama3b_finewebedu_teacher_s42_100B
+  - id: eval_ppl_teacher_llama3b_vanilla_300B_s42
+    run: bash train/eval-base/eval_pretrain_ppl.sh llama3b-vanilla-300B-s42 llama3.1-3b 149999 pretrain_param_only_v6 --resume --param_only
+    depends_on: llama3b_finewebedu_teacher_s42_300B
+  - id: eval_base_acc_teacher_llama3b_vanilla_300B_s42
+    run: bash train/eval-base/eval_base_acc.sh llama3b-vanilla-300B-s42 llama3.1-3b 149999 pretrain_param_only_v6 --resume --param_only
+    depends_on: llama3b_finewebedu_teacher_s42_300B
+  - id: eval_ppl_teacher_llama8b_vanilla_5B_s42
+    run: bash train/eval-base/eval_pretrain_ppl.sh llama8b-vanilla-5B-s42 llama3.1-8b 2499 pretrain_param_only_v6 --resume --param_only
+    depends_on: llama8b_finewebedu_teacher_s42_5B
+  - id: eval_base_acc_teacher_llama8b_vanilla_5B_s42
+    run: bash train/eval-base/eval_base_acc.sh llama8b-vanilla-5B-s42 llama3.1-8b 2499 pretrain_param_only_v6 --resume --param_only
+    depends_on: llama8b_finewebedu_teacher_s42_5B
+  - id: eval_ppl_teacher_llama8b_vanilla_10B_s42
+    run: bash train/eval-base/eval_pretrain_ppl.sh llama8b-vanilla-10B-s42 llama3.1-8b 4999 pretrain_param_only_v6 --resume --param_only
+    depends_on: llama8b_finewebedu_teacher_s42_10B
+  - id: eval_base_acc_teacher_llama8b_vanilla_10B_s42
+    run: bash train/eval-base/eval_base_acc.sh llama8b-vanilla-10B-s42 llama3.1-8b 4999 pretrain_param_only_v6 --resume --param_only
+    depends_on: llama8b_finewebedu_teacher_s42_10B
+  - id: eval_ppl_teacher_llama8b_vanilla_30B_s42
+    run: bash train/eval-base/eval_pretrain_ppl.sh llama8b-vanilla-30B-s42 llama3.1-8b 14999 pretrain_param_only_v6 --resume --param_only
+    depends_on: llama8b_finewebedu_teacher_s42_30B
+  - id: eval_base_acc_teacher_llama8b_vanilla_30B_s42
+    run: bash train/eval-base/eval_base_acc.sh llama8b-vanilla-30B-s42 llama3.1-8b 14999 pretrain_param_only_v6 --resume --param_only
+    depends_on: llama8b_finewebedu_teacher_s42_30B
+  - id: eval_ppl_teacher_llama8b_vanilla_50B_s42
+    run: bash train/eval-base/eval_pretrain_ppl.sh llama8b-vanilla-50B-s42 llama3.1-8b 24999 pretrain_param_only_v6 --resume --param_only
+    depends_on: llama8b_finewebedu_teacher_s42_50B
+  - id: eval_base_acc_teacher_llama8b_vanilla_50B_s42
+    run: bash train/eval-base/eval_base_acc.sh llama8b-vanilla-50B-s42 llama3.1-8b 24999 pretrain_param_only_v6 --resume --param_only
+    depends_on: llama8b_finewebedu_teacher_s42_50B
+  - id: eval_ppl_teacher_llama8b_vanilla_80B_s42
+    run: bash train/eval-base/eval_pretrain_ppl.sh llama8b-vanilla-80B-s42 llama3.1-8b 39999 pretrain_param_only_v6 --resume --param_only
+    depends_on: llama8b_finewebedu_teacher_s42_80B
+  - id: eval_base_acc_teacher_llama8b_vanilla_80B_s42
+    run: bash train/eval-base/eval_base_acc.sh llama8b-vanilla-80B-s42 llama3.1-8b 39999 pretrain_param_only_v6 --resume --param_only
+    depends_on: llama8b_finewebedu_teacher_s42_80B
+  - id: eval_ppl_teacher_llama8b_vanilla_100B_s42
+    run: bash train/eval-base/eval_pretrain_ppl.sh llama8b-vanilla-100B-s42 llama3.1-8b 49999 pretrain_param_only_v6 --resume --param_only
+    depends_on: llama8b_finewebedu_teacher_s42_100B
+  - id: eval_base_acc_teacher_llama8b_vanilla_100B_s42
+    run: bash train/eval-base/eval_base_acc.sh llama8b-vanilla-100B-s42 llama3.1-8b 49999 pretrain_param_only_v6 --resume --param_only
+    depends_on: llama8b_finewebedu_teacher_s42_100B
+  - id: eval_ppl_teacher_llama8b_vanilla_300B_s42
+    run: bash train/eval-base/eval_pretrain_ppl.sh llama8b-vanilla-300B-s42 llama3.1-8b 149999 pretrain_param_only_v6 --resume --param_only
+    depends_on: llama8b_finewebedu_teacher_s42_300B
+  - id: eval_base_acc_teacher_llama8b_vanilla_300B_s42
+    run: bash train/eval-base/eval_base_acc.sh llama8b-vanilla-300B-s42 llama3.1-8b 149999 pretrain_param_only_v6 --resume --param_only
+    depends_on: llama8b_finewebedu_teacher_s42_300B

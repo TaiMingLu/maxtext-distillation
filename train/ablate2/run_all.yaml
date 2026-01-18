@@ -1,80 +1,80 @@
 tasks:
       # ============== qwen03b distillation (teacher: qwen015b) ==============
-      - id: ablate2_qwen03b_A015BT50BS42_a1_s43
-        run: bash train/ablate2/ablate2_qwen03b-A015BT50BS42-a1-s43.sh
-        depends_on: convert_ablate2_qwen015b_finewebedu_vanilla_s42_50b
-      - id: ablate2_qwen03b_A015BT50BS42_a08_s43
-        run: bash train/ablate2/ablate2_qwen03b-A015BT50BS42-a08-s43.sh
-        depends_on: convert_ablate2_qwen015b_finewebedu_vanilla_s42_50b
-      - id: ablate2_qwen03b_A015BT50BS42_a06_s43
-        run: bash train/ablate2/ablate2_qwen03b-A015BT50BS42-a06-s43.sh
-        depends_on: convert_ablate2_qwen015b_finewebedu_vanilla_s42_50b
-      - id: ablate2_qwen03b_A015BT50BS42_a05_s43
-        run: bash train/ablate2/ablate2_qwen03b-A015BT50BS42-a05-s43.sh
-        depends_on: convert_ablate2_qwen015b_finewebedu_vanilla_s42_50b
-      - id: ablate2_qwen03b_A015BT50BS42_a04_s43
-        run: bash train/ablate2/ablate2_qwen03b-A015BT50BS42-a04-s43.sh
-        depends_on: convert_ablate2_qwen015b_finewebedu_vanilla_s42_50b
-      - id: ablate2_qwen03b_A015BT50BS42_a02_s43
-        run: bash train/ablate2/ablate2_qwen03b-A015BT50BS42-a02-s43.sh
-        depends_on: convert_ablate2_qwen015b_finewebedu_vanilla_s42_50b
+      - id: ablate2_qwen03b_A015BT10BS42_a1_s43
+        run: bash train/ablate2/ablate2_qwen03b-A015BT10BS42-a1-s43.sh
+        depends_on: convert_ablate2_qwen015b_finewebedu_vanilla_s42_10b
+      - id: ablate2_qwen03b_A015BT10BS42_a08_s43
+        run: bash train/ablate2/ablate2_qwen03b-A015BT10BS42-a08-s43.sh
+        depends_on: convert_ablate2_qwen015b_finewebedu_vanilla_s42_10b
+      - id: ablate2_qwen03b_A015BT10BS42_a06_s43
+        run: bash train/ablate2/ablate2_qwen03b-A015BT10BS42-a06-s43.sh
+        depends_on: convert_ablate2_qwen015b_finewebedu_vanilla_s42_10b
+      - id: ablate2_qwen03b_A015BT10BS42_a05_s43
+        run: bash train/ablate2/ablate2_qwen03b-A015BT10BS42-a05-s43.sh
+        depends_on: convert_ablate2_qwen015b_finewebedu_vanilla_s42_10b
+      - id: ablate2_qwen03b_A015BT10BS42_a04_s43
+        run: bash train/ablate2/ablate2_qwen03b-A015BT10BS42-a04-s43.sh
+        depends_on: convert_ablate2_qwen015b_finewebedu_vanilla_s42_10b
+      - id: ablate2_qwen03b_A015BT10BS42_a02_s43
+        run: bash train/ablate2/ablate2_qwen03b-A015BT10BS42-a02-s43.sh
+        depends_on: convert_ablate2_qwen015b_finewebedu_vanilla_s42_10b
 
       # ============== qwen03b distillation (teacher: qwen03b) ==============
-      - id: ablate2_qwen03b_A03BT50BS42_a1_s43
-        run: bash train/ablate2/ablate2_qwen03b-A03BT50BS42-a1-s43.sh
-        depends_on: convert_ablate2_qwen03b_finewebedu_vanilla_s42_50b
-      - id: ablate2_qwen03b_A03BT50BS42_a08_s43
-        run: bash train/ablate2/ablate2_qwen03b-A03BT50BS42-a08-s43.sh
-        depends_on: convert_ablate2_qwen03b_finewebedu_vanilla_s42_50b
-      - id: ablate2_qwen03b_A03BT50BS42_a06_s43
-        run: bash train/ablate2/ablate2_qwen03b-A03BT50BS42-a06-s43.sh
-        depends_on: convert_ablate2_qwen03b_finewebedu_vanilla_s42_50b
-      - id: ablate2_qwen03b_A03BT50BS42_a05_s43
-        run: bash train/ablate2/ablate2_qwen03b-A03BT50BS42-a05-s43.sh
-        depends_on: convert_ablate2_qwen03b_finewebedu_vanilla_s42_50b
-      - id: ablate2_qwen03b_A03BT50BS42_a04_s43
-        run: bash train/ablate2/ablate2_qwen03b-A03BT50BS42-a04-s43.sh
-        depends_on: convert_ablate2_qwen03b_finewebedu_vanilla_s42_50b
-      - id: ablate2_qwen03b_A03BT50BS42_a02_s43
-        run: bash train/ablate2/ablate2_qwen03b-A03BT50BS42-a02-s43.sh
-        depends_on: convert_ablate2_qwen03b_finewebedu_vanilla_s42_50b
+      - id: ablate2_qwen03b_A03BT10BS42_a1_s43
+        run: bash train/ablate2/ablate2_qwen03b-A03BT10BS42-a1-s43.sh
+        depends_on: convert_ablate2_qwen03b_finewebedu_vanilla_s42_10b
+      - id: ablate2_qwen03b_A03BT10BS42_a08_s43
+        run: bash train/ablate2/ablate2_qwen03b-A03BT10BS42-a08-s43.sh
+        depends_on: convert_ablate2_qwen03b_finewebedu_vanilla_s42_10b
+      - id: ablate2_qwen03b_A03BT10BS42_a06_s43
+        run: bash train/ablate2/ablate2_qwen03b-A03BT10BS42-a06-s43.sh
+        depends_on: convert_ablate2_qwen03b_finewebedu_vanilla_s42_10b
+      - id: ablate2_qwen03b_A03BT10BS42_a05_s43
+        run: bash train/ablate2/ablate2_qwen03b-A03BT10BS42-a05-s43.sh
+        depends_on: convert_ablate2_qwen03b_finewebedu_vanilla_s42_10b
+      - id: ablate2_qwen03b_A03BT10BS42_a04_s43
+        run: bash train/ablate2/ablate2_qwen03b-A03BT10BS42-a04-s43.sh
+        depends_on: convert_ablate2_qwen03b_finewebedu_vanilla_s42_10b
+      - id: ablate2_qwen03b_A03BT10BS42_a02_s43
+        run: bash train/ablate2/ablate2_qwen03b-A03BT10BS42-a02-s43.sh
+        depends_on: convert_ablate2_qwen03b_finewebedu_vanilla_s42_10b
 
       # ============== qwen03b distillation (teacher: qwen06b) ==============
-      - id: ablate2_qwen03b_A06BT50BS42_a1_s43
-        run: bash train/ablate2/ablate2_qwen03b-A06BT50BS42-a1-s43.sh
-        depends_on: convert_ablate2_qwen06b_finewebedu_vanilla_s42_50b
-      - id: ablate2_qwen03b_A06BT50BS42_a08_s43
-        run: bash train/ablate2/ablate2_qwen03b-A06BT50BS42-a08-s43.sh
-        depends_on: convert_ablate2_qwen06b_finewebedu_vanilla_s42_50b
-      - id: ablate2_qwen03b_A06BT50BS42_a06_s43
-        run: bash train/ablate2/ablate2_qwen03b-A06BT50BS42-a06-s43.sh
-        depends_on: convert_ablate2_qwen06b_finewebedu_vanilla_s42_50b
-      - id: ablate2_qwen03b_A06BT50BS42_a05_s43
-        run: bash train/ablate2/ablate2_qwen03b-A06BT50BS42-a05-s43.sh
-        depends_on: convert_ablate2_qwen06b_finewebedu_vanilla_s42_50b
-      - id: ablate2_qwen03b_A06BT50BS42_a04_s43
-        run: bash train/ablate2/ablate2_qwen03b-A06BT50BS42-a04-s43.sh
-        depends_on: convert_ablate2_qwen06b_finewebedu_vanilla_s42_50b
-      - id: ablate2_qwen03b_A06BT50BS42_a02_s43
-        run: bash train/ablate2/ablate2_qwen03b-A06BT50BS42-a02-s43.sh
-        depends_on: convert_ablate2_qwen06b_finewebedu_vanilla_s42_50b
+      - id: ablate2_qwen03b_A06BT10BS42_a1_s43
+        run: bash train/ablate2/ablate2_qwen03b-A06BT10BS42-a1-s43.sh
+        depends_on: convert_ablate2_qwen06b_finewebedu_vanilla_s42_10b
+      - id: ablate2_qwen03b_A06BT10BS42_a08_s43
+        run: bash train/ablate2/ablate2_qwen03b-A06BT10BS42-a08-s43.sh
+        depends_on: convert_ablate2_qwen06b_finewebedu_vanilla_s42_10b
+      - id: ablate2_qwen03b_A06BT10BS42_a06_s43
+        run: bash train/ablate2/ablate2_qwen03b-A06BT10BS42-a06-s43.sh
+        depends_on: convert_ablate2_qwen06b_finewebedu_vanilla_s42_10b
+      - id: ablate2_qwen03b_A06BT10BS42_a05_s43
+        run: bash train/ablate2/ablate2_qwen03b-A06BT10BS42-a05-s43.sh
+        depends_on: convert_ablate2_qwen06b_finewebedu_vanilla_s42_10b
+      - id: ablate2_qwen03b_A06BT10BS42_a04_s43
+        run: bash train/ablate2/ablate2_qwen03b-A06BT10BS42-a04-s43.sh
+        depends_on: convert_ablate2_qwen06b_finewebedu_vanilla_s42_10b
+      - id: ablate2_qwen03b_A06BT10BS42_a02_s43
+        run: bash train/ablate2/ablate2_qwen03b-A06BT10BS42-a02-s43.sh
+        depends_on: convert_ablate2_qwen06b_finewebedu_vanilla_s42_10b
 
       # ============== qwen03b distillation (teacher: qwen1b) ==============
-      - id: ablate2_qwen03b_A1BT50BS42_a1_s43
-        run: bash train/ablate2/ablate2_qwen03b-A1BT50BS42-a1-s43.sh
-        depends_on: convert_ablate2_qwen1b_finewebedu_vanilla_s42_50b
-      - id: ablate2_qwen03b_A1BT50BS42_a08_s43
-        run: bash train/ablate2/ablate2_qwen03b-A1BT50BS42-a08-s43.sh
-        depends_on: convert_ablate2_qwen1b_finewebedu_vanilla_s42_50b
-      - id: ablate2_qwen03b_A1BT50BS42_a06_s43
-        run: bash train/ablate2/ablate2_qwen03b-A1BT50BS42-a06-s43.sh
-        depends_on: convert_ablate2_qwen1b_finewebedu_vanilla_s42_50b
-      - id: ablate2_qwen03b_A1BT50BS42_a05_s43
-        run: bash train/ablate2/ablate2_qwen03b-A1BT50BS42-a05-s43.sh
-        depends_on: convert_ablate2_qwen1b_finewebedu_vanilla_s42_50b
-      - id: ablate2_qwen03b_A1BT50BS42_a04_s43
-        run: bash train/ablate2/ablate2_qwen03b-A1BT50BS42-a04-s43.sh
-        depends_on: convert_ablate2_qwen1b_finewebedu_vanilla_s42_50b
-      - id: ablate2_qwen03b_A1BT50BS42_a02_s43
-        run: bash train/ablate2/ablate2_qwen03b-A1BT50BS42-a02-s43.sh
-        depends_on: convert_ablate2_qwen1b_finewebedu_vanilla_s42_50b
+      - id: ablate2_qwen03b_A1BT10BS42_a1_s43
+        run: bash train/ablate2/ablate2_qwen03b-A1BT10BS42-a1-s43.sh
+        depends_on: convert_ablate2_qwen1b_finewebedu_vanilla_s42_10b
+      - id: ablate2_qwen03b_A1BT10BS42_a08_s43
+        run: bash train/ablate2/ablate2_qwen03b-A1BT10BS42-a08-s43.sh
+        depends_on: convert_ablate2_qwen1b_finewebedu_vanilla_s42_10b
+      - id: ablate2_qwen03b_A1BT10BS42_a06_s43
+        run: bash train/ablate2/ablate2_qwen03b-A1BT10BS42-a06-s43.sh
+        depends_on: convert_ablate2_qwen1b_finewebedu_vanilla_s42_10b
+      - id: ablate2_qwen03b_A1BT10BS42_a05_s43
+        run: bash train/ablate2/ablate2_qwen03b-A1BT10BS42-a05-s43.sh
+        depends_on: convert_ablate2_qwen1b_finewebedu_vanilla_s42_10b
+      - id: ablate2_qwen03b_A1BT10BS42_a04_s43
+        run: bash train/ablate2/ablate2_qwen03b-A1BT10BS42-a04-s43.sh
+        depends_on: convert_ablate2_qwen1b_finewebedu_vanilla_s42_10b
+      - id: ablate2_qwen03b_A1BT10BS42_a02_s43
+        run: bash train/ablate2/ablate2_qwen03b-A1BT10BS42-a02-s43.sh
+        depends_on: convert_ablate2_qwen1b_finewebedu_vanilla_s42_10b

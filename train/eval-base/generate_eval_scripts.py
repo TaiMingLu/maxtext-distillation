@@ -34,7 +34,8 @@ EXP2_CONFIG = {
     # "tokens": ["10B"],
     # "tokens": ["5B", "10B", "80B"],
     # "alphas": [0.5, 1.0],
-    "alphas": [0.2, 0.4, 0.6, 0.8],
+    # "alphas": [0.2, 0.4, 0.6, 0.8],
+    "alphas": [0.2, 0.4, 0.5, 0.6, 0.8, 1.0],
 }
 
 # Checkpoint steps
