@@ -75,7 +75,7 @@ fi
 
 # Use base model tokenizer (NOT Instruct) since we're evaluating base model
 HF_MODEL_PATH="/home/terry/gcs-bucket/HF_HOME/Llama-3.1-8B"
-EVAL_RESULTS_DIR="/home/terry/gcs-bucket/eval_1229/base_acc_results"
+EVAL_RESULTS_DIR="/home/terry/gcs-bucket/eval_vanilla/base_acc_results"
 RESULT_JSON_PATH="${EVAL_RESULTS_DIR}/${RUN_NAME}_step${CHECKPOINT_STEP}.json"
 
 export XLA_PYTHON_CLIENT_MEM_FRACTION=0.9
