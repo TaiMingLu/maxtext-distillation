@@ -33,12 +33,12 @@ export USE_KD=false
 export BASE_OUTPUT_DIRECTORY="gs://$BUCKET_NAME/ckpts/ablate2"
 export DATA_FILES='/home/terry/gcs-data/datasets/fineweb-edu/*.array_record'
 
-export RUN_NAME="qwen03b_finewebedu_vanilla_s43_10b"
-export RUN_ID="qwen03b_finewebedu_vanilla_s43_10b"
+export RUN_NAME="qwen03b_finewebedu_vanilla_s43_10b_5"
+export RUN_ID="qwen03b_finewebedu_vanilla_s43_10b_5"
 # Distillation parameters
 
 echo "========================"
-echo "running qwen03b_finewebedu_vanilla_s43_10b"
+echo "running qwen03b_finewebedu_vanilla_s43_10b_5"
 echo "parameters:"
 echo "MODEL_NAME: $MODEL_NAME"
 echo "SEQ_LEN: $SEQ_LEN"
