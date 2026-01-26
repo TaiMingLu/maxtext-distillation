@@ -17,6 +17,8 @@
 set +x
 set -eo pipefail
 
+export HF_HUB_DISABLE_XET=1
+
 if [[ $# -lt 4 ]]; then
   echo "Usage: $0 <run_name> <model_name> <checkpoint_step> <ckpt_dir> [--resume]"
   echo "  run_name: Name of the run (e.g., llama3.1-1b-finewebedu-vanilla-s42_v6)"
@@ -68,7 +70,7 @@ else
 fi
 # Use Qwen3 tokenizer for evaluation
 HF_MODEL_PATH="/home/terry/gcs-bucket/HF_HOME/Llama-3.1-8B"
-EVAL_RESULTS_DIR="/home/terry/gcs-bucket/eval_ablate2/ppl_results/"
+EVAL_RESULTS_DIR="/home/terry/gcs-bucket/eval_ablations/ppl_results/"
 RESULT_JSON_PATH="${EVAL_RESULTS_DIR}/${RUN_NAME}_step${CHECKPOINT_STEP}.json"
 
 export XLA_PYTHON_CLIENT_MEM_FRACTION=0.9
