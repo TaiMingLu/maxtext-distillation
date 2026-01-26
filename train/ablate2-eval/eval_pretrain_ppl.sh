@@ -18,6 +18,9 @@ set +x
 set -eo pipefail
 
 export HF_HUB_DISABLE_XET=1
+export HF_HUB_DOWNLOAD_TIMEOUT=600
+export HF_HUB_ETAG_TIMEOUT=600
+
 
 if [[ $# -lt 4 ]]; then
   echo "Usage: $0 <run_name> <model_name> <checkpoint_step> <ckpt_dir> [--resume]"
