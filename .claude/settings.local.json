@@ -7,7 +7,12 @@
       "WebFetch(domain:fig.io)",
       "WebFetch(domain:github.com)",
       "WebFetch(domain:groups.google.com)",
-      "Bash(grep:*)"
+      "Bash(grep:*)",
+      "Bash(find:*)",
+      "Bash(while read f)",
+      "Bash(do sed -i 's|dataset_path: super_glue$|dataset_path: aps/super_glue|g' \"$f\")",
+      "Bash(echo:*)",
+      "Bash(done)"
     ],
     "deny": [],
     "ask": []
