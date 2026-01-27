@@ -573,15 +573,15 @@ def safe_tokenize_batch(tokenizer, texts: list, add_special_tokens: bool = True,
 
 def get_ppl_enc(task, tokenizer, add_special_tokens: bool = True):
     if task == 'wikitext':
-        dataset = load_dataset("wikitext", "wikitext-103-v1", split="train", trust_remote_code=True)
+        dataset = load_dataset("Salesforce/wikitext", "wikitext-103-v1", split="train", trust_remote_code=True)
         text_column = "text"
         testenc = safe_tokenize(tokenizer, "\n\n".join(dataset[:32768][text_column]), add_special_tokens=add_special_tokens)
     elif task == 'wikitext2':
-        dataset = load_dataset("wikitext", "wikitext-2-raw-v1", split="train", trust_remote_code=True)
+        dataset = load_dataset("Salesforce/wikitext", "wikitext-2-raw-v1", split="train", trust_remote_code=True)
         text_column = "text"
         testenc = safe_tokenize(tokenizer, "\n\n".join(dataset[:32768][text_column]), add_special_tokens=add_special_tokens)
     elif task == 'cnn_dailymail':
-        dataset = load_dataset("cnn_dailymail", "3.0.0", split="train", trust_remote_code=True)
+        dataset = load_dataset("abisee/cnn_dailymail", "3.0.0", split="train", trust_remote_code=True)
         text_column = "article"
         testenc = safe_tokenize(tokenizer, " ".join(dataset[:16384][text_column]), add_special_tokens=add_special_tokens)
     elif task == 'c4':

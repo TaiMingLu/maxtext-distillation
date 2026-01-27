@@ -22,6 +22,7 @@ export HF_HUB_DOWNLOAD_TIMEOUT=600
 export HF_HUB_ETAG_TIMEOUT=600
 
 
+
 if [[ $# -lt 4 ]]; then
   echo "Usage: $0 <run_name> <model_name> <checkpoint_step> <ckpt_dir> [--resume]"
   echo "  run_name: Name of the run (e.g., llama3.1-1b-finewebedu-vanilla-s42_v6)"
