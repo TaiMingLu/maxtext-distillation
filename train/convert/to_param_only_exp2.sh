@@ -20,7 +20,7 @@ for var in "${required_vars[@]}"; do
 done
 
 
-for run_dir in $(gsutil ls -d gs://${BUCKET_NAME}/ckpts/exp2/*/); do
+for run_dir in $(gsutil ls -d gs://${BUCKET_NAME}/ckpts/exp1/*/ | grep '_llama'); do
   run_name=$(basename "$run_dir")
   echo "========================================"
   echo "Processing: $run_name"
