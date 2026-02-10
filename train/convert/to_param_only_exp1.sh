@@ -20,7 +20,7 @@ for var in "${required_vars[@]}"; do
 done
 
 
-for run_dir in $(gsutil ls -d gs://${BUCKET_NAME}/ckpts/exp1/*/); do
+for run_dir in $(gsutil ls -d gs://${BUCKET_NAME}/ckpts/exp2/*/); do
   run_name=$(basename "$run_dir")
   echo "========================================"
   echo "Processing: $run_name"
@@ -33,8 +33,8 @@ for run_dir in $(gsutil ls -d gs://${BUCKET_NAME}/ckpts/exp1/*/); do
       export TPU_LOG_DIR=/home/terry/tpu_logs
       source ~/maxtext_env/bin/activate
       python3.10 -u -m MaxText.generate_param_only_checkpoint MaxText/configs/base.yml \
-        load_full_state_path=gs://${BUCKET_NAME}/ckpts/exp1/${run_name}/checkpoints/24999/items \
-        checkpoint_dir=gs://${BUCKET_NAME}/ckpts/exp1_param_only/${run_name}/checkpoints/24999/items \
+        load_full_state_path=gs://${BUCKET_NAME}/ckpts/exp2/${run_name}/checkpoints/24999/items \
+        checkpoint_dir=gs://${BUCKET_NAME}/ckpts/exp2_param_only/${run_name}/checkpoints/24999/items \
         enable_checkpointing=True async_checkpointing=False \
         model_name=llama3.1-1b
       "
