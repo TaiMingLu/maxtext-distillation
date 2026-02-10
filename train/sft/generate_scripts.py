@@ -21,7 +21,7 @@ from itertools import product
 # BEST HYPERPARAMETERS (from sweep)
 # =============================================================================
 SFT_HYPERPARAMS = {
-    "lr": "5e-5",
+    "lr": "1e-5",
     "min_lr_ratio": 0.1,      # Cosine decay to 1/10
     "warmup_ratio": 0.01,     # 1% warmup
     "batch_size": 4,
@@ -125,7 +125,7 @@ export WARMUP_RATIO={warmup_ratio}  # 1% warmup
 export ASYNC_CHECKPOINTING=false
 
 # Pretrained checkpoint to load
-export PRETRAINED_CHECKPOINT="gs://${{BUCKET_NAME}}/ckpts/{checkpoint_path}"
+export PRETRAINED_CHECKPOINT="gs://${{BUCKET_NAME}}/ckpts_copy/{checkpoint_path}"
 # Output directory for SFT checkpoints
 export BASE_OUTPUT_DIRECTORY="gs://$BUCKET_NAME/ckpts/sft"
 
@@ -169,7 +169,7 @@ python -u multihost_runner_orig.py \\
     export TPU_LOG_DIR=/home/terry/tpu_logs
     source ~/maxtext_env/bin/activate
     export WANDB_API_KEY='01126ae90da25bae0d86704140ac978cb9fd9c73'
-    export WANDB_PROJECT=maxtext_sft
+    export WANDB_PROJECT=maxtext_sft1228
     export WANDB_NAME=${{RUN_NAME}}
     python3.10 -u -m MaxText.sft_trainer MaxText/configs/sft.yml \\
         run_name=${{RUN_NAME}} \\
@@ -204,7 +204,7 @@ python -u multihost_runner_orig.py \\
         data_shuffle_seed=43 \\
         gcs_metrics=True \\
         use_wandb=True \\
-        wandb_project=maxtext_sft \\
+        wandb_project=maxtext_sft1228 \\
         wandb_run_name=${{RUN_NAME}} \\
         wandb_run_id=${{RUN_ID}}
     "
@@ -400,7 +400,7 @@ def generate_run_all_yaml(script_infos: list, output_dir: str) -> str:
     for info in script_infos:
         lines.append(f"  - id: {info['run_id']}")
         lines.append(f"    run: bash train/sft/{info['script_name']}")
-        lines.append(f"    hide: true")
+        # lines.append(f"    hide: true")
 
     content = '\n'.join(lines) + '\n'
 
@@ -425,7 +425,7 @@ def generate_eval_all_yaml(script_infos: list, output_dir: str) -> str:
         lines.append(f"  - id: eval_{run_name.replace('-', '_')}")
         lines.append(f"    run: bash train/eval-base/eval_base_acc.sh {run_name} {model_name} {ckpt_step} sft --resume")
         lines.append(f"    depends_on: {sft_task_id}")
-        lines.append(f"    hide: true")
+        # lines.append(f"    hide: true")
 
     content = '\n'.join(lines) + '\n'
 

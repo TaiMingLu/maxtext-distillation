@@ -30,7 +30,7 @@ done
 # Model configuration
 export MODEL_NAME='llama3.1-1b'
 export SEQ_LEN=4096
-export BATCH_SIZE=2  # per-device batch size
+export BATCH_SIZE=4  # per-device batch size
 export GRAD_ACCUM=1
 
 # SFT training hyperparameters
@@ -86,7 +86,7 @@ python -u multihost_runner_orig.py \
     export TPU_LOG_DIR=/home/terry/tpu_logs
     source ~/maxtext_env/bin/activate
     export WANDB_API_KEY='01126ae90da25bae0d86704140ac978cb9fd9c73'
-    export WANDB_PROJECT=maxtext_sft_experiment
+    export WANDB_PROJECT=maxtext_sft_experiment1227
     export WANDB_NAME=${RUN_NAME}
     python3.10 -u -m MaxText.sft_trainer MaxText/configs/sft.yml \
         run_name=${RUN_NAME} \

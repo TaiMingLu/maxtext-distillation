@@ -4,7 +4,7 @@
 # Loads pretrained checkpoint and fine-tunes on Dolci dataset
 #
 # Hyperparameters (from sweep):
-#   - LR: 5e-5 with cosine decay to 0.1
+#   - LR: 1e-5 with cosine decay to 0.1
 #   - Warmup: 0.01
 #   - Batch size: 4, Steps: 4000
 #
@@ -36,13 +36,13 @@ export GRAD_ACCUM=1
 
 # SFT training hyperparameters (best from sweep)
 export NUM_STEPS=4000
-export LR=5e-5
+export LR=1e-5
 export MIN_LR_RATIO=0.1  # Cosine decay to 1/10
 export WARMUP_RATIO=0.01  # 1% warmup
 export ASYNC_CHECKPOINTING=false
 
 # Pretrained checkpoint to load
-export PRETRAINED_CHECKPOINT="gs://${BUCKET_NAME}/ckpts/exp1/exp1_llama3.1-1b-A8BT50BS42-a1-s43/checkpoints/24999/items"
+export PRETRAINED_CHECKPOINT="gs://${BUCKET_NAME}/ckpts_copy/exp1/exp1_llama3.1-1b-A8BT50BS42-a1-s43/checkpoints/24999/items"
 # Output directory for SFT checkpoints
 export BASE_OUTPUT_DIRECTORY="gs://$BUCKET_NAME/ckpts/sft"
 
@@ -86,7 +86,7 @@ python -u multihost_runner_orig.py \
     export TPU_LOG_DIR=/home/terry/tpu_logs
     source ~/maxtext_env/bin/activate
     export WANDB_API_KEY='01126ae90da25bae0d86704140ac978cb9fd9c73'
-    export WANDB_PROJECT=maxtext_sft
+    export WANDB_PROJECT=maxtext_sft1228
     export WANDB_NAME=${RUN_NAME}
     python3.10 -u -m MaxText.sft_trainer MaxText/configs/sft.yml \
         run_name=${RUN_NAME} \
@@ -121,7 +121,7 @@ python -u multihost_runner_orig.py \
         data_shuffle_seed=43 \
         gcs_metrics=True \
         use_wandb=True \
-        wandb_project=maxtext_sft \
+        wandb_project=maxtext_sft1228 \
         wandb_run_name=${RUN_NAME} \
         wandb_run_id=${RUN_ID}
     "

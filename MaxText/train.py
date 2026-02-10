@@ -826,6 +826,14 @@ def setup_train_loop(config, recorder, devices=None):
             if 'base_mlp_dim' in overrides:
               overrides['mlp_dim'] = (2 ** mlp_dim_scale) * overrides['base_mlp_dim']
 
+            # CRITICAL: Also compute num_query_heads and num_kv_heads!
+            # This is required when teacher and student have different head counts (e.g., Qwen models)
+            if 'base_num_query_heads' in overrides:
+              overrides['num_query_heads'] = (2 ** num_head_scale) * overrides['base_num_query_heads']
+
+            if 'base_num_kv_heads' in overrides:
+              overrides['num_kv_heads'] = (2 ** num_head_scale) * overrides['base_num_kv_heads']
+
             object.__setattr__(self, '_overrides', overrides)
 
           def __getattr__(self, key):
@@ -848,6 +856,10 @@ def setup_train_loop(config, recorder, devices=None):
 
         max_logging.log(f"[KD DEBUG] teacher base_emb_dim: {teacher_config.base_emb_dim}")
         max_logging.log(f"[KD DEBUG] teacher base_num_decoder_layers: {teacher_config.base_num_decoder_layers}")
+        max_logging.log(f"[KD DEBUG] teacher base_num_query_heads: {teacher_config.base_num_query_heads}")
+        max_logging.log(f"[KD DEBUG] teacher base_num_kv_heads: {teacher_config.base_num_kv_heads}")
+        max_logging.log(f"[KD DEBUG] teacher num_query_heads (derived): {teacher_config.num_query_heads}")
+        max_logging.log(f"[KD DEBUG] teacher num_kv_heads (derived): {teacher_config.num_kv_heads}")
 
         # Create teacher model with wrapper config
         teacher_model = train_utils.create_model(teacher_config, mesh)

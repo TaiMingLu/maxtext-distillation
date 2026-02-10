@@ -1,0 +1,40 @@
+tasks:
+  # ============== distillation (teacher: A05BT300BS42) ==============
+  - id: ablate1_llama1b-A05BT300BS42-a08-s43
+    run: bash train/ablate1/ablate1_llama1b-A05BT300BS42-a08-s43.sh
+  - id: ablate1_llama1b-A05BT300BS42-a06-s43
+    run: bash train/ablate1/ablate1_llama1b-A05BT300BS42-a06-s43.sh
+  - id: ablate1_llama1b-A05BT300BS42-a05-s43
+    run: bash train/ablate1/ablate1_llama1b-A05BT300BS42-a05-s43.sh
+  - id: ablate1_llama1b-A05BT300BS42-a04-s43
+    run: bash train/ablate1/ablate1_llama1b-A05BT300BS42-a04-s43.sh
+
+  # ============== distillation (teacher: A1BT300BS42) ==============
+  - id: ablate1_llama1b-A1BT300BS42-a08-s43
+    run: bash train/ablate1/ablate1_llama1b-A1BT300BS42-a08-s43.sh
+  - id: ablate1_llama1b-A1BT300BS42-a06-s43
+    run: bash train/ablate1/ablate1_llama1b-A1BT300BS42-a06-s43.sh
+  - id: ablate1_llama1b-A1BT300BS42-a05-s43
+    run: bash train/ablate1/ablate1_llama1b-A1BT300BS42-a05-s43.sh
+  - id: ablate1_llama1b-A1BT300BS42-a04-s43
+    run: bash train/ablate1/ablate1_llama1b-A1BT300BS42-a04-s43.sh
+
+  # ============== distillation (teacher: A3BT300BS42) ==============
+  - id: ablate1_llama1b-A3BT300BS42-a08-s43
+    run: bash train/ablate1/ablate1_llama1b-A3BT300BS42-a08-s43.sh
+  - id: ablate1_llama1b-A3BT300BS42-a06-s43
+    run: bash train/ablate1/ablate1_llama1b-A3BT300BS42-a06-s43.sh
+  - id: ablate1_llama1b-A3BT300BS42-a05-s43
+    run: bash train/ablate1/ablate1_llama1b-A3BT300BS42-a05-s43.sh
+  - id: ablate1_llama1b-A3BT300BS42-a04-s43
+    run: bash train/ablate1/ablate1_llama1b-A3BT300BS42-a04-s43.sh
+
+  # ============== distillation (teacher: A8BT300BS42) ==============
+  - id: ablate1_llama1b-A8BT300BS42-a08-s43
+    run: bash train/ablate1/ablate1_llama1b-A8BT300BS42-a08-s43.sh
+  - id: ablate1_llama1b-A8BT300BS42-a06-s43
+    run: bash train/ablate1/ablate1_llama1b-A8BT300BS42-a06-s43.sh
+  - id: ablate1_llama1b-A8BT300BS42-a05-s43
+    run: bash train/ablate1/ablate1_llama1b-A8BT300BS42-a05-s43.sh
+  - id: ablate1_llama1b-A8BT300BS42-a04-s43
+    run: bash train/ablate1/ablate1_llama1b-A8BT300BS42-a04-s43.sh

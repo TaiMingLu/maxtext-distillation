@@ -1,0 +1,175 @@
+tasks:
+  - id: ablate2_eval_ppl_baseline_qwen03b_finewebedu_vanilla_s43_10b
+    run: bash train/ablate2-eval/eval_pretrain_ppl.sh qwen03b_finewebedu_vanilla_s43_10b qwen3-03b 4999 ablate2 --resume
+    depends_on: ablate2_qwen03b_finewebedu_vanilla_s43_10b
+  - id: ablate2_eval_base_acc_baseline_qwen03b_finewebedu_vanilla_s43_10b
+    run: bash train/ablate2-eval/eval_base_acc.sh qwen03b_finewebedu_vanilla_s43_10b qwen3-03b 4999 ablate2 --resume
+    depends_on: ablate2_qwen03b_finewebedu_vanilla_s43_10b
+  - id: ablate2_eval_ppl_teacher_qwen015b_vanilla_10B_s42
+    run: bash train/ablate2-eval/eval_pretrain_ppl.sh qwen015b-vanilla-10B-s42 qwen3-015b 4999 ablate2_param_only --resume --param_only
+    depends_on: convert_ablate2_qwen015b_finewebedu_vanilla_s42_10b
+  - id: ablate2_eval_base_acc_teacher_qwen015b_vanilla_10B_s42
+    run: bash train/ablate2-eval/eval_base_acc.sh qwen015b-vanilla-10B-s42 qwen3-015b 4999 ablate2_param_only --resume --param_only
+    depends_on: convert_ablate2_qwen015b_finewebedu_vanilla_s42_10b
+  - id: ablate2_eval_ppl_teacher_qwen03b_vanilla_10B_s42
+    run: bash train/ablate2-eval/eval_pretrain_ppl.sh qwen03b-vanilla-10B-s42 qwen3-03b 4999 ablate2_param_only --resume --param_only
+    depends_on: convert_ablate2_qwen03b_finewebedu_vanilla_s42_10b
+  - id: ablate2_eval_base_acc_teacher_qwen03b_vanilla_10B_s42
+    run: bash train/ablate2-eval/eval_base_acc.sh qwen03b-vanilla-10B-s42 qwen3-03b 4999 ablate2_param_only --resume --param_only
+    depends_on: convert_ablate2_qwen03b_finewebedu_vanilla_s42_10b
+  - id: ablate2_eval_ppl_teacher_qwen06b_vanilla_10B_s42
+    run: bash train/ablate2-eval/eval_pretrain_ppl.sh qwen06b-vanilla-10B-s42 qwen3-06b 4999 ablate2_param_only --resume --param_only
+    depends_on: convert_ablate2_qwen06b_finewebedu_vanilla_s42_10b
+  - id: ablate2_eval_base_acc_teacher_qwen06b_vanilla_10B_s42
+    run: bash train/ablate2-eval/eval_base_acc.sh qwen06b-vanilla-10B-s42 qwen3-06b 4999 ablate2_param_only --resume --param_only
+    depends_on: convert_ablate2_qwen06b_finewebedu_vanilla_s42_10b
+  - id: ablate2_eval_ppl_teacher_qwen1b_vanilla_10B_s42
+    run: bash train/ablate2-eval/eval_pretrain_ppl.sh qwen1b-vanilla-10B-s42 qwen3-1b 4999 ablate2_param_only --resume --param_only
+    depends_on: convert_ablate2_qwen1b_finewebedu_vanilla_s42_10b
+  - id: ablate2_eval_base_acc_teacher_qwen1b_vanilla_10B_s42
+    run: bash train/ablate2-eval/eval_base_acc.sh qwen1b-vanilla-10B-s42 qwen3-1b 4999 ablate2_param_only --resume --param_only
+    depends_on: convert_ablate2_qwen1b_finewebedu_vanilla_s42_10b
+  - id: ablate2_eval_ppl_kd_ablate2_qwen03b_A015BT10BS42_a02_s43
+    run: bash train/ablate2-eval/eval_pretrain_ppl.sh ablate2_qwen03b_A015BT10BS42_a02_s43 qwen3-03b 4999 ablate2 --resume
+    depends_on: ablate2_qwen03b_A015BT10BS42_a02_s43
+  - id: ablate2_eval_base_acc_kd_ablate2_qwen03b_A015BT10BS42_a02_s43
+    run: bash train/ablate2-eval/eval_base_acc.sh ablate2_qwen03b_A015BT10BS42_a02_s43 qwen3-03b 4999 ablate2 --resume
+    depends_on: ablate2_qwen03b_A015BT10BS42_a02_s43
+  - id: ablate2_eval_ppl_kd_ablate2_qwen03b_A015BT10BS42_a04_s43
+    run: bash train/ablate2-eval/eval_pretrain_ppl.sh ablate2_qwen03b_A015BT10BS42_a04_s43 qwen3-03b 4999 ablate2 --resume
+    depends_on: ablate2_qwen03b_A015BT10BS42_a04_s43
+  - id: ablate2_eval_base_acc_kd_ablate2_qwen03b_A015BT10BS42_a04_s43
+    run: bash train/ablate2-eval/eval_base_acc.sh ablate2_qwen03b_A015BT10BS42_a04_s43 qwen3-03b 4999 ablate2 --resume
+    depends_on: ablate2_qwen03b_A015BT10BS42_a04_s43
+  - id: ablate2_eval_ppl_kd_ablate2_qwen03b_A015BT10BS42_a05_s43
+    run: bash train/ablate2-eval/eval_pretrain_ppl.sh ablate2_qwen03b_A015BT10BS42_a05_s43 qwen3-03b 4999 ablate2 --resume
+    depends_on: ablate2_qwen03b_A015BT10BS42_a05_s43
+  - id: ablate2_eval_base_acc_kd_ablate2_qwen03b_A015BT10BS42_a05_s43
+    run: bash train/ablate2-eval/eval_base_acc.sh ablate2_qwen03b_A015BT10BS42_a05_s43 qwen3-03b 4999 ablate2 --resume
+    depends_on: ablate2_qwen03b_A015BT10BS42_a05_s43
+  - id: ablate2_eval_ppl_kd_ablate2_qwen03b_A015BT10BS42_a06_s43
+    run: bash train/ablate2-eval/eval_pretrain_ppl.sh ablate2_qwen03b_A015BT10BS42_a06_s43 qwen3-03b 4999 ablate2 --resume
+    depends_on: ablate2_qwen03b_A015BT10BS42_a06_s43
+  - id: ablate2_eval_base_acc_kd_ablate2_qwen03b_A015BT10BS42_a06_s43
+    run: bash train/ablate2-eval/eval_base_acc.sh ablate2_qwen03b_A015BT10BS42_a06_s43 qwen3-03b 4999 ablate2 --resume
+    depends_on: ablate2_qwen03b_A015BT10BS42_a06_s43
+  - id: ablate2_eval_ppl_kd_ablate2_qwen03b_A015BT10BS42_a08_s43
+    run: bash train/ablate2-eval/eval_pretrain_ppl.sh ablate2_qwen03b_A015BT10BS42_a08_s43 qwen3-03b 4999 ablate2 --resume
+    depends_on: ablate2_qwen03b_A015BT10BS42_a08_s43
+  - id: ablate2_eval_base_acc_kd_ablate2_qwen03b_A015BT10BS42_a08_s43
+    run: bash train/ablate2-eval/eval_base_acc.sh ablate2_qwen03b_A015BT10BS42_a08_s43 qwen3-03b 4999 ablate2 --resume
+    depends_on: ablate2_qwen03b_A015BT10BS42_a08_s43
+  - id: ablate2_eval_ppl_kd_ablate2_qwen03b_A015BT10BS42_a1_s43
+    run: bash train/ablate2-eval/eval_pretrain_ppl.sh ablate2_qwen03b_A015BT10BS42_a1_s43 qwen3-03b 4999 ablate2 --resume
+    depends_on: ablate2_qwen03b_A015BT10BS42_a1_s43
+  - id: ablate2_eval_base_acc_kd_ablate2_qwen03b_A015BT10BS42_a1_s43
+    run: bash train/ablate2-eval/eval_base_acc.sh ablate2_qwen03b_A015BT10BS42_a1_s43 qwen3-03b 4999 ablate2 --resume
+    depends_on: ablate2_qwen03b_A015BT10BS42_a1_s43
+  - id: ablate2_eval_ppl_kd_ablate2_qwen03b_A03BT10BS42_a02_s43
+    run: bash train/ablate2-eval/eval_pretrain_ppl.sh ablate2_qwen03b_A03BT10BS42_a02_s43 qwen3-03b 4999 ablate2 --resume
+    depends_on: ablate2_qwen03b_A03BT10BS42_a02_s43
+  - id: ablate2_eval_base_acc_kd_ablate2_qwen03b_A03BT10BS42_a02_s43
+    run: bash train/ablate2-eval/eval_base_acc.sh ablate2_qwen03b_A03BT10BS42_a02_s43 qwen3-03b 4999 ablate2 --resume
+    depends_on: ablate2_qwen03b_A03BT10BS42_a02_s43
+  - id: ablate2_eval_ppl_kd_ablate2_qwen03b_A03BT10BS42_a04_s43
+    run: bash train/ablate2-eval/eval_pretrain_ppl.sh ablate2_qwen03b_A03BT10BS42_a04_s43 qwen3-03b 4999 ablate2 --resume
+    depends_on: ablate2_qwen03b_A03BT10BS42_a04_s43
+  - id: ablate2_eval_base_acc_kd_ablate2_qwen03b_A03BT10BS42_a04_s43
+    run: bash train/ablate2-eval/eval_base_acc.sh ablate2_qwen03b_A03BT10BS42_a04_s43 qwen3-03b 4999 ablate2 --resume
+    depends_on: ablate2_qwen03b_A03BT10BS42_a04_s43
+  - id: ablate2_eval_ppl_kd_ablate2_qwen03b_A03BT10BS42_a05_s43
+    run: bash train/ablate2-eval/eval_pretrain_ppl.sh ablate2_qwen03b_A03BT10BS42_a05_s43 qwen3-03b 4999 ablate2 --resume
+    depends_on: ablate2_qwen03b_A03BT10BS42_a05_s43
+  - id: ablate2_eval_base_acc_kd_ablate2_qwen03b_A03BT10BS42_a05_s43
+    run: bash train/ablate2-eval/eval_base_acc.sh ablate2_qwen03b_A03BT10BS42_a05_s43 qwen3-03b 4999 ablate2 --resume
+    depends_on: ablate2_qwen03b_A03BT10BS42_a05_s43
+  - id: ablate2_eval_ppl_kd_ablate2_qwen03b_A03BT10BS42_a06_s43
+    run: bash train/ablate2-eval/eval_pretrain_ppl.sh ablate2_qwen03b_A03BT10BS42_a06_s43 qwen3-03b 4999 ablate2 --resume
+    depends_on: ablate2_qwen03b_A03BT10BS42_a06_s43
+  - id: ablate2_eval_base_acc_kd_ablate2_qwen03b_A03BT10BS42_a06_s43
+    run: bash train/ablate2-eval/eval_base_acc.sh ablate2_qwen03b_A03BT10BS42_a06_s43 qwen3-03b 4999 ablate2 --resume
+    depends_on: ablate2_qwen03b_A03BT10BS42_a06_s43
+  - id: ablate2_eval_ppl_kd_ablate2_qwen03b_A03BT10BS42_a08_s43
+    run: bash train/ablate2-eval/eval_pretrain_ppl.sh ablate2_qwen03b_A03BT10BS42_a08_s43 qwen3-03b 4999 ablate2 --resume
+    depends_on: ablate2_qwen03b_A03BT10BS42_a08_s43
+  - id: ablate2_eval_base_acc_kd_ablate2_qwen03b_A03BT10BS42_a08_s43
+    run: bash train/ablate2-eval/eval_base_acc.sh ablate2_qwen03b_A03BT10BS42_a08_s43 qwen3-03b 4999 ablate2 --resume
+    depends_on: ablate2_qwen03b_A03BT10BS42_a08_s43
+  - id: ablate2_eval_ppl_kd_ablate2_qwen03b_A03BT10BS42_a1_s43
+    run: bash train/ablate2-eval/eval_pretrain_ppl.sh ablate2_qwen03b_A03BT10BS42_a1_s43 qwen3-03b 4999 ablate2 --resume
+    depends_on: ablate2_qwen03b_A03BT10BS42_a1_s43
+  - id: ablate2_eval_base_acc_kd_ablate2_qwen03b_A03BT10BS42_a1_s43
+    run: bash train/ablate2-eval/eval_base_acc.sh ablate2_qwen03b_A03BT10BS42_a1_s43 qwen3-03b 4999 ablate2 --resume
+    depends_on: ablate2_qwen03b_A03BT10BS42_a1_s43
+  - id: ablate2_eval_ppl_kd_ablate2_qwen03b_A06BT10BS42_a02_s43
+    run: bash train/ablate2-eval/eval_pretrain_ppl.sh ablate2_qwen03b_A06BT10BS42_a02_s43 qwen3-03b 4999 ablate2 --resume
+    depends_on: ablate2_qwen03b_A06BT10BS42_a02_s43
+  - id: ablate2_eval_base_acc_kd_ablate2_qwen03b_A06BT10BS42_a02_s43
+    run: bash train/ablate2-eval/eval_base_acc.sh ablate2_qwen03b_A06BT10BS42_a02_s43 qwen3-03b 4999 ablate2 --resume
+    depends_on: ablate2_qwen03b_A06BT10BS42_a02_s43
+  - id: ablate2_eval_ppl_kd_ablate2_qwen03b_A06BT10BS42_a04_s43
+    run: bash train/ablate2-eval/eval_pretrain_ppl.sh ablate2_qwen03b_A06BT10BS42_a04_s43 qwen3-03b 4999 ablate2 --resume
+    depends_on: ablate2_qwen03b_A06BT10BS42_a04_s43
+  - id: ablate2_eval_base_acc_kd_ablate2_qwen03b_A06BT10BS42_a04_s43
+    run: bash train/ablate2-eval/eval_base_acc.sh ablate2_qwen03b_A06BT10BS42_a04_s43 qwen3-03b 4999 ablate2 --resume
+    depends_on: ablate2_qwen03b_A06BT10BS42_a04_s43
+  - id: ablate2_eval_ppl_kd_ablate2_qwen03b_A06BT10BS42_a05_s43
+    run: bash train/ablate2-eval/eval_pretrain_ppl.sh ablate2_qwen03b_A06BT10BS42_a05_s43 qwen3-03b 4999 ablate2 --resume
+    depends_on: ablate2_qwen03b_A06BT10BS42_a05_s43
+  - id: ablate2_eval_base_acc_kd_ablate2_qwen03b_A06BT10BS42_a05_s43
+    run: bash train/ablate2-eval/eval_base_acc.sh ablate2_qwen03b_A06BT10BS42_a05_s43 qwen3-03b 4999 ablate2 --resume
+    depends_on: ablate2_qwen03b_A06BT10BS42_a05_s43
+  - id: ablate2_eval_ppl_kd_ablate2_qwen03b_A06BT10BS42_a06_s43
+    run: bash train/ablate2-eval/eval_pretrain_ppl.sh ablate2_qwen03b_A06BT10BS42_a06_s43 qwen3-03b 4999 ablate2 --resume
+    depends_on: ablate2_qwen03b_A06BT10BS42_a06_s43
+  - id: ablate2_eval_base_acc_kd_ablate2_qwen03b_A06BT10BS42_a06_s43
+    run: bash train/ablate2-eval/eval_base_acc.sh ablate2_qwen03b_A06BT10BS42_a06_s43 qwen3-03b 4999 ablate2 --resume
+    depends_on: ablate2_qwen03b_A06BT10BS42_a06_s43
+  - id: ablate2_eval_ppl_kd_ablate2_qwen03b_A06BT10BS42_a08_s43
+    run: bash train/ablate2-eval/eval_pretrain_ppl.sh ablate2_qwen03b_A06BT10BS42_a08_s43 qwen3-03b 4999 ablate2 --resume
+    depends_on: ablate2_qwen03b_A06BT10BS42_a08_s43
+  - id: ablate2_eval_base_acc_kd_ablate2_qwen03b_A06BT10BS42_a08_s43
+    run: bash train/ablate2-eval/eval_base_acc.sh ablate2_qwen03b_A06BT10BS42_a08_s43 qwen3-03b 4999 ablate2 --resume
+    depends_on: ablate2_qwen03b_A06BT10BS42_a08_s43
+  - id: ablate2_eval_ppl_kd_ablate2_qwen03b_A06BT10BS42_a1_s43
+    run: bash train/ablate2-eval/eval_pretrain_ppl.sh ablate2_qwen03b_A06BT10BS42_a1_s43 qwen3-03b 4999 ablate2 --resume
+    depends_on: ablate2_qwen03b_A06BT10BS42_a1_s43
+  - id: ablate2_eval_base_acc_kd_ablate2_qwen03b_A06BT10BS42_a1_s43
+    run: bash train/ablate2-eval/eval_base_acc.sh ablate2_qwen03b_A06BT10BS42_a1_s43 qwen3-03b 4999 ablate2 --resume
+    depends_on: ablate2_qwen03b_A06BT10BS42_a1_s43
+  - id: ablate2_eval_ppl_kd_ablate2_qwen03b_A1BT10BS42_a02_s43
+    run: bash train/ablate2-eval/eval_pretrain_ppl.sh ablate2_qwen03b_A1BT10BS42_a02_s43 qwen3-03b 4999 ablate2 --resume
+    depends_on: ablate2_qwen03b_A1BT10BS42_a02_s43
+  - id: ablate2_eval_base_acc_kd_ablate2_qwen03b_A1BT10BS42_a02_s43
+    run: bash train/ablate2-eval/eval_base_acc.sh ablate2_qwen03b_A1BT10BS42_a02_s43 qwen3-03b 4999 ablate2 --resume
+    depends_on: ablate2_qwen03b_A1BT10BS42_a02_s43
+  - id: ablate2_eval_ppl_kd_ablate2_qwen03b_A1BT10BS42_a04_s43
+    run: bash train/ablate2-eval/eval_pretrain_ppl.sh ablate2_qwen03b_A1BT10BS42_a04_s43 qwen3-03b 4999 ablate2 --resume
+    depends_on: ablate2_qwen03b_A1BT10BS42_a04_s43
+  - id: ablate2_eval_base_acc_kd_ablate2_qwen03b_A1BT10BS42_a04_s43
+    run: bash train/ablate2-eval/eval_base_acc.sh ablate2_qwen03b_A1BT10BS42_a04_s43 qwen3-03b 4999 ablate2 --resume
+    depends_on: ablate2_qwen03b_A1BT10BS42_a04_s43
+  - id: ablate2_eval_ppl_kd_ablate2_qwen03b_A1BT10BS42_a05_s43
+    run: bash train/ablate2-eval/eval_pretrain_ppl.sh ablate2_qwen03b_A1BT10BS42_a05_s43 qwen3-03b 4999 ablate2 --resume
+    depends_on: ablate2_qwen03b_A1BT10BS42_a05_s43
+  - id: ablate2_eval_base_acc_kd_ablate2_qwen03b_A1BT10BS42_a05_s43
+    run: bash train/ablate2-eval/eval_base_acc.sh ablate2_qwen03b_A1BT10BS42_a05_s43 qwen3-03b 4999 ablate2 --resume
+    depends_on: ablate2_qwen03b_A1BT10BS42_a05_s43
+  - id: ablate2_eval_ppl_kd_ablate2_qwen03b_A1BT10BS42_a06_s43
+    run: bash train/ablate2-eval/eval_pretrain_ppl.sh ablate2_qwen03b_A1BT10BS42_a06_s43 qwen3-03b 4999 ablate2 --resume
+    depends_on: ablate2_qwen03b_A1BT10BS42_a06_s43
+  - id: ablate2_eval_base_acc_kd_ablate2_qwen03b_A1BT10BS42_a06_s43
+    run: bash train/ablate2-eval/eval_base_acc.sh ablate2_qwen03b_A1BT10BS42_a06_s43 qwen3-03b 4999 ablate2 --resume
+    depends_on: ablate2_qwen03b_A1BT10BS42_a06_s43
+  - id: ablate2_eval_ppl_kd_ablate2_qwen03b_A1BT10BS42_a08_s43
+    run: bash train/ablate2-eval/eval_pretrain_ppl.sh ablate2_qwen03b_A1BT10BS42_a08_s43 qwen3-03b 4999 ablate2 --resume
+    depends_on: ablate2_qwen03b_A1BT10BS42_a08_s43
+  - id: ablate2_eval_base_acc_kd_ablate2_qwen03b_A1BT10BS42_a08_s43
+    run: bash train/ablate2-eval/eval_base_acc.sh ablate2_qwen03b_A1BT10BS42_a08_s43 qwen3-03b 4999 ablate2 --resume
+    depends_on: ablate2_qwen03b_A1BT10BS42_a08_s43
+  - id: ablate2_eval_ppl_kd_ablate2_qwen03b_A1BT10BS42_a1_s43
+    run: bash train/ablate2-eval/eval_pretrain_ppl.sh ablate2_qwen03b_A1BT10BS42_a1_s43 qwen3-03b 4999 ablate2 --resume
+    depends_on: ablate2_qwen03b_A1BT10BS42_a1_s43
+  - id: ablate2_eval_base_acc_kd_ablate2_qwen03b_A1BT10BS42_a1_s43
+    run: bash train/ablate2-eval/eval_base_acc.sh ablate2_qwen03b_A1BT10BS42_a1_s43 qwen3-03b 4999 ablate2 --resume
+    depends_on: ablate2_qwen03b_A1BT10BS42_a1_s43
