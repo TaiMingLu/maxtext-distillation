@@ -199,6 +199,7 @@ def load_model(model_name, ckpt_path, seq_length):
     print(f"  Loading model {model_name} from {ckpt_path}")
 
     config_args = [
+        "",  # argv[0] = program name (unused)
         "MaxText/configs/base.yml",
         f"model_name={model_name}",
         f"load_parameters_path={ckpt_path}",
