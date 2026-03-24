@@ -9,7 +9,7 @@ cd ~/maxtext
 source ~/maxtext_env/bin/activate
 
 BUCKET_NAME="${BUCKET_NAME:?BUCKET_NAME not set}"
-LOCAL_META_PATH="/tmp/meta-ckpt-8b"
+LOCAL_META_PATH="/mnt/ramdisk/meta-ckpt-8b"
 MAXTEXT_PATH="gs://${BUCKET_NAME}/rebuttal/converted/llama3.1-8b-official"
 MODEL_SIZE="llama3.1-8b"
 
