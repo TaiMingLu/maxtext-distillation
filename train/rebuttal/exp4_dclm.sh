@@ -22,13 +22,13 @@ export GRAD_ACCUM=1
 export LR=3.e-4
 export MIN_LR_RATIO=0.1
 export WARMUP_RATIO=0.05
+export ASYNC_CHECKPOINTING=false
 export BASE_OUTPUT_DIRECTORY="gs://$BUCKET_NAME/rebuttal/exp4"
 export DATA_FILES='/home/terry/gcs-bucket/rebuttal/data/dclm/llama3_64_array_record/*.array_record'
 
 case "$CONFIG" in
   baseline)
     export USE_KD=false
-    export KD_ALPHA=0.0
     export RUN_NAME="exp4_dclm_baseline_s43"
     ;;
   weak)
@@ -65,16 +65,15 @@ case "$CONFIG" in
 esac
 
 export KD_TEMPERATURE=1.0
-
 export RUN_ID=$(echo "$RUN_NAME" | tr '-' '_')
 
 echo "RUN_NAME: $RUN_NAME"
 echo "USE_KD: $USE_KD"
 echo "DATA: DCLM"
 
-source ~/maxtext_env/bin/activate
 wandb login --relogin 01126ae90da25bae0d86704140ac978cb9fd9c73
 
+# Build KD args
 KD_ARGS=""
 if [ "$USE_KD" = "true" ]; then
   KD_ARGS="use_kd=true kd_alpha=${KD_ALPHA} kd_temperature=${KD_TEMPERATURE} kd_teacher_parameters_path=${KD_TEACHER_PARAMETERS_PATH}"
@@ -83,36 +82,46 @@ if [ "$USE_KD" = "true" ]; then
   fi
 fi
 
-python3.10 -u -m MaxText.train MaxText/configs/base.yml \
-    run_name=${RUN_NAME} \
-    base_output_directory=${BASE_OUTPUT_DIRECTORY} \
-    dataset_type=grain \
-    grain_train_files=${DATA_FILES} \
-    grain_file_type='arrayrecord' \
-    grain_worker_count=1 \
-    tokenize_train_data=False \
-    tokenize_eval_data=False \
-    max_target_length=${SEQ_LEN} \
-    async_checkpointing=false \
-    original_max_position_embeddings=${SEQ_LEN} \
-    model_name=${MODEL_NAME} \
-    steps=${NUM_STEPS} \
-    per_device_batch_size=${BATCH_SIZE} \
-    gradient_accumulation_steps=${GRAD_ACCUM} \
-    learning_rate=${LR} \
-    cosine_learning_rate_final_fraction=${MIN_LR_RATIO} \
-    warmup_steps_fraction=${WARMUP_RATIO} \
-    checkpoint_period=2500 \
-    checkpoint_max_to_keep=2 \
-    gcs_metrics=True \
-    use_wandb=True \
-    wandb_project=maxtext_1b \
-    wandb_run_name=${RUN_NAME} \
-    wandb_run_id=${RUN_ID} \
-    wandb_resume=relog \
-    wandb_relog_source=auto \
-    packing=true \
-    enable_data_shuffling=true \
-    data_shuffle_seed=43 \
-    init_weights_seed=43 \
-    $KD_ARGS
+python -u multihost_runner_orig.py \
+    --TPU_PREFIX=$TPU_PREFIX \
+    --INTERNAL_IP=true \
+    --COMMAND="
+    export TPU_LOG_DIR=/home/terry/tpu_logs
+    source ~/maxtext_env/bin/activate
+    export WANDB_API_KEY='01126ae90da25bae0d86704140ac978cb9fd9c73'
+    export WANDB_PROJECT=maxtext_1b
+    export WANDB_NAME=${RUN_NAME}
+    python3.10 -u -m MaxText.train MaxText/configs/base.yml \
+        run_name=${RUN_NAME} \
+        base_output_directory=${BASE_OUTPUT_DIRECTORY} \
+        dataset_type=grain \
+        grain_train_files=${DATA_FILES} \
+        grain_file_type='arrayrecord' \
+        grain_worker_count=1 \
+        tokenize_train_data=False \
+        tokenize_eval_data=False \
+        max_target_length=${SEQ_LEN} \
+        async_checkpointing=${ASYNC_CHECKPOINTING} \
+        original_max_position_embeddings=${SEQ_LEN} \
+        model_name=${MODEL_NAME} \
+        steps=${NUM_STEPS} \
+        per_device_batch_size=${BATCH_SIZE} \
+        gradient_accumulation_steps=${GRAD_ACCUM} \
+        learning_rate=${LR} \
+        cosine_learning_rate_final_fraction=${MIN_LR_RATIO} \
+        warmup_steps_fraction=${WARMUP_RATIO} \
+        checkpoint_period=2500 \
+        checkpoint_max_to_keep=2 \
+        gcs_metrics=True \
+        use_wandb=True \
+        wandb_project=maxtext_1b \
+        wandb_run_name=${RUN_NAME} \
+        wandb_run_id=${RUN_ID} \
+        packing=true \
+        enable_data_shuffling=true \
+        data_shuffle_seed=43 \
+        init_weights_seed=43 \
+        wandb_resume=relog \
+        wandb_relog_source=auto \
+        $KD_ARGS
+    "
