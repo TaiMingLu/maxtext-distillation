@@ -161,39 +161,25 @@ for name, info in MODELS.items():
 # Data loading
 # ---------------------------------------------------------------------------
 def load_eval_sequences(tokenizer, data_path, num_sequences, seq_length):
-    """Load and tokenize evaluation sequences from array_record files."""
-    import glob
-    import tensorflow as tf
-    import grain.python as grain
+    """Load and tokenize evaluation sequences.
 
-    files = sorted(glob.glob(os.path.join(data_path, "*.array_record")))
-    if not files:
-        raise FileNotFoundError(f"No array_record files in {data_path}")
+    Uses HuggingFace datasets (wikitext) for consistent eval data,
+    matching the existing eval pipeline in test_orbax_eval.py.
+    data_path is ignored — we use a standard eval corpus instead.
+    """
+    import datasets as hf_datasets
 
-    print(f"Loading {num_sequences} sequences (seq_len={seq_length}) from {len(files)} files...")
+    print(f"Loading {num_sequences} sequences (seq_len={seq_length}) from wikitext-103...")
 
-    # Read raw text from first file(s)
-    sequences = []
-    for fpath in files:
-        if len(sequences) >= num_sequences * 2:  # read extra to ensure enough after tokenization
-            break
-        ds = tf.data.TFRecordDataset(fpath)
-        for raw_record in ds:
-            text = raw_record.numpy().decode("utf-8", errors="replace")
-            if len(text) > 100:  # skip very short docs
-                sequences.append(text)
-            if len(sequences) >= num_sequences * 2:
-                break
+    dataset = hf_datasets.load_dataset(
+        "Salesforce/wikitext", "wikitext-103-v1", split="train", trust_remote_code=True
+    )
+    # Concatenate text and tokenize
+    raw_text = "\n\n".join(dataset[:32768]["text"])
 
-    print(f"  Read {len(sequences)} raw texts, tokenizing...")
+    print(f"  Tokenizing...")
 
-    # Tokenize and chunk into fixed-length sequences
-    all_tokens = []
-    for text in sequences:
-        tokens = tokenizer.encode(text, add_special_tokens=False)
-        all_tokens.extend(tokens)
-        if len(all_tokens) >= num_sequences * seq_length:
-            break
+    all_tokens = tokenizer.encode(raw_text, add_special_tokens=False)
 
     # Chunk into sequences
     total_tokens = (len(all_tokens) // seq_length) * seq_length
