@@ -198,7 +198,6 @@ def load_model(model_name, ckpt_path, seq_length):
     """Load a MaxText model and checkpoint. Returns (forward_fn, params, mesh)."""
     print(f"  Loading model {model_name} from {ckpt_path}")
 
-    # Create config
     config_args = [
         "MaxText/configs/base.yml",
         f"model_name={model_name}",
@@ -211,8 +210,7 @@ def load_model(model_name, ckpt_path, seq_length):
         "run_name=logit_analysis",
         "base_output_directory=gs://taiming_us_central1/rebuttal/exp5_mechanism",
     ]
-    pyconfig.initialize(config_args)
-    config = pyconfig.config
+    config = pyconfig.initialize(config_args)
 
     init_rng = jax.random.PRNGKey(0)
     init_rng, rng1 = jax.random.split(init_rng)
