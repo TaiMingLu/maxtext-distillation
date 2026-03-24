@@ -24,7 +24,7 @@ export USE_KD=true
 export KD_ALPHA=1.0
 export KD_TEMPERATURE=1.0
 export TEACHER_MODEL_NAME='llama3.1-8b'
-export KD_TEACHER_PARAMETERS_PATH="/home/terry/gcs-bucket/rebuttal/converted/llama3.1-8b-official/0/items"
+export KD_TEACHER_PARAMETERS_PATH="/home/terry/gcs-bucket/rebuttal/converted/llama3.1-8b-official-param-only/checkpoints/0/items"
 
 export BASE_OUTPUT_DIRECTORY="gs://$BUCKET_NAME/rebuttal/exp1"
 export DATA_FILES='/home/terry/gcs-bucket/rebuttal/data/fineweb-edu/*.array_record'
