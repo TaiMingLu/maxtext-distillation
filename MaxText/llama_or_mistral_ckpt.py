@@ -813,8 +813,15 @@ def _convert_huggingface_to_jax_weights(base_model_path: str, model_size: str, m
   # logits dense #################################################
   max_logging.log("Processing logits dense")
 
+  if "output.weight" in chkpt_vars:
+    logits_weight = chkpt_vars["output.weight"]
+  else:
+    # tie_word_embeddings=true: output weight is shared with tok_embeddings
+    max_logging.log("  output.weight not found, using tok_embeddings.weight (tied embeddings)")
+    logits_weight = chkpt_vars["tok_embeddings.weight"]
+
   jax_weights["decoder"]["logits_dense"]["kernel"] = (
-      chkpt_vars["output.weight"].to(torch.float32).numpy().astype(CAST_DTYPE).transpose()[:, :vocab_size]
+      logits_weight.to(torch.float32).numpy().astype(CAST_DTYPE).transpose()[:, :vocab_size]
   )
 
   logging.debug("Memory usage: %f GB", mem_info.memory_info().rss / (1024**3))
