@@ -40,23 +40,23 @@ case "$CONFIG" in
     ;;
   same)
     export USE_KD=true
-    export KD_ALPHA=0.2
+    export KD_ALPHA=0.4
     export KD_TEACHER_PARAMETERS_PATH="/home/terry/gcs-bucket/rebuttal/teachers/llama1b-50B-s42/checkpoint_24999/0/items"
-    export RUN_NAME="exp4_dclm_A1B-a02_s43"
+    export RUN_NAME="exp4_dclm_A1B-a04_s43"
     ;;
   strong)
     export USE_KD=true
-    export KD_ALPHA=0.2
+    export KD_ALPHA=0.6
     export KD_TEACHER_PARAMETERS_PATH="/home/terry/gcs-bucket/rebuttal/teachers/llama3b-50B-s42/checkpoint_24999/0/items"
     export TEACHER_MODEL_NAME="llama3.1-3b"
-    export RUN_NAME="exp4_dclm_A3B-a02_s43"
+    export RUN_NAME="exp4_dclm_A3B-a06_s43"
     ;;
   strongest)
     export USE_KD=true
-    export KD_ALPHA=0.2
+    export KD_ALPHA=0.6
     export KD_TEACHER_PARAMETERS_PATH="/home/terry/gcs-bucket/rebuttal/teachers/llama8b-50B-s42/checkpoint_24999/0/items"
     export TEACHER_MODEL_NAME="llama3.1-8b"
-    export RUN_NAME="exp4_dclm_A8B-a02_s43"
+    export RUN_NAME="exp4_dclm_A8B-a06_s43"
     ;;
   *)
     echo "ERROR: config must be baseline|weak|same|strong|strongest"
