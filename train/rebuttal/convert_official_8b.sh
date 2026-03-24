@@ -2,14 +2,14 @@
 set -euo pipefail
 
 # Convert official Llama 3.1 8B to MaxText format.
-# Uses Meta's native .pth format (not safetensors) — same as official MaxText e2e test.
+# Uses Meta's native .pth format — same as official MaxText e2e test.
 # See: end_to_end/tpu/llama3.1/8b/1_test_llama3.1_8b.sh
 
 cd ~/maxtext
 source ~/maxtext_env/bin/activate
 
 BUCKET_NAME="${BUCKET_NAME:?BUCKET_NAME not set}"
-LOCAL_META_PATH="/mnt/ramdisk/meta-ckpt-8b"
+LOCAL_META_PATH="/tmp/meta-ckpt-8b"
 MAXTEXT_PATH="gs://${BUCKET_NAME}/rebuttal/converted/llama3.1-8b-official"
 MODEL_SIZE="llama3.1-8b"
 
@@ -17,7 +17,7 @@ echo "========================================"
 echo "Converting official Llama 3.1 8B"
 echo "========================================"
 
-# Step 1: Copy Meta's native checkpoint to local
+# Step 1: Copy only the Meta native checkpoint files (not the full HF repo)
 rm -rf "$LOCAL_META_PATH"
 mkdir -p "$LOCAL_META_PATH"
 echo "Copying Meta checkpoint from GCS..."
