@@ -21,6 +21,7 @@ echo "========================================"
 python3.10 -m MaxText.llama_or_mistral_ckpt \
   --base-model-path "$HF_PATH" \
   --maxtext-model-path "$MAXTEXT_PATH" \
-  --model-size "$MODEL_SIZE"
+  --model-size "$MODEL_SIZE" \
+  --huggingface-checkpoint=true
 
 echo "Done. Checkpoint at: $MAXTEXT_PATH"

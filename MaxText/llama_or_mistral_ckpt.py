@@ -201,6 +201,15 @@ MODEL_PARAMS_DICT = {
         "vocab": 128256,
         "base_mlp_dim": 8192,
     },
+    "llama3.2-1b-official": {
+        "base_emb_dim": 2048,
+        "num_layers": 16,
+        "num_heads": 32,
+        "num_kv_heads": 8,
+        "dims_per_head": 64,
+        "vocab": 128256,
+        "base_mlp_dim": 8192,
+    },
     "llama3.1-3b": {
         "base_emb_dim": 3072,
         "num_layers": 28,
