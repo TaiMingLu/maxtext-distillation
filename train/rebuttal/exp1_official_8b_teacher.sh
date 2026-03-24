@@ -28,8 +28,10 @@ export KD_TEACHER_PARAMETERS_PATH="/home/terry/gcs-bucket/rebuttal/converted/lla
 export BASE_OUTPUT_DIRECTORY="gs://$BUCKET_NAME/rebuttal/exp1"
 export DATA_FILES='/home/terry/gcs-bucket/rebuttal/data/fineweb-edu/*.array_record'
 export RUN_NAME="exp1_official-8b-teacher_a1-s43"
+export RUN_ID="exp1_official_8b_teacher_a1_s43"
 
 source ~/maxtext_env/bin/activate
+wandb login --relogin 01126ae90da25bae0d86704140ac978cb9fd9c73
 
 python3.10 -u -m MaxText.train MaxText/configs/base.yml \
     run_name=${RUN_NAME} \
@@ -51,8 +53,14 @@ python3.10 -u -m MaxText.train MaxText/configs/base.yml \
     cosine_learning_rate_final_fraction=${MIN_LR_RATIO} \
     warmup_steps_fraction=${WARMUP_RATIO} \
     checkpoint_period=2500 \
-    checkpoint_max_to_keep=5 \
+    checkpoint_max_to_keep=10 \
     gcs_metrics=True \
+    use_wandb=True \
+    wandb_project=maxtext_1b \
+    wandb_run_name=${RUN_NAME} \
+    wandb_run_id=${RUN_ID} \
+    wandb_resume=relog \
+    wandb_relog_source=auto \
     packing=true \
     enable_data_shuffling=true \
     data_shuffle_seed=43 \

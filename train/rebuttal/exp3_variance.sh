@@ -67,12 +67,15 @@ esac
 
 export KD_TEMPERATURE=1.0
 
+export RUN_ID=$(echo "$RUN_NAME" | tr '-' '_')
+
 echo "RUN_NAME: $RUN_NAME"
 echo "USE_KD: $USE_KD"
 echo "KD_ALPHA: ${KD_ALPHA:-N/A}"
 echo "SEED: $SEED"
 
 source ~/maxtext_env/bin/activate
+wandb login --relogin 01126ae90da25bae0d86704140ac978cb9fd9c73
 
 # Build KD args
 KD_ARGS=""
@@ -103,8 +106,14 @@ python3.10 -u -m MaxText.train MaxText/configs/base.yml \
     cosine_learning_rate_final_fraction=${MIN_LR_RATIO} \
     warmup_steps_fraction=${WARMUP_RATIO} \
     checkpoint_period=5000 \
-    checkpoint_max_to_keep=2 \
+    checkpoint_max_to_keep=10 \
     gcs_metrics=True \
+    use_wandb=True \
+    wandb_project=maxtext_1b \
+    wandb_run_name=${RUN_NAME} \
+    wandb_run_id=${RUN_ID} \
+    wandb_resume=relog \
+    wandb_relog_source=auto \
     packing=true \
     enable_data_shuffling=true \
     data_shuffle_seed=${SEED} \
