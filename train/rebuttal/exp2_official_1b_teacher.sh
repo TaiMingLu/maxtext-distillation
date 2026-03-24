@@ -55,7 +55,7 @@ python3.10 -u -m MaxText.train MaxText/configs/base.yml \
     cosine_learning_rate_final_fraction=${MIN_LR_RATIO} \
     warmup_steps_fraction=${WARMUP_RATIO} \
     checkpoint_period=2500 \
-    checkpoint_max_to_keep=10 \
+    checkpoint_max_to_keep=2 \
     gcs_metrics=True \
     use_wandb=True \
     wandb_project=maxtext_1b \
