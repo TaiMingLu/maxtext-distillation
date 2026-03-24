@@ -44,7 +44,7 @@ import jax.numpy as jnp
 from jax.experimental import mesh_utils
 from jax.sharding import Mesh
 from flax.linen import partitioning as nn_partitioning
-from jax import pjit
+from jax.experimental.pjit import pjit
 from transformers import AutoTokenizer
 
 # MaxText imports
