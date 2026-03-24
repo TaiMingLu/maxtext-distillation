@@ -114,8 +114,9 @@ class MetricLogger:
         wandb.init(**init_kwargs)
         # Stash module for later usage without re-importing
         self._wandb = wandb
-      except Exception:  # pylint: disable=broad-except
+      except Exception as e:  # pylint: disable=broad-except
         # If wandb is not available or initialization fails, disable it gracefully.
+        max_logging.log(f"WARNING: wandb initialization failed: {e}")
         self.use_wandb = False
 
   def write_metrics(self, metrics, step, is_training=True):
