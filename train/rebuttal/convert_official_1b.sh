@@ -23,7 +23,7 @@ echo "========================================"
 # Step 1: Copy from GCS to local
 rm -rf "$LOCAL_HF_PATH"
 echo "Copying from GCS to $LOCAL_HF_PATH ..."
-gcloud storage cp -r "gs://${BUCKET_NAME}/rebuttal/hf_models/Llama-3.2-1B" /tmp/
+gcloud storage cp -r "gs://${BUCKET_NAME}/rebuttal/hf_models/Llama-3.2-1B" /dev/shm/
 echo "Copy done. $(du -sh $LOCAL_HF_PATH | cut -f1)"
 
 # Step 2: Convert HF checkpoint to MaxText scanned checkpoint (on CPU)
