@@ -3,7 +3,6 @@
 # Runs PPL evaluation on each model, which produces per-token log-likelihoods.
 # Run on v6e-8.
 
-set -eo pipefail
 cd ~/maxtext
 source ~/maxtext_env/bin/activate
 
@@ -13,6 +12,11 @@ export PYTHONPATH="$(pwd):$(pwd)/lm-evaluation-harness:${PYTHONPATH:-}"
 HF_TOKENIZER="/home/terry/gcs-bucket/rebuttal/hf_models/Llama-3.1-8B"
 EVAL_DIR="/home/terry/gcs-bucket/rebuttal/exp5_mechanism"
 mkdir -p "$EVAL_DIR"
+
+# Install lm-evaluation-harness once upfront
+cd ~/maxtext/lm-evaluation-harness
+pip install -e . -q 2>&1 | tail -3 || echo "WARNING: pip install had issues, continuing..."
+cd ~/maxtext
 
 echo "========================================"
 echo "Exp 5: Mechanism Study"
@@ -35,7 +39,6 @@ run_eval() {
     echo "--- [$LABEL] model=$MODEL ---"
 
     cd ~/maxtext/lm-evaluation-harness
-    pip install -e . -q 2>/dev/null
 
     python3.10 -u scripts/test_orbax_eval.py ../MaxText/configs/base.yml \
         load_parameters_path="$CKPT" \
