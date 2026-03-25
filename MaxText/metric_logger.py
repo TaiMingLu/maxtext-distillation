@@ -175,6 +175,9 @@ class MetricLogger:
           log_message += f", ce_loss: {ce:.3f}"
         if kd is not None:
           log_message += f", kd_loss: {kd:.3f}"
+        teacher_ce = metrics['scalar'].get('learning/teacher_ce')
+        if teacher_ce is not None:
+          log_message += f", teacher_ce: {teacher_ce:.3f}"
 
       max_logging.log(log_message)
 

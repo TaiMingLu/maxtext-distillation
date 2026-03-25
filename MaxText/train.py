@@ -398,6 +398,13 @@ def kd_loss_fn(model, config, data, dropout_rng, params, teacher_params, is_trai
     moe_lb_loss = jnp.mean(jnp.array(total_moe_lb_loss))
     loss += moe_lb_loss
 
+  # Diagnostic: compute teacher's own CE (how well does teacher predict targets?)
+  teacher_ce_total = jnp.float32(0.0)
+  if TEACHER_MODEL is not None:
+    teacher_xent, _ = max_utils.cross_entropy_with_logits(teacher_logits, one_hot_targets, 0.0)
+    teacher_xent = teacher_xent * target_mask
+    teacher_ce_total = jnp.sum(teacher_xent) / (total_weights + EPS)
+
   intermediate_outputs["logits"] = logits
 
   aux = {
@@ -407,6 +414,7 @@ def kd_loss_fn(model, config, data, dropout_rng, params, teacher_params, is_trai
       "moe_lb_loss": moe_lb_loss,
       "mtp_loss": mtp_loss,
       "kd_loss": kd_loss,
+      "teacher_ce": teacher_ce_total,
       "ce_loss": hard_loss,
   }
   return loss, aux
@@ -643,6 +651,7 @@ def train_step(model, config, state_mesh_shardings, state, data, dropout_rng, sp
   else:
     if getattr(config, "use_kd", False):
       scalar_metrics["learning/kd_loss"] = aux.get("kd_loss", 0.0)
+      scalar_metrics["learning/teacher_ce"] = aux.get("teacher_ce", 0.0)
     scalar_metrics["learning/ce_loss"] = aux.get("ce_loss", aux["total_loss"] / (total_weights + EPS))
   if config.sparse_model_training:
     scalar_metrics["learning/zeros"] = zeros
