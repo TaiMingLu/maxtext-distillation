@@ -940,6 +940,24 @@ def setup_train_loop(config, recorder, devices=None):
       except Exception as e:
         max_logging.log(f"[KD CONFIRM] Could not verify teacher param shapes: {e}")
 
+      # DIAGNOSTIC: Check ALL teacher params are real arrays, not abstract
+      abstract_count = 0
+      real_count = 0
+      def _check_all_params(path, value):
+        nonlocal abstract_count, real_count
+        is_real = hasattr(value, 'dtype') and not isinstance(value, jax.ShapeDtypeStruct)
+        if is_real:
+          real_count += 1
+        else:
+          abstract_count += 1
+          max_logging.log(f"[KD WARN] ABSTRACT param at {path}: type={type(value).__name__}, shape={getattr(value, 'shape', '?')}")
+      jax.tree_util.tree_map_with_path(_check_all_params, teacher_params)
+      max_logging.log(f"[KD DIAG] Teacher params: {real_count} real arrays, {abstract_count} abstract. Total leaves: {real_count + abstract_count}")
+
+      # Also log teacher param tree structure
+      param_keys = jax.tree_util.tree_map(lambda x: f"{type(x).__name__}:{getattr(x, 'shape', '?')}", teacher_params)
+      max_logging.log(f"[KD DIAG] Teacher param tree keys: {jax.tree_util.tree_structure(teacher_params)}")
+
       # Merge teacher params and sharding
       state = _merge_kd_state(state, teacher_params)
       teacher_params_sharding = teacher_state_mesh_shardings.params["params"]
