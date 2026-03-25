@@ -30,13 +30,17 @@ run_eval() {
     local LABEL="$3"
     local SAVE_DIR="$EVAL_DIR/$LABEL"
 
-    if [ -f "$SAVE_DIR/results.json" ]; then
+    if [ -f "$SAVE_DIR/exp5_${LABEL}.json" ]; then
         echo "[$LABEL] Already done, skipping."
         return 0
     fi
 
     echo ""
     echo "--- [$LABEL] model=$MODEL ---"
+
+    # Kill any stale JAX/Python processes holding TPU devices
+    pkill -9 -f "python3.10.*test_orbax_eval" 2>/dev/null || true
+    sleep 5
 
     cd ~/maxtext/lm-evaluation-harness
 
