@@ -14,8 +14,8 @@ echo "========================"
 export MODEL_NAME='llama3.1-1b'
 export NUM_STEPS=25000
 export SEQ_LEN=8192
-export BATCH_SIZE=4
-export GRAD_ACCUM=1
+export BATCH_SIZE=2
+export GRAD_ACCUM=2  # Teacher uses dot_product attention (head_dim=64), needs less memory per device
 export LR=3.e-4
 export MIN_LR_RATIO=0.1
 export WARMUP_RATIO=0.05
