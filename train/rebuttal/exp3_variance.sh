@@ -71,8 +71,7 @@ echo "USE_KD: $USE_KD"
 echo "KD_ALPHA: ${KD_ALPHA:-N/A}"
 echo "SEED: $SEED"
 
-source ~/maxtext_env/bin/activate
-wandb login --relogin 01126ae90da25bae0d86704140ac978cb9fd9c73
+~/maxtext_env/bin/wandb login --relogin 01126ae90da25bae0d86704140ac978cb9fd9c73
 
 # Build KD args
 KD_ARGS=""

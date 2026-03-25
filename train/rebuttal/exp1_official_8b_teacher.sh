@@ -31,8 +31,7 @@ export DATA_FILES='/home/terry/gcs-bucket/rebuttal/data/fineweb-edu/*.array_reco
 export RUN_NAME="exp1_official-8b-teacher_a1-s43"
 export RUN_ID="exp1_official_8b_teacher_a1_s43"
 
-source ~/maxtext_env/bin/activate
-wandb login --relogin 01126ae90da25bae0d86704140ac978cb9fd9c73
+~/maxtext_env/bin/wandb login --relogin 01126ae90da25bae0d86704140ac978cb9fd9c73
 
 python -u multihost_runner_orig.py \
     --TPU_PREFIX=$TPU_PREFIX \
