@@ -16,6 +16,7 @@ export PYTHONPATH="$(pwd):$(pwd)/lm-evaluation-harness:${PYTHONPATH:-}"
 
 HF_TOKENIZER="/home/terry/gcs-bucket/rebuttal/hf_models/Llama-3.1-8B"
 SAVE_DIR="/home/terry/gcs-bucket/rebuttal/exp5_mechanism/$LABEL"
+LOGIT_DIR="/home/terry/gcs-bucket/rebuttal/exp5_logits/$LABEL"
 
 # Install lm-eval-harness
 cd lm-evaluation-harness && pip install -e . -q 2>&1 | tail -1 || true
@@ -42,7 +43,8 @@ python3.10 -u scripts/test_orbax_eval.py ../MaxText/configs/base.yml \
     --eval_mode=ppl \
     --eval_save_dir="$SAVE_DIR" \
     --ppl_batch_size=2 \
-    --ppl_seq_length=2048
+    --ppl_seq_length=2048 \
+    --save_logit_data="$LOGIT_DIR"
 
 EXIT_CODE=$?
 echo "=== $LABEL done (exit $EXIT_CODE) ==="

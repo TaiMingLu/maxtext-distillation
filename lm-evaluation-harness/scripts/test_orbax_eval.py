@@ -821,6 +821,9 @@ def get_ppl(
                 if save_logit_data and task in ('finewebedu-test-100M', 'wikitext', 'c4'):
                     flat_logits = shift_logits.reshape(-1, shift_logits.size(-1)).float()
                     flat_labels = shift_labels.reshape(-1)
+                    # Per-token position within sequence (0 to seq_len-2 for each sample)
+                    batch_sz = shift_logits.size(0)
+                    positions = torch.arange(shift_logits.size(1)).unsqueeze(0).expand(batch_sz, -1).reshape(-1)
                     # Per-token log-prob of ground truth
                     log_probs = torch.nn.functional.log_softmax(flat_logits, dim=-1)
                     gt_log_probs = log_probs.gather(1, flat_labels.unsqueeze(1)).squeeze(1)
@@ -830,12 +833,13 @@ def get_ppl(
                     # Top-50 logits and indices
                     top_vals, top_idxs = torch.topk(flat_logits, k=min(50, flat_logits.size(-1)), dim=-1)
                     if '_logit_data' not in dir():
-                        _logit_data = {'gt_log_probs': [], 'entropy': [], 'top_vals': [], 'top_idxs': [], 'labels': []}
+                        _logit_data = {'gt_log_probs': [], 'entropy': [], 'top_vals': [], 'top_idxs': [], 'labels': [], 'positions': []}
                     _logit_data['gt_log_probs'].append(gt_log_probs.cpu())
                     _logit_data['entropy'].append(entropy.cpu())
                     _logit_data['top_vals'].append(top_vals.cpu())
                     _logit_data['top_idxs'].append(top_idxs.cpu())
                     _logit_data['labels'].append(flat_labels.cpu())
+                    _logit_data['positions'].append(positions.cpu())
                 
             ppl_res[task] = torch.exp(torch.tensor(tot_loss / tot_tokens)).item()
             duration_s = time.perf_counter() - start_ts
@@ -856,9 +860,10 @@ def get_ppl(
                     top_vals=torch.cat(_logit_data['top_vals']).numpy(),
                     top_idxs=torch.cat(_logit_data['top_idxs']).numpy(),
                     labels=torch.cat(_logit_data['labels']).numpy(),
+                    positions=torch.cat(_logit_data['positions']).numpy(),
                 )
                 print(f"  -> Saved logit data ({torch.cat(_logit_data['gt_log_probs']).shape[0]} tokens) to {logit_path}")
-                _logit_data = {'gt_log_probs': [], 'entropy': [], 'top_vals': [], 'top_idxs': [], 'labels': []}
+                _logit_data = {'gt_log_probs': [], 'entropy': [], 'top_vals': [], 'top_idxs': [], 'labels': [], 'positions': []}
 
             # Save intermediate results after each task
             if save_callback:
@@ -1434,6 +1439,7 @@ if __name__ == "__main__":
         "--fewshot_as_multiturn",
         "--resume",
         "--batch_scale_factor",
+        "--save_logit_data",
     ]
     for arg in to_remove_args:
         model_args = [s for s in model_args if not s.startswith(arg)]
