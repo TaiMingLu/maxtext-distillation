@@ -1,4 +1,6 @@
 #!/bin/bash
+# Free disk space from old multihost_runner clones and temp files
+rm -rf ~/2026-* /tmp/2026-* 2>/dev/null
 cd ~/maxtext
 source ~/maxtext_env/bin/activate
 export PYTHONPATH="$(pwd):$(pwd)/lm-evaluation-harness:${PYTHONPATH:-}"
