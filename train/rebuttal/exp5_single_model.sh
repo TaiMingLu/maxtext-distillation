@@ -34,15 +34,15 @@ python3.10 -u scripts/test_orbax_eval.py ../MaxText/configs/base.yml \
     load_parameters_path="$CKPT" \
     run_name="exp5_${LABEL}" \
     model_name="$MODEL" \
-    max_target_length=4096 \
+    max_target_length=2048 \
     dtype=bfloat16 \
     scan_layers=true \
     attention=dot_product \
     --hf_model_path="$HF_TOKENIZER" \
     --eval_mode=ppl \
     --eval_save_dir="$SAVE_DIR" \
-    --ppl_batch_size=8 \
-    --ppl_seq_length=4096
+    --ppl_batch_size=2 \
+    --ppl_seq_length=2048
 
 EXIT_CODE=$?
 echo "=== $LABEL done (exit $EXIT_CODE) ==="
