@@ -15,13 +15,13 @@ python3.10 -u scripts/test_orbax_eval.py ../MaxText/configs/base.yml \
     load_parameters_path="/home/terry/gcs-bucket/rebuttal/converted/llama3.2-1b-official/0/items" \
     run_name="debug_official_1b" \
     model_name="llama3.2-1b-official" \
-    max_target_length=4096 \
+    max_target_length=2048 \
     dtype=bfloat16 \
     scan_layers=true \
     --hf_model_path="/home/terry/gcs-bucket/rebuttal/hf_models/Llama-3.1-8B" \
     --eval_mode=ppl \
     --eval_save_dir="/home/terry/gcs-bucket/rebuttal/debug_official_1b" \
-    --ppl_batch_size=4 \
-    --ppl_seq_length=4096
+    --ppl_batch_size=1 \
+    --ppl_seq_length=2048
 
 echo "=== Done ==="
