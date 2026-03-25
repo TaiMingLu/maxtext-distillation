@@ -321,6 +321,17 @@ def kd_loss_fn(model, config, data, dropout_rng, params, teacher_params, is_trai
   )
   teacher_logits = jax.lax.stop_gradient(teacher_logits)
 
+  # Diagnostic: print teacher and student logit stats every 50 steps
+  def _debug_logits(student_l, teacher_l, step_msg=""):
+    s_mean, s_std, s_max = jnp.mean(student_l), jnp.std(student_l), jnp.max(jnp.abs(student_l))
+    t_mean, t_std, t_max = jnp.mean(teacher_l), jnp.std(teacher_l), jnp.max(jnp.abs(teacher_l))
+    jax.debug.print(
+        "LOGIT_DEBUG {s} | student: mean={sm:.4f} std={ss:.4f} max={sx:.4f} | teacher: mean={tm:.4f} std={ts:.4f} max={tx:.4f}",
+        s=step_msg, sm=s_mean, ss=s_std, sx=s_max, tm=t_mean, ts=t_std, tx=t_max,
+    )
+  if TEACHER_MODEL is not None:  # Only for separate teacher architecture (exp2)
+    _debug_logits(logits, teacher_logits)
+
   target_mask = data["targets_segmentation"] != 0
   one_hot_targets = jax.nn.one_hot(data["targets"], config.vocab_size)
   xent, _ = max_utils.cross_entropy_with_logits(logits, one_hot_targets, 0.0)
