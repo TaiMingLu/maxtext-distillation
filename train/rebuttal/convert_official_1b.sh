@@ -9,7 +9,10 @@ cd ~/maxtext
 source ~/maxtext_env/bin/activate
 
 BUCKET_NAME="${BUCKET_NAME:?BUCKET_NAME not set}"
-LOCAL_HF_PATH="/tmp/Llama-3.2-1B"
+# Use /dev/shm (RAM-backed tmpfs) to avoid disk full issues
+LOCAL_HF_PATH="/dev/shm/Llama-3.2-1B"
+# Clean up old files first
+rm -rf ~/2026-* /tmp/2026-* /tmp/Llama-* /dev/shm/Llama-* 2>/dev/null
 MAXTEXT_PATH="gs://${BUCKET_NAME}/rebuttal/converted/llama3.2-1b-official"
 MODEL_SIZE="llama3.2-1b-official"
 
