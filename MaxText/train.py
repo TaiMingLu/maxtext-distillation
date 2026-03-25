@@ -647,6 +647,7 @@ def train_step(model, config, state_mesh_shardings, state, data, dropout_rng, sp
   if config.gradient_accumulation_steps > 1:
     if getattr(config, "use_kd", False):
       scalar_metrics["learning/kd_loss"] = aux_kd_loss_for_log
+      scalar_metrics["learning/teacher_ce"] = aux.get("teacher_ce", 0.0)
     scalar_metrics["learning/ce_loss"] = aux_ce_loss_for_log
   else:
     if getattr(config, "use_kd", False):
