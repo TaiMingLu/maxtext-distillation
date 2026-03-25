@@ -38,9 +38,14 @@ run_eval() {
     echo ""
     echo "--- [$LABEL] model=$MODEL ---"
 
-    # Kill any stale JAX/Python processes holding TPU devices
-    pkill -9 -f "python3.10.*test_orbax_eval" 2>/dev/null || true
-    sleep 5
+    # Force-release TPU devices held by stale JAX processes
+    pkill -9 -f "python3.10" 2>/dev/null || true
+    sleep 3
+    # Release /dev/vfio device handles
+    for vfio in /dev/vfio/*; do
+        fuser -k "$vfio" 2>/dev/null || true
+    done
+    sleep 10
 
     cd ~/maxtext/lm-evaluation-harness
 
