@@ -286,7 +286,7 @@ MODEL_PARAMS_DICT = {
     },
 }
 
-llama3_variants = {"llama3.1", "llama3.3"}
+llama3_variants = {"llama3.1", "llama3.2", "llama3.3"}
 
 SIMULATED_CPU_DEVICES_COUNT = 16
 
