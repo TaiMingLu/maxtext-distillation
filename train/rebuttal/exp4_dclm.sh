@@ -71,6 +71,7 @@ echo "RUN_NAME: $RUN_NAME"
 echo "USE_KD: $USE_KD"
 echo "DATA: DCLM"
 
+source ~/maxtext_env/bin/activate
 wandb login --relogin 01126ae90da25bae0d86704140ac978cb9fd9c73
 
 # Build KD args
