@@ -32,9 +32,9 @@ export DATA_FILES='/home/terry/gcs-bucket/rebuttal/data/fineweb-edu/*.array_reco
 export RUN_NAME="exp2_official-1b-teacher_a1-s43"
 export RUN_ID="exp2_official_1b_teacher_a1_s43"
 
-~/maxtext_env/bin/wandb login --relogin 01126ae90da25bae0d86704140ac978cb9fd9c73
+wandb login --relogin 01126ae90da25bae0d86704140ac978cb9fd9c73 2>/dev/null || true
 
-python -u multihost_runner_orig.py \
+python3.10 -u multihost_runner_orig.py \
     --TPU_PREFIX=$TPU_PREFIX \
     --INTERNAL_IP=true \
     --COMMAND="

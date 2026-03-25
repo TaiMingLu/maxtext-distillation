@@ -71,7 +71,7 @@ echo "USE_KD: $USE_KD"
 echo "KD_ALPHA: ${KD_ALPHA:-N/A}"
 echo "SEED: $SEED"
 
-~/maxtext_env/bin/wandb login --relogin 01126ae90da25bae0d86704140ac978cb9fd9c73
+wandb login --relogin 01126ae90da25bae0d86704140ac978cb9fd9c73 2>/dev/null || true
 
 # Build KD args
 KD_ARGS=""
@@ -82,7 +82,7 @@ if [ "$USE_KD" = "true" ]; then
   fi
 fi
 
-python -u multihost_runner_orig.py \
+python3.10 -u multihost_runner_orig.py \
     --TPU_PREFIX=$TPU_PREFIX \
     --INTERNAL_IP=true \
     --COMMAND="
