@@ -881,6 +881,11 @@ def setup_train_loop(config, recorder, devices=None):
         max_logging.log(f"[KD DEBUG] teacher base_num_kv_heads: {teacher_config.base_num_kv_heads}")
         max_logging.log(f"[KD DEBUG] teacher num_query_heads (derived): {teacher_config.num_query_heads}")
         max_logging.log(f"[KD DEBUG] teacher num_kv_heads (derived): {teacher_config.num_kv_heads}")
+        max_logging.log(f"[KD DEBUG] teacher rope_type: {teacher_config.rope_type}")
+        max_logging.log(f"[KD DEBUG] teacher head_dim: {teacher_config.head_dim}")
+        max_logging.log(f"[KD DEBUG] teacher model_name: {teacher_config.model_name}")
+        max_logging.log(f"[KD DEBUG] teacher attention: {teacher_config.attention}")
+        max_logging.log(f"[KD DEBUG] teacher overrides keys: {list(teacher_overrides.keys())}")
 
         # Create teacher model with wrapper config
         teacher_model = train_utils.create_model(teacher_config, mesh)
