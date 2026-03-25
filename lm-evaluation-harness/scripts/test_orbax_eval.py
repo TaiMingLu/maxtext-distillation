@@ -759,6 +759,7 @@ def get_ppl(
     existing_ppl_results: dict = None,
     existing_ppl_times: dict = None,
     save_callback = None,
+    save_logit_data: str = None,  # Path to save per-token logit data (entropy, top-k, log-probs)
 ):
     """
     Args:
@@ -809,12 +810,32 @@ def get_ppl(
                 
                 shift_logits = lm_logits[:, :-1, :].contiguous()
                 shift_labels = inputs[:, 1:]
-                
+
                 loss_fct = nn.CrossEntropyLoss().to(shift_logits.device)
                 loss = loss_fct(shift_logits.reshape(-1, shift_logits.size(-1)), shift_labels.reshape(-1))
-                
+
                 tot_loss += loss.item() * seq_len * (j - i)
                 tot_tokens += seq_len * (j - i)
+
+                # Collect per-token logit data if requested
+                if save_logit_data and task in ('finewebedu-test-100M', 'wikitext', 'c4'):
+                    flat_logits = shift_logits.reshape(-1, shift_logits.size(-1)).float()
+                    flat_labels = shift_labels.reshape(-1)
+                    # Per-token log-prob of ground truth
+                    log_probs = torch.nn.functional.log_softmax(flat_logits, dim=-1)
+                    gt_log_probs = log_probs.gather(1, flat_labels.unsqueeze(1)).squeeze(1)
+                    # Per-token entropy
+                    probs = torch.nn.functional.softmax(flat_logits, dim=-1)
+                    entropy = -(probs * log_probs).sum(dim=-1)
+                    # Top-50 logits and indices
+                    top_vals, top_idxs = torch.topk(flat_logits, k=min(50, flat_logits.size(-1)), dim=-1)
+                    if '_logit_data' not in dir():
+                        _logit_data = {'gt_log_probs': [], 'entropy': [], 'top_vals': [], 'top_idxs': [], 'labels': []}
+                    _logit_data['gt_log_probs'].append(gt_log_probs.cpu())
+                    _logit_data['entropy'].append(entropy.cpu())
+                    _logit_data['top_vals'].append(top_vals.cpu())
+                    _logit_data['top_idxs'].append(top_idxs.cpu())
+                    _logit_data['labels'].append(flat_labels.cpu())
                 
             ppl_res[task] = torch.exp(torch.tensor(tot_loss / tot_tokens)).item()
             duration_s = time.perf_counter() - start_ts
@@ -823,6 +844,21 @@ def get_ppl(
             if task == "dclm":
                 print("dclm val loss", math.log(ppl_res[task]))
             print_device_memory(f"after PPL task {task}")
+
+            # Save per-token logit data
+            if save_logit_data and '_logit_data' in dir() and _logit_data['gt_log_probs']:
+                import numpy as np
+                logit_path = os.path.join(save_logit_data, f"logits_{task.replace('-', '_').replace('.', '_')}.npz")
+                os.makedirs(save_logit_data, exist_ok=True)
+                np.savez_compressed(logit_path,
+                    gt_log_probs=torch.cat(_logit_data['gt_log_probs']).numpy(),
+                    entropy=torch.cat(_logit_data['entropy']).numpy(),
+                    top_vals=torch.cat(_logit_data['top_vals']).numpy(),
+                    top_idxs=torch.cat(_logit_data['top_idxs']).numpy(),
+                    labels=torch.cat(_logit_data['labels']).numpy(),
+                )
+                print(f"  -> Saved logit data ({torch.cat(_logit_data['gt_log_probs']).shape[0]} tokens) to {logit_path}")
+                _logit_data = {'gt_log_probs': [], 'entropy': [], 'top_vals': [], 'top_idxs': [], 'labels': []}
 
             # Save intermediate results after each task
             if save_callback:
@@ -1234,6 +1270,7 @@ def main(config, test_args):
             existing_ppl_results=ppl_res if test_args.resume else None,
             existing_ppl_times=ppl_times if test_args.resume else None,
             save_callback=save_intermediate_results if save_path else None,
+            save_logit_data=test_args.save_logit_data if test_args.save_logit_data else None,
         )
         print(ppl_res)
         print({"ppl_times_s": ppl_times})
@@ -1362,6 +1399,7 @@ if __name__ == "__main__":
     parser.add_argument("--acc_task_seq_lens", type=str, default="", help="Per-task accuracy sequence lengths, e.g. 'piqa:2304,arc_easy:3000'")
     parser.add_argument("--acc_task_batch_sizes", type=str, default="", help="Per-task accuracy batch sizes, e.g. 'piqa:4,arc_easy:8'")
     parser.add_argument("--eval_mode", type=str, choices=["ppl", "acc", "all"], default="all", help="Evaluation mode: 'ppl' (perplexity only), 'acc' (accuracy only), or 'all' (both)")
+    parser.add_argument("--save_logit_data", type=str, default="", help="Path to save per-token logit data (entropy, top-k, log-probs) for mechanism analysis")
     parser.add_argument("--apply_chat_template", type=str2bool, default=False, help="Apply chat template for ACC evaluation (use True for SFT models, False for pretrained)")
     parser.add_argument("--fewshot_as_multiturn", type=str2bool, default=True, help="Format few-shot examples as multi-turn conversation (recommended for SFT models)")
     parser.add_argument("--resume", type=str2bool, default=False, help="Resume from existing JSON results file, skipping already completed tasks")
