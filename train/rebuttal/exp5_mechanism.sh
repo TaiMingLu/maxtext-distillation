@@ -30,9 +30,15 @@ run_eval() {
     local LABEL="$3"
     local SAVE_DIR="$EVAL_DIR/$LABEL"
 
+    # Check if ALL 13 datasets are in the results file (not just file exists)
     if [ -f "$SAVE_DIR/exp5_${LABEL}.json" ]; then
-        echo "[$LABEL] Already done, skipping."
-        return 0
+        local n_datasets=$(python3.10 -c "import json; d=json.load(open('$SAVE_DIR/exp5_${LABEL}.json')); print(len(d.get('ppl',{})))" 2>/dev/null || echo 0)
+        if [ "$n_datasets" -ge 13 ]; then
+            echo "[$LABEL] All 13 datasets done, skipping."
+            return 0
+        fi
+        echo "[$LABEL] Only $n_datasets/13 datasets, re-running..."
+        rm -f "$SAVE_DIR/exp5_${LABEL}.json"
     fi
 
     echo ""
