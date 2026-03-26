@@ -18,9 +18,12 @@ HF_TOKENIZER="/home/terry/gcs-bucket/rebuttal/hf_models/Llama-3.1-8B"
 SAVE_DIR="/home/terry/gcs-bucket/rebuttal/exp5_mechanism/$LABEL"
 LOGIT_DIR="/home/terry/gcs-bucket/rebuttal/exp5_logits/$LABEL"
 
-# Install lm-eval-harness
-cd lm-evaluation-harness && pip install -e . -q 2>&1 | tail -1 || true
+# Install lm-eval-harness (--no-deps since deps already in venv)
+cd lm-evaluation-harness && pip install -e . --no-deps 2>&1 | tail -3
 cd ~/maxtext
+
+# Verify lm_eval is importable
+python3.10 -c 'import lm_eval' || { echo "FATAL: lm_eval not importable"; exit 1; }
 
 echo "========================================"
 echo "Exp 5: $LABEL (model=$MODEL)"
