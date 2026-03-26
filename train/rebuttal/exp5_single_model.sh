@@ -27,10 +27,11 @@ echo "  Checkpoint: $CKPT"
 echo "  Save dir: $SAVE_DIR"
 echo "========================================"
 
-# Run from repo root so relative paths work
-cd ~/maxtext/lm-evaluation-harness
+# Run from repo root (avoid cd to lm-evaluation-harness — transformers 4.54.1
+# Path("src").resolve() fails with FileNotFoundError in some cwd contexts)
+cd ~/maxtext
 
-python3.10 -u scripts/test_orbax_eval.py ../MaxText/configs/base.yml \
+python3.10 -u lm-evaluation-harness/scripts/test_orbax_eval.py MaxText/configs/base.yml \
     load_parameters_path="$CKPT" \
     run_name="exp5_${LABEL}" \
     model_name="$MODEL" \
