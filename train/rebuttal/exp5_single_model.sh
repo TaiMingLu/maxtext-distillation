@@ -42,8 +42,9 @@ python3.10 -u scripts/test_orbax_eval.py ../MaxText/configs/base.yml \
     --hf_model_path="$HF_TOKENIZER" \
     --eval_mode=ppl \
     --eval_save_dir="$SAVE_DIR" \
-    --ppl_batch_size=2 \
+    --ppl_batch_size=1 \
     --ppl_seq_length=2048 \
+    --tasks=c4,wikitext,finewebedu-test-100M \
     --save_logit_data="$LOGIT_DIR"
 
 EXIT_CODE=$?
