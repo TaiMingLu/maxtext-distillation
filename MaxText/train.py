@@ -914,17 +914,6 @@ def setup_train_loop(config, recorder, devices=None):
       except Exception as e:
         max_logging.log(f"[KD DEBUG] Could not check param shapes: {e}")
 
-      # DIAGNOSTIC: Test teacher model with RANDOM init weights (no checkpoint)
-      # This isolates architecture issues from weight loading issues
-      if TEACHER_MODEL is None:  # Only on first setup
-        try:
-          init_params = teacher_abstract_state.params
-          # Check if init params produce reasonable CE (should be ~ln(vocab) ≈ 11.76 for random)
-          max_logging.log(f"[KD DIAG] Teacher init params type: {type(jax.tree_util.tree_leaves(init_params)[0]).__name__}")
-          max_logging.log(f"[KD DIAG] Teacher init params leaves: {len(jax.tree_util.tree_leaves(init_params))}")
-        except Exception as e:
-          max_logging.log(f"[KD DIAG] Init param check failed: {e}")
-
       # Restore teacher parameters.
       # 1) Try params-only restore using the TEACHER abstract state
       try:
