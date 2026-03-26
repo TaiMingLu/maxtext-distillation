@@ -241,7 +241,10 @@ sudo rm -f /tmp/libtpu_lockfile"""
 
 def scps(slices, run_name_dir, zip_name):
   """ Zip the script directory, scp it to the TPUs, and unzip it there. """
-  original_working_directory = os.getcwd()
+  try:
+    original_working_directory = os.getcwd()
+  except FileNotFoundError:
+    original_working_directory = args.SCRIPT_DIR
   os.chdir(args.SCRIPT_DIR) # To tar script_dir, it is most convenient to cd there.
 
   # Zip script directory
