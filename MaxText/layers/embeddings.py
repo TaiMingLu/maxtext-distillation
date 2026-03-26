@@ -396,9 +396,7 @@ class LLaMARotaryEmbedding(RotaryEmbedding):
   def timescale(self):
     half_embedding_dim = self.embedding_dims // 2
     fraction = 2 * jnp.arange(0, half_embedding_dim) / self.embedding_dims
-    # NOTE: removed jnp.repeat(fraction, 2) — the parent __call__ splits inputs
-    # into D/2 halves, so timescale must be D/2 length (not D)
-    timescale = self.min_timescale * (self.max_timescale / self.min_timescale) ** fraction
+    timescale = self.min_timescale * (self.max_timescale / self.min_timescale) ** jnp.repeat(fraction, 2)
 
     # Apply scaling factor if enabled
     if self.use_scale:
