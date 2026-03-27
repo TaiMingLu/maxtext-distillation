@@ -472,6 +472,10 @@ def loss_fn(model, config, data, dropout_rng, params, is_train=True):
   # jax.debug.print("logits={}", logits)
   
   one_hot_targets = jax.nn.one_hot(data["targets"], config.vocab_size)
+  # Apply label smoothing if configured
+  if config.label_smoothing > 0:
+    eps = config.label_smoothing
+    one_hot_targets = (1.0 - eps) * one_hot_targets + eps / config.vocab_size
   xent, _ = max_utils.cross_entropy_with_logits(logits, one_hot_targets, 0.0)
   xent = nn.with_logical_constraint(xent, ("activation_embed_and_logits_batch", "activation_length"))
   # Mask out paddings at the end of each example.
