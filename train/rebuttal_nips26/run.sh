@@ -38,12 +38,23 @@ USE_KD=false
 TEACHER_MODEL_NAME=""
 
 case "$TASK" in
-  # ---- L2: new-seed pair @50B (pairs with paper runs at seed 43) ----
+  # ---- L2: new-seed runs @50B (pair with paper runs at seed 43) ----
   l2_baseline_s44)
     SEED=44; NUM_STEPS=25000 ;;
+  l2_baseline_s45)
+    SEED=45; NUM_STEPS=25000 ;;
   l2_same_s44)
     SEED=44; NUM_STEPS=25000; USE_KD=true; KD_ALPHA=0.2
     KD_TEACHER_PARAMETERS_PATH="${T_DIR}/llama1b-50B-s42/checkpoint_24999/0/items" ;;
+  l2_same_s45)
+    SEED=45; NUM_STEPS=25000; USE_KD=true; KD_ALPHA=0.2
+    KD_TEACHER_PARAMETERS_PATH="${T_DIR}/llama1b-50B-s42/checkpoint_24999/0/items" ;;
+  l2_weak_s44)
+    SEED=44; NUM_STEPS=25000; USE_KD=true; KD_ALPHA=0.2; TEACHER_MODEL_NAME='llama3.1-05b'
+    KD_TEACHER_PARAMETERS_PATH="${T_DIR}/llama05b-50B-s42/checkpoint_24999/0/items" ;;
+  l2_weak_s45)
+    SEED=45; NUM_STEPS=25000; USE_KD=true; KD_ALPHA=0.2; TEACHER_MODEL_NAME='llama3.1-05b'
+    KD_TEACHER_PARAMETERS_PATH="${T_DIR}/llama05b-50B-s42/checkpoint_24999/0/items" ;;
 
   # ---- L4: inverted compute-match — distill on fewer tokens, total FLOPs = 50B baseline ----
   l4_inverted_same)
