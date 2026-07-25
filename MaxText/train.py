@@ -362,15 +362,27 @@ def kd_loss_fn(model, config, data, dropout_rng, params, teacher_params, is_trai
   else:
     top_k_arg = int(kd_top_k) if kd_top_k and kd_top_k > 0 else None
     top_p_arg = float(kd_top_p) if kd_top_p and kd_top_p > 0.0 else None
-    # Use efficient version to avoid OOM with large vocabularies
-    kd_kl = max_utils.kl_divergence_between_logits_efficient(
-        logits,
-        teacher_logits,
-        kd_temperature,
-        top_k=top_k_arg,
-        top_p=top_p_arg,
-        use_other_bucket=kd_use_other_bucket,
-    )
+    # Use efficient version to avoid OOM with large vocabularies.
+    # kd_loss_type=reverse_kl computes KL(student || teacher) by swapping the
+    # argument roles (the helper computes KL(arg2 || arg1)).
+    if getattr(config, "kd_loss_type", "forward_kl") == "reverse_kl":
+      kd_kl = max_utils.kl_divergence_between_logits_efficient(
+          teacher_logits,
+          logits,
+          kd_temperature,
+          top_k=top_k_arg,
+          top_p=top_p_arg,
+          use_other_bucket=kd_use_other_bucket,
+      )
+    else:
+      kd_kl = max_utils.kl_divergence_between_logits_efficient(
+          logits,
+          teacher_logits,
+          kd_temperature,
+          top_k=top_k_arg,
+          top_p=top_p_arg,
+          use_other_bucket=kd_use_other_bucket,
+      )
     kd_kl = kd_kl * target_mask
     total_kd = jnp.sum(kd_kl)
     kd_loss = (total_kd / (total_weights + EPS)) * (kd_temperature * kd_temperature)

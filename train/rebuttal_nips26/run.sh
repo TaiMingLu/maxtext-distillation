@@ -96,10 +96,39 @@ case "$TASK" in
   l3_base_17p4B) SEED=43; NUM_STEPS=8300  ;;
   l3_base_24p7B) SEED=43; NUM_STEPS=11780 ;;
 
+  # ---- L6b: objective ablations @10B (counterparts of l3_distill_{1b,8b}) ----
+  l6_revkl_1b)
+    SEED=43; NUM_STEPS=5000; USE_KD=true; KD_ALPHA=0.2; KD_LOSS_TYPE=reverse_kl
+    KD_TEACHER_PARAMETERS_PATH="${T_DIR}/llama1b-50B-s42/checkpoint_24999/0/items" ;;
+  l6_topk_8b)
+    SEED=43; NUM_STEPS=5000; USE_KD=true; KD_ALPHA=0.8; KD_TOP_K=100; TEACHER_MODEL_NAME='llama3.1-8b'
+    KD_TEACHER_PARAMETERS_PATH="${T_DIR}/llama8b-50B-s42/checkpoint_24999/0/items" ;;
+
+  # ---- L7: piecewise alpha schedules @10B (fTyB Q2). Two phases resume the same run_name;
+  #      constant-alpha controls are l3_distill_{05b,1b} (alpha=0.2 = phase average). ----
+  l7_rampup_1b_p1)
+    SEED=43; NUM_STEPS=2500; CKPT_PERIOD=2500; USE_KD=true; KD_ALPHA=0.1; RUN_BASE=l7_rampup_1b
+    KD_TEACHER_PARAMETERS_PATH="${T_DIR}/llama1b-50B-s42/checkpoint_24999/0/items" ;;
+  l7_rampup_1b_p2)
+    SEED=43; NUM_STEPS=5000; CKPT_PERIOD=2500; USE_KD=true; KD_ALPHA=0.3; RUN_BASE=l7_rampup_1b
+    KD_TEACHER_PARAMETERS_PATH="${T_DIR}/llama1b-50B-s42/checkpoint_24999/0/items" ;;
+  l7_rampdown_1b_p1)
+    SEED=43; NUM_STEPS=2500; CKPT_PERIOD=2500; USE_KD=true; KD_ALPHA=0.3; RUN_BASE=l7_rampdown_1b
+    KD_TEACHER_PARAMETERS_PATH="${T_DIR}/llama1b-50B-s42/checkpoint_24999/0/items" ;;
+  l7_rampdown_1b_p2)
+    SEED=43; NUM_STEPS=5000; CKPT_PERIOD=2500; USE_KD=true; KD_ALPHA=0.1; RUN_BASE=l7_rampdown_1b
+    KD_TEACHER_PARAMETERS_PATH="${T_DIR}/llama1b-50B-s42/checkpoint_24999/0/items" ;;
+  l7_rampup_05b_p1)
+    SEED=43; NUM_STEPS=2500; CKPT_PERIOD=2500; USE_KD=true; KD_ALPHA=0.1; RUN_BASE=l7_rampup_05b; TEACHER_MODEL_NAME='llama3.1-05b'
+    KD_TEACHER_PARAMETERS_PATH="${T_DIR}/llama05b-50B-s42/checkpoint_24999/0/items" ;;
+  l7_rampup_05b_p2)
+    SEED=43; NUM_STEPS=5000; CKPT_PERIOD=2500; USE_KD=true; KD_ALPHA=0.3; RUN_BASE=l7_rampup_05b; TEACHER_MODEL_NAME='llama3.1-05b'
+    KD_TEACHER_PARAMETERS_PATH="${T_DIR}/llama05b-50B-s42/checkpoint_24999/0/items" ;;
+
   *) echo "ERROR: unknown task '$TASK'"; exit 1 ;;
 esac
 
-export RUN_NAME="nips26_${TASK}"
+export RUN_NAME="nips26_${RUN_BASE:-$TASK}"
 export RUN_ID=$(echo "$RUN_NAME" | tr '-' '_')
 
 echo "========================================"
@@ -114,6 +143,12 @@ if [ "$USE_KD" = "true" ]; then
   KD_ARGS="use_kd=true kd_alpha=${KD_ALPHA} kd_temperature=${KD_TEMPERATURE} kd_teacher_parameters_path=${KD_TEACHER_PARAMETERS_PATH}"
   if [ -n "${TEACHER_MODEL_NAME:-}" ]; then
     KD_ARGS="$KD_ARGS kd_teacher_model_name=${TEACHER_MODEL_NAME}"
+  fi
+  if [ -n "${KD_LOSS_TYPE:-}" ]; then
+    KD_ARGS="$KD_ARGS kd_loss_type=${KD_LOSS_TYPE}"
+  fi
+  if [ -n "${KD_TOP_K:-}" ]; then
+    KD_ARGS="$KD_ARGS kd_top_k=${KD_TOP_K}"
   fi
 fi
 
@@ -145,7 +180,7 @@ python3.10 -u multihost_runner_orig.py \
         learning_rate=${LR} \
         cosine_learning_rate_final_fraction=${MIN_LR_RATIO} \
         warmup_steps_fraction=${WARMUP_RATIO} \
-        checkpoint_period=5000 \
+        checkpoint_period=${CKPT_PERIOD:-5000} \
         checkpoint_max_to_keep=2 \
         gcs_metrics=True \
         use_wandb=True \
