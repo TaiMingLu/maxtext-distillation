@@ -90,6 +90,52 @@ case "$TASK" in
     SEED=43; NUM_STEPS=5000; USE_KD=true; KD_ALPHA=0.8; KD_TEMPERATURE=2.0; TEACHER_MODEL_NAME='llama3.1-8b'
     KD_TEACHER_PARAMETERS_PATH="/home/terry/gcs-bucket/rebuttal/converted/llama3.1-8b-official/0/items" ;;
 
+  # ---- Wave 2 (2026-07-27): more seeds @50B ----
+  l2_baseline_s46)
+    SEED=46; NUM_STEPS=25000 ;;
+  l2_same_s46)
+    SEED=46; NUM_STEPS=25000; USE_KD=true; KD_ALPHA=0.2
+    KD_TEACHER_PARAMETERS_PATH="${T_DIR}/llama1b-50B-s42/checkpoint_24999/0/items" ;;
+  l2_weak_s46)
+    SEED=46; NUM_STEPS=25000; USE_KD=true; KD_ALPHA=0.2; TEACHER_MODEL_NAME='llama3.1-05b'
+    KD_TEACHER_PARAMETERS_PATH="${T_DIR}/llama05b-50B-s42/checkpoint_24999/0/items" ;;
+  l2_same_s44_a04)
+    SEED=44; NUM_STEPS=25000; USE_KD=true; KD_ALPHA=0.4
+    KD_TEACHER_PARAMETERS_PATH="${T_DIR}/llama1b-50B-s42/checkpoint_24999/0/items" ;;
+
+  # ---- Wave 2: identical-data control alpha sweep ----
+  l5_distill_identical_a02)
+    SEED=43; NUM_STEPS=25000; USE_KD=true; KD_ALPHA=0.2
+    KD_TEACHER_PARAMETERS_PATH="/home/terry/gcs-bucket/rebuttal/param_only/nips26_l5_teacher_identical/checkpoint_24999/0/items" ;;
+  l5_distill_identical_a06)
+    SEED=43; NUM_STEPS=25000; USE_KD=true; KD_ALPHA=0.6
+    KD_TEACHER_PARAMETERS_PATH="/home/terry/gcs-bucket/rebuttal/param_only/nips26_l5_teacher_identical/checkpoint_24999/0/items" ;;
+
+  # ---- Wave 2: inverted compute-match, remaining teachers (distill tokens = 50B-baseline FLOPs) ----
+  l4_inverted_weak)
+    SEED=43; NUM_STEPS=20460; USE_KD=true; KD_ALPHA=0.2; TEACHER_MODEL_NAME='llama3.1-05b'
+    KD_TEACHER_PARAMETERS_PATH="${T_DIR}/llama05b-50B-s42/checkpoint_24999/0/items" ;;
+  l4_inverted_3b)
+    SEED=43; NUM_STEPS=13680; USE_KD=true; KD_ALPHA=0.6; TEACHER_MODEL_NAME='llama3.1-3b'
+    KD_TEACHER_PARAMETERS_PATH="${T_DIR}/llama3b-50B-s42/checkpoint_24999/0/items" ;;
+  l4_inverted_8b)
+    SEED=43; NUM_STEPS=9640; USE_KD=true; KD_ALPHA=0.8; TEACHER_MODEL_NAME='llama3.1-8b'
+    KD_TEACHER_PARAMETERS_PATH="${T_DIR}/llama8b-50B-s42/checkpoint_24999/0/items" ;;
+
+  # ---- Wave 2: objective ablations at a second teacher (@10B) ----
+  l6_revkl_3b)
+    SEED=43; NUM_STEPS=5000; USE_KD=true; KD_ALPHA=0.6; KD_LOSS_TYPE=reverse_kl; TEACHER_MODEL_NAME='llama3.1-3b'
+    KD_TEACHER_PARAMETERS_PATH="${T_DIR}/llama3b-50B-s42/checkpoint_24999/0/items" ;;
+  l6_tau2_8b50b)
+    SEED=43; NUM_STEPS=5000; USE_KD=true; KD_ALPHA=0.8; KD_TEMPERATURE=2.0; TEACHER_MODEL_NAME='llama3.1-8b'
+    KD_TEACHER_PARAMETERS_PATH="${T_DIR}/llama8b-50B-s42/checkpoint_24999/0/items" ;;
+
+  # ---- Wave 2: empirical label-smoothing baselines (@10B, no KD; App J.4 control) ----
+  l8_labelsmooth_01)
+    SEED=43; NUM_STEPS=5000; LABEL_SMOOTHING=0.1 ;;
+  l8_labelsmooth_005)
+    SEED=43; NUM_STEPS=5000; LABEL_SMOOTHING=0.05 ;;
+
   # ---- L3 baseline side: standard pretraining at compute-matched token budgets ----
   l3_base_11p7B) SEED=43; NUM_STEPS=5580  ;;
   l3_base_13p3B) SEED=43; NUM_STEPS=6340  ;;
@@ -150,6 +196,9 @@ if [ "$USE_KD" = "true" ]; then
   if [ -n "${KD_TOP_K:-}" ]; then
     KD_ARGS="$KD_ARGS kd_top_k=${KD_TOP_K}"
   fi
+fi
+if [ -n "${LABEL_SMOOTHING:-}" ]; then
+  KD_ARGS="$KD_ARGS label_smoothing=${LABEL_SMOOTHING}"
 fi
 
 python3.10 -u multihost_runner_orig.py \
